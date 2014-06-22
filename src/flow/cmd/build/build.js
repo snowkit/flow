@@ -3,36 +3,48 @@
         , cmds = require('../')
         , fs = require('graceful-fs')
 
+
+//Build step
+
+
     exports.run = function run(flow, opt) {
 
             //default to the system if no target specified
         flow.target = opt.target || flow.system;
-            //set the project file if specified
-        flow.project.file = opt.project;
+            //set the project values
+        flow.project.parsed = opt.project.parsed;
+        flow.project.path = opt.project.path;
+        flow.project.file = opt.project.file;
 
             //not a normal build, but building a library
             //we defer this to it's own file
         if(flow.flags.lib) {
             flow.execute(flow, cmds['_build_lib']);
         } else {
-            console.log('flow / building for %s', flow.target);
+            console.log('flow / building %s %s for %s',
+                flow.project.parsed.name, flow.project.parsed.version, flow.target);
         }
 
     }; //run
+
+
+//Verification step
+
 
     exports.verify = function verify(flow, done) {
 
         var result = {};
         var target = flow.flags._next('build') || flow.flags._next('try');
 
-        var project_state = flow.project.verify(flow);
+        var project = flow.project.verify(flow);
 
-        if(!project_state.valid) {
-            return done( exports._error_project(flow, project_state.reason), null );
+            //if no valid project was found
+        if(!project.parsed) {
+            return done( exports._error_project(flow, project.reason), null );
         }
 
         result.target = target;
-        result.project = project_state.path;
+        result.project = project;
 
         if(target && target.charAt(0) != '-') {
 
@@ -61,6 +73,10 @@
         done(null, result);
 
     }; //verify
+
+
+//Error handlers
+
 
     exports.error = function error(flow, err) {
 

@@ -3,11 +3,12 @@
 
 exports.run = function run(flow, data) {
 
-    if(!flow.project.current) {
+    if(!flow.project.parsed) {
         return;
     }
 
-    console.log('flow / running %s', flow.target);
+    console.log('flow / running %s %s for %s',
+        flow.project.parsed.name, flow.project.parsed.version, flow.target);
 
 } //run
 
