@@ -2,7 +2,7 @@
 //helpers for simple process use
 
 var   exec = require('child_process').exec
-    , fs = require('graceful-fs')
+    , fs = require('fs')
     , os = require('os')
     , path = require('path')
     , util = require('./util')

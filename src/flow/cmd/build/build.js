@@ -1,18 +1,11 @@
 
-    var   config = require('./config')
-        , cmds = require('../')
-        , fs = require('graceful-fs')
+    var config = require('./config');
+    var cmds = require('../');
 
-    exports.run = function run(flow, opt) {
+    exports.run = function run(flow, target) {
 
             //default to the system if no target specified
-        flow.target = opt.target || flow.system;
-            //set the project file if specified
-        flow.project.file = opt.project_file;
-            //parse the project details
-        if(!flow.project.parse(flow)) {
-            return;
-        }
+        flow.target = target || flow.system;
 
             //not a normal build, but building a library
             //we defer this to it's own file
@@ -26,17 +19,7 @@
 
     exports.verify = function verify(flow, done) {
 
-        var result = {};
         var target = flow.flags._next('build') || flow.flags._next('try');
-
-        var project_file = flow.project.verify(flow);
-
-        if(!project_file) {
-            return done( exports._error_project(flow), null );
-        }
-
-        result.target = target;
-        result.project_file = project_file;
 
         if(target && target.charAt(0) != '-') {
 
@@ -52,7 +35,7 @@
                     return done( exports._error_invalid(flow, target), null );
                 }
 
-                return done(null, result);
+                return done(null, target);
 
             } else {
 
@@ -62,7 +45,7 @@
 
         } //target && target[0] != -
 
-        done(null, result);
+        done(null, target);
 
     }; //verify
 
@@ -75,12 +58,6 @@
         }
 
     }; //error
-
-    exports._error_project = function(flow, file){
-
-        return 'cannot find project file ' + flow.project.default;
-
-    } //_error_project
 
     exports._error_unknown = function(flow, target){
 

@@ -1,7 +1,6 @@
 
     var   cmds = require('./cmd')
         , flagger = require('./util/flagger')
-        , project = require('./project/project')
 
 
 //initial parsing and setup
@@ -13,10 +12,6 @@ var flow = {
     system : process.argv[3],
     version : require('./package.json').version
 };
-
-//set up flow functions and properties
-
-        flow.project = project;
 
 //execute a specific cmd object
 
@@ -68,28 +63,17 @@ var flow = {
         console.log('flow / %s', flow.version);
         console.log('flow / current platform is %s', flow.system);
 
-            //store old path because we will go back
-        var cwd = process.cwd();
+            //get the requested command
+        var requested = flow.flags._at(0);
+        var command = flow.flags._alias(requested);
+            //find the command implementation
+        var cmd = cmds[command];
 
-            //builds happen in the working path
-        console.log('flow / running in %s', flow.run_path);
-        process.chdir(flow.run_path);
-
-                    //get the requested command
-                var requested = flow.flags._at(0);
-                var command = flow.flags._alias(requested);
-                    //find the command implementation
-                var cmd = cmds[command];
-
-                    //check if exists
-                if(cmd) {
-                    flow.execute(flow, cmd);
-                } else {
-                    cmds.usage.run(flow, requested ? 'unknown command ' + requested : '');
-                }
-
-
-            //restore
-        process.chdir(cwd);
+            //check if exists
+        if(cmd) {
+            flow.execute(flow, cmd);
+        } else {
+            cmds.usage.run(flow, requested ? 'unknown command ' + requested : '');
+        }
 
     } //non critical flags
