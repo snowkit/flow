@@ -3,6 +3,10 @@
 
 exports.run = function run(flow, data) {
 
+    if(!flow.project.current) {
+        return;
+    }
+
     console.log('flow / running %s', flow.target);
 
 } //run
