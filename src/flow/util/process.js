@@ -49,7 +49,7 @@ var   exec = require('child_process').exec
                 return;
             }
 
-            fs.writeFileSync(stdout_file, stdout_current);
+            process.stdout.write(stdout_current.substr(stdout_previous.length));
             stdout_previous = stdout_current;
 
         } //update_stdout
