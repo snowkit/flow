@@ -16,11 +16,6 @@ module.exports = {
             return this._[index];
         }
 
-        flags._swap = function _swap(flag,to) {
-            var ind = this._index(flag);
-            this._[ind] = to;
-        }
-
         flags._next = function _next(flag) {
             var ind = this._index(flag);
             return (ind == -1) ? null : this._at(ind+1);

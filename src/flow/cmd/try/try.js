@@ -8,8 +8,6 @@
 
 exports.run = function run(data, flow) {
 
-    flow.flags._swap('try','build');
-
     flow.execute(cmds['build'], flow);
     flow.execute(cmds['run'], flow);
 

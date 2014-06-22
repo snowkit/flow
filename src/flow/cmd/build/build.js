@@ -12,7 +12,7 @@
 
     exports.verify = function verify(flow, done) {
 
-        var target = flow.flags._next('build');
+        var target = flow.flags._next('build') || flow.flags._next('try');
 
         if(target && target.charAt(0) != '-') {
 
