@@ -14,8 +14,11 @@ var libs = {};
 
         var path = cmd.execsync('haxelib path ' + name);
 
-            //clean up trailing whitespace
-        path = path.trim();
+        if(path.code != 0) {
+            return '';
+        } else {
+            path = path.output.trim();
+        }
 
             //for each line we need to find the one without - in front
         var lines = path.split('\n');
