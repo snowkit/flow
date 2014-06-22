@@ -28,7 +28,7 @@ module.exports = {
 
         flags._alias = function _alias(flag) {
                 //strip internal commands
-            if(flag.charAt(0) != '_') {
+            if(flag && flag.charAt(0) != '_') {
                 return this._aliases[flag] || flag;
             }
         }
