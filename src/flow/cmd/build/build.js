@@ -1,12 +1,19 @@
 
     var config = require('./config');
+    var cmds = require('../');
 
     exports.run = function run(flow, target) {
 
             //default to the system if no target specified
         flow.target = target || flow.system;
 
-        console.log('flow / building for %s', flow.target);
+            //not a normal build, but building a library
+            //we defer this to it's own file
+        if(flow.flags.lib) {
+            flow.execute(flow, cmds['_build_lib']);
+        } else {
+            console.log('flow / building for %s', flow.target);
+        }
 
     }; //run
 

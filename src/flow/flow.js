@@ -73,7 +73,7 @@ var flow = {
         if(cmd) {
             flow.execute(flow, cmd);
         } else {
-            cmds.usage.run(requested ? 'unknown command ' + requested : '');
+            cmds.usage.run(flow, requested ? 'unknown command ' + requested : '');
         }
 
     } //non critical flags
