@@ -38,9 +38,10 @@ var   exec = require('child_process').exec
             sleep_file = path.resolve(path.join(tmpdir,util.random_file())),
             stdout_previous = ''
 
+        var silent = true;
         function update_stdout() {
 
-            if(!fs.existsSync(stdout_file)) {
+            if(silent || !fs.existsSync(stdout_file)) {
                 return;
             }
 
@@ -73,6 +74,7 @@ var   exec = require('child_process').exec
 
         fs.writeFileSync(script_file, script);
         exec('"'+process.execPath+'" '+script_file, {
+            env : process.env,
             maxBuffer: 20*1024*1024
         });
 
