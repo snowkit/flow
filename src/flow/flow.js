@@ -46,7 +46,7 @@ var flow = {
 
         } else {
 
-            cmds.usage.run('unknown command ' + requested);
+            cmds.usage.run(requested ? 'unknown command ' + requested : '');
 
         }
 

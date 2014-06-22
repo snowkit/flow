@@ -10,7 +10,7 @@ class Flow {
     public static var flow_path : String = './';
     public static var node_path : String = 'bin/node';
     public static var node_script : String = 'src/flow/flow.js';
-    public static var system : String = 'none';
+    public static var system : String = '';
 
     static function main() {
 
@@ -24,6 +24,10 @@ class Flow {
             //append the system name and infp
         node_path = Path.normalize(Path.join([flow_path,node_path]));
         node_path += '-$system';
+
+        if(system == 'linux') {
+            system += get_arch();
+        }
 
         //we do `node script.js run_path system <other>`
 
@@ -41,6 +45,27 @@ class Flow {
 
     static function get_platform() : String {
         return Sys.systemName().toLowerCase();
+    }
+
+    static function get_arch() : String {
+
+        switch(system) {
+
+            case 'linux','mac' :
+
+                var process = new sys.io.Process('uname',['-m']);
+                var value = process.stdout.readAll().toString();
+                (value.indexOf('64') != -1) ? return '64' : '';
+
+            case 'windows' :
+
+                var arch = Sys.getEnv("PROCESSOR_ARCHITEW6432");
+                (arch != null && arch.indexOf('64') != -1) ? return '64' : '';
+
+        } //switch
+
+        return '32';
+
     }
 
 } //Flow
