@@ -8,11 +8,7 @@
             //default to the system if no target specified
         flow.target = opt.target || flow.system;
             //set the project file if specified
-        flow.project.file = opt.project_file;
-            //parse the project details
-        if(!flow.project.parse(flow)) {
-            return;
-        }
+        flow.project.file = opt.project;
 
             //not a normal build, but building a library
             //we defer this to it's own file
@@ -29,14 +25,14 @@
         var result = {};
         var target = flow.flags._next('build') || flow.flags._next('try');
 
-        var project_file = flow.project.verify(flow);
+        var project_state = flow.project.verify(flow);
 
-        if(!project_file) {
-            return done( exports._error_project(flow), null );
+        if(!project_state.valid) {
+            return done( exports._error_project(flow, project_state.reason), null );
         }
 
         result.target = target;
-        result.project_file = project_file;
+        result.project = project_state.path;
 
         if(target && target.charAt(0) != '-') {
 
@@ -76,9 +72,13 @@
 
     }; //error
 
-    exports._error_project = function(flow, file){
+    exports._error_project = function(flow, reason){
 
-        return 'cannot find project file ' + flow.project.default;
+        if(reason && reason.length > 0) {
+            return 'project file error \n\n > ' + reason;
+        } else {
+            return 'unknown project error';
+        }
 
     } //_error_project
 

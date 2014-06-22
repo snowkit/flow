@@ -2,40 +2,18 @@
 var   fs = require('graceful-fs')
     , path = require('path')
     , jsonic = require('jsonic')
+    , util = require('util') //node util, not local
 
 
 exports.default = 'flow.json';
 
-    //reads a flow.json project file and returns it's info
-exports.parse = function parse(flow) {
 
-    if(!flow.project.file) {
-        console.log('flow / no project file..?');
-        return null;
-    }
+    //convert a parsed project into a fully parsed project,
+    //complete with per target flags, values and so on
+exports.cook = function cook(flow) {
 
-    if(!fs.existsSync(flow.project.file)) {
-        console.log('flow / project file not found at %s', flow.project.file);
-        return null;
-    }
 
-    try {
-
-        var project = jsonic( fs.readFileSync(flow.project.file,'utf8') );
-        flow.project.current = project;
-
-        return true;
-
-    } catch(e) {
-
-        console.log('flow / syntax error in project file\n');
-        console.log('> %s:%d:%d %s \n', path.basename(flow.project.file), e.line,e.column, e.message);
-
-        return false;
-
-    }
-
-} //parse
+} //cook
 
 exports.verify = function verify(flow) {
 
@@ -44,10 +22,27 @@ exports.verify = function verify(flow) {
 
     console.log('flow / looking for project file %s', abs_path)
 
+        //fail if not found
     if(!fs.existsSync(abs_path)) {
-        return null;
+        return { valid:false, reason:'cannot find file ' + project_file };
     }
 
-    return abs_path;
+        //attempt to parse the project file
+    try {
+
+        var project = jsonic( fs.readFileSync( abs_path,'utf8' ) );
+        flow.project.current = project;
+
+    } catch(e) {
+
+        var reason = 'syntax error in project file\n';
+            reason += util.format(' > %s:%d:%d %s \n', project_file, e.line,e.column, e.message);
+
+            //no reason because it logs the reason here
+        return { valid:false, reason:reason };
+
+    }
+
+    return { valid:true, path:abs_path };
 
 } //verify
