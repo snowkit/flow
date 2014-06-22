@@ -1,5 +1,5 @@
 
-    var known_targets = ['mac','windows','linux','ios','android','web'];
+    var config = require('./config');
 
     exports.run = function run(target, flow) {
 
@@ -18,16 +18,21 @@
 
                 //look up the list of known targets
                 //if found, it is a valid build command
-            if(known_targets.indexOf(target) != -1) {
+            if(config.known_targets.indexOf(target) != -1) {
+
+                    //check that this is a valid target for our system
+                var invalid = config.invalid_targets[flow.system];
+
+                    //if not, invalidate
+                if(invalid.indexOf(target) != -1) {
+                    return done( exports._error_invalid(flow, target), null );
+                }
 
                 return done(null, target);
 
             } else {
 
-                var err = 'unknown target `' + target + '`\n\n';
-                    err += '> known targets : ' + known_targets.join(', ');
-
-                return done(err, null);
+                return done( exports._error_unknown(target), null);
 
             } //not a known target
 
@@ -40,10 +45,43 @@
     exports.error = function error(err, flow) {
 
         console.log('\nflow / build command error');
-        console.log('flow / %s\n', err);
-        console.log('flow / build command usage : \n');
-        console.log('> flow build ?target -options');
-        console.log('\n`target` is optional. Without it, the current platform is used.\n');
+
+        if(err && err.length > 0) {
+            console.log('flow / %s\n', err);
+        }
 
     }; //error
+
+    exports._error_unknown = function(target){
+
+        var err = 'unknown target `' + target + '`\n\n';
+            err += '> known targets : ' + config.known_targets.join(', ');
+
+        return err;
+
+    } //_error_unknown
+
+    exports._error_invalid = function(flow, target){
+
+        var err = 'invalid target `'+target+'` for system `'+flow.system+'` \n\n';
+
+        var valid = [].concat(config.known_targets);
+        var invalid = config.invalid_targets[flow.system];
+
+            //remove invalid from valid list
+        for(index in invalid) {
+
+            var value = invalid[index];
+            var valid_index = valid.indexOf(value);
+            if(valid_index != -1) {
+                valid.splice(valid_index,1);
+            }
+
+        } //index in valid
+
+            err += '> valid targets : ' + valid.join(', ');
+
+        return err;
+
+    } //_error_invalid
 

@@ -1,0 +1,9 @@
+{
+    "known_targets" : ["mac","windows","linux","ios","android","web"],
+
+    "invalid_targets" : {
+        "windows"   : ["linux","mac","ios"],
+        "mac"       : ["linux","windows"],
+        "linux"     : ["windows","mac","ios"]
+    }
+}
