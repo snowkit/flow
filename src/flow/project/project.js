@@ -10,8 +10,13 @@ exports.default = 'flow.json';
 
     //convert a parsed project into a fully parsed project,
     //complete with per target flags, values and so on
-exports.cook = function cook(flow) {
+exports.cook = function cook(flow, project) {
 
+    console.log('flow / cooking project %s', project.name );
+
+    if(project.build)
+
+    return project;
 
 } //cook
 
@@ -37,15 +42,38 @@ exports.verify = function verify(flow) {
 
     var result;
 
+    function fail_verify(reason) {
+        return {
+            parsed : null,
+            reason : reason,
+            file : project_file,
+            path : abs_path
+        };
+    }
+
         //fail if not found
     if(!fs.existsSync(abs_path)) {
-        return { valid:false, reason:'cannot find file ' + project_file };
+        return fail_verify('cannot find file ' + project_file);
     }
 
     try {
 
+        var parsed = jsonic( fs.readFileSync( abs_path,'utf8' ) );
+
+            //now check that it has valid information
+        if(!(parsed.name) || !(parsed.version)) {
+            return fail_verify('flow projects require a name and a version');
+        }
+
+            //now check that it also has build information,
+            //this may change because dependent projects may very well
+            //use the parent defaults ? not sure, makes more sense atm to require
+        if(!parsed.build) {
+            return fail_verify('flow projects require build options');
+        }
+
         result = {
-            parsed : jsonic( fs.readFileSync( abs_path,'utf8' ) ),
+            parsed : parsed,
             path : abs_path,
             file : project_file
         };
@@ -55,13 +83,7 @@ exports.verify = function verify(flow) {
         var reason = 'syntax error in project file\n';
             reason += util.format(' > %s:%d:%d %s \n', project_file, e.line,e.column, e.message);
 
-            //no reason because it logs the reason here
-        return {
-            parsed : null,
-            reason : reason,
-            file : project_file,
-            path : abs_path
-        };
+        return fail_verify(reason);
 
     }
 

@@ -21,8 +21,14 @@
         if(flow.flags.lib) {
             flow.execute(flow, cmds['_build_lib']);
         } else {
+
+
             console.log('flow / building %s %s for %s',
                 flow.project.parsed.name, flow.project.parsed.version, flow.target);
+
+                //to build a project we need to cook it for the dependencies etc
+            flow.project.cooked = flow.project.cook(flow, flow.project.parsed);
+
         }
 
     }; //run
