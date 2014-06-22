@@ -1,14 +1,15 @@
 
-    //mac specific build processing
+// a template for adding new commands
+// do not add it to the index.js
 
 exports.run = function run(flow, data) {
 
-}
+} //run
 
 exports.verify = function verify(flow, done) {
     done(null,null);
-}
+} //verify
 
 exports.error = function(flow, err) {
-    console.log('flow / error %s', err);
-}
+
+} //error

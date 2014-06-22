@@ -10,19 +10,19 @@ var flow = {
     flow_path : process.argv[1],
     run_path : process.argv[2],
     system : process.argv[3],
-    version : '1.0.0-alpha.1'
+    version : require('./package.json').version
 };
 
 //execute a specific cmd object
 
-        flow.execute = function execute(cmd, _flow) {
+        flow.execute = function execute(_flow, cmd) {
 
-            cmd.verify(_flow, function(err,data){
+            cmd.verify(_flow, function(err, data) {
 
                 if(!err) {
-                    cmd.run(data, _flow);
+                    cmd.run(_flow, data);
                 } else {
-                    cmd.error(err, _flow);
+                    cmd.error(_flow, err);
                 }
 
             }); //verify
@@ -41,6 +41,22 @@ var flow = {
 
         console.log(flow.version);
 
+    } else if(flow.flags._has('er')) {
+
+        //http://www.geocities.com/spunk1111/flowers.htm
+
+        console.log("      _ _");
+        console.log("    _{ ' }_");
+        console.log("   { `.!.` }");
+        console.log("   ',_/Y\\_,'");
+        console.log("     {_,_}");
+        console.log("       |");
+        console.log("     (\\|  /)");
+        console.log("      \\| //");
+        console.log("       |//");
+        console.log("jgs \\\\ |/  //");
+        console.log("^^^^^^^^^^^^^^^");
+
     } else {
 
             //useful information
@@ -55,7 +71,7 @@ var flow = {
 
             //check if exists
         if(cmd) {
-            flow.execute(cmd, flow);
+            flow.execute(flow, cmd);
         } else {
             cmds.usage.run(requested ? 'unknown command ' + requested : '');
         }

@@ -4,7 +4,8 @@ var minimist = require('minimist');
 module.exports = {
     parse : function parse(args) {
 
-        var flags = minimist(args, {string:['-version']});
+        var flags = minimist(args, {
+        });
 
         flags._aliases = { 'try':'try_' };
 

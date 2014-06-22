@@ -1,7 +1,7 @@
 
     var config = require('./config');
 
-    exports.run = function run(target, flow) {
+    exports.run = function run(flow, target) {
 
             //default to the system if no target specified
         flow.target = target || flow.system;
@@ -32,7 +32,7 @@
 
             } else {
 
-                return done( exports._error_unknown(target), null);
+                return done( exports._error_unknown(flow, target), null);
 
             } //not a known target
 
@@ -42,7 +42,7 @@
 
     }; //verify
 
-    exports.error = function error(err, flow) {
+    exports.error = function error(flow, err) {
 
         console.log('\nflow / build command error');
 
@@ -52,7 +52,7 @@
 
     }; //error
 
-    exports._error_unknown = function(target){
+    exports._error_unknown = function(flow, target){
 
         var err = 'unknown target `' + target + '`\n\n';
             err += '> known targets : ' + config.known_targets.join(', ');

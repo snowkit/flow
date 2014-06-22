@@ -1,7 +1,7 @@
 
 // > flow run web -options
 
-exports.run = function run(data, flow) {
+exports.run = function run(flow, data) {
 
     console.log('flow / running %s', flow.target);
 
@@ -17,7 +17,7 @@ exports.verify = function verify(flow, done) {
 
 } //verify
 
-exports.error = function(err, flow) {
+exports.error = function(flow, err) {
 
     if(err && err.length > 0) {
         console.log('flow / run / error %s', err);

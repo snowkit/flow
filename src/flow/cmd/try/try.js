@@ -6,10 +6,10 @@
 // > flow build web -options
 // > flow run web -options
 
-exports.run = function run(data, flow) {
+exports.run = function run(flow, data) {
 
-    flow.execute(cmds['build'], flow);
-    flow.execute(cmds['run'], flow);
+    flow.execute(flow, cmds['build']);
+    flow.execute(flow, cmds['run']);
 
 } //run
 
@@ -17,6 +17,6 @@ exports.verify = function verify(flow, done) {
     done(null,null);
 }
 
-exports.error = function(err, flow) {
+exports.error = function(flow, err) {
     console.log('flow / try / error %s', err);
 }
