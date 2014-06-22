@@ -4,9 +4,9 @@
     exports.run = function run(target, flow) {
 
             //default to the system if no target specified
-        target = target || flow.system;
+        flow.target = target || flow.system;
 
-        console.log('flow / building for %s', target);
+        console.log('flow / building for %s', flow.target);
 
     }; //run
 

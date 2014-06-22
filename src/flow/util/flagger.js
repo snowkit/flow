@@ -6,20 +6,32 @@ module.exports = {
 
         var flags = minimist(args, {string:['-version']});
 
-        flags._has = function has(flag) {
+        flags._aliases = { 'try':'try_' };
+
+        flags._has = function _has(flag) {
             return this._.indexOf(flag) != -1;
         }
 
-        flags._at = function at(index) {
+        flags._at = function _at(index) {
             return this._[index];
         }
 
-        flags._next = function next(flag) {
-            return this._at(this._index(flag)+1);
+        flags._swap = function _swap(flag,to) {
+            var ind = this._index(flag);
+            this._[ind] = to;
         }
 
-        flags._index = function index(flag) {
+        flags._next = function _next(flag) {
+            var ind = this._index(flag);
+            return (ind == -1) ? null : this._at(ind+1);
+        }
+
+        flags._index = function _index(flag) {
             return this._.indexOf(flag);
+        }
+
+        flags._alias = function _alias(flag) {
+            return this._aliases[flag] || flag;
         }
 
         return flags;

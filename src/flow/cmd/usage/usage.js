@@ -1,11 +1,13 @@
 
-exports.run = function run(reason) {
+exports.run = function run(err) {
 
-    if(reason) {
-        console.error('error : %s', reason);
+    if(err) {
+        console.error('\n> Error');
+        console.error('> %s', err);
     }
 
-    console.log('flow options : ');
-    console.log('- blah');
+    console.log('\nflow options : ');
+    console.log('> blah');
+    console.log('');
 
 }

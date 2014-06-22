@@ -1,7 +1,9 @@
 
     var   cmds = require('./cmd')
         , flagger = require('./util/flagger')
-// Main
+
+
+//initial parsing and setup
 
 var flow = {
     bin_path : process.argv[0],
@@ -10,6 +12,24 @@ var flow = {
     system : process.argv[3],
     version : '1.0.0-alpha.1'
 };
+
+//execute a specific cmd object
+
+        flow.execute = function execute(cmd, _flow) {
+
+            cmd.verify(_flow, function(err,data){
+
+                if(!err) {
+                    cmd.run(data, _flow);
+                } else {
+                    cmd.error(err, _flow);
+                }
+
+            }); //verify
+
+        } //execute
+
+//entry point
 
     var args = [].concat(process.argv);
     args = args.splice(4, args.length-4);
@@ -29,25 +49,15 @@ var flow = {
 
             //get the requested command
         var requested = flow.flags._at(0);
-        var cmd = cmds[requested];
+        var command = flow.flags._alias(requested);
+            //find the command implementation
+        var cmd = cmds[command];
 
             //check if exists
         if(cmd) {
-
-            cmd.verify(flow, function(err,data){
-
-                if(!err) {
-                    cmd.run(data, flow);
-                } else {
-                    cmd.error(err, flow);
-                }
-
-            }); //verify
-
+            flow.execute(cmd, flow);
         } else {
-
             cmds.usage.run(requested ? 'unknown command ' + requested : '');
-
         }
 
     } //non critical flags
