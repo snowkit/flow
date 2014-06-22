@@ -1,5 +1,6 @@
 
-var cmd = require('./process');
+var   cmd = require('./process')
+    , path = require('path')
 
 //caches a list of installed haxelibs for the remaining execution,
 var libs = {};
@@ -12,30 +13,34 @@ var libs = {};
             return libs[name].path;
         }
 
-        var path = cmd.execsync('haxelib path ' + name);
+        var result = cmd.execsync('haxelib path ' + name);
 
-        if(path.code != 0) {
+        if(result.code != 0) {
             return '';
         } else {
-            path = path.output.trim();
+            result = result.output.trim();
         }
 
             //for each line we need to find the one without - in front
-        var lines = path.split('\n');
+        var lines = result.split('\n');
         for(index in lines) {
-            var line = lines[index];
+            var line = lines[index].trim();
             if(line.charAt(0) != '-') {
-                path = line;
+                result = path.normalize(line);
                 break;
             }
         }
 
-        libs[name] = {
-            name : name,
-            path : path
-        };
+        if(libs[name]) {
+            libs[name].path = result;
+        } else {
+            libs[name] = {
+                name : name,
+                path : result
+            };
+        }
 
-        return path;
+        return result;
 
     } //path
 
