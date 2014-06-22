@@ -35,8 +35,8 @@ var   exec = require('child_process').exec
         var output = fs.readFileSync('output',{encoding:'utf8'});
 
             // Delete temporary files.
-        fs.unlinkSync('output');
-        fs.unlinkSync('done');
+        try { fs.unlinkSync('output'); } catch(e) {}
+        try { fs.unlinkSync('done'); } catch(e) {}
 
         return output;
 
