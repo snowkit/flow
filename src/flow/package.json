@@ -1,0 +1,22 @@
+{
+  "author": "Sven Bergström",
+  "name": "flow",
+  "description": "flow is a haxe project build tool chain",
+  "license": "MIT",
+  "version": "1.0.0-alpha.1",
+  "repository": "http://github.com/underscorediscovery/flow",
+  "scripts": {
+    "start": "flow.js"
+  },
+  "engines": {
+    "node": "0.10.x"
+  },
+  "dependencies": {
+    "glob": "~4.0.2",
+    "minimist": "~0.2.0",
+    "handlebars" : "~2.0.0",
+    "graceful-fs" : "~3.0.2",
+    "wrench" : "~1.5.8",
+    "jsonic" : "~0.1.1"
+  }
+}

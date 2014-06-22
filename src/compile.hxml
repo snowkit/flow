@@ -1,0 +1,3 @@
+-main Flow.hx
+-neko ../run.n
+-cp ./

@@ -1,0 +1,12 @@
+{
+    "name": "flow",
+    "license": "MIT",
+    "url": "",
+    "description": "",
+    "releasenote": "",
+    "version": "0.0.0",
+
+    "contributors": [ "underscorediscovery" ],
+    "tags": [],
+    "dependencies": { }
+}
