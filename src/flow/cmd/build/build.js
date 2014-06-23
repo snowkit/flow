@@ -29,6 +29,10 @@
                 //to build a project we need to cook it for the dependencies etc
             flow.project.cooked = flow.project.cook(flow, flow.project.parsed);
 
+            if(!flow.project.cooked) {
+                return flow.project.failed = true;
+            }
+
         }
 
     }; //run

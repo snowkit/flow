@@ -2,6 +2,7 @@
     var   cmds = require('./cmd')
         , flagger = require('./util/flagger')
         , project = require('./project/project')
+        , haxelib = require('./util/haxelib')
 
 
 //initial parsing and setup
@@ -17,6 +18,7 @@ var flow = {
 //set up flow functions and properties
 
         flow.project = project;
+        haxelib.init();
 
 //execute a specific cmd object
 

@@ -1,5 +1,17 @@
 
 
+Object.size = function(obj) {
+    var size = 0, key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+};
+
+exports.deep_copy = function deep_copy(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
 //sourced https://github.com/arturadib/shelljs
 exports.random_file = function random_file() {
 
@@ -17,3 +29,7 @@ exports.random_file = function random_file() {
   return 'flow_'+random_hash(20);
 
 } //random_file
+
+exports.pad = function pad(width, string, padding) {
+  return (width <= string.length) ? string : exports.pad(width, padding + string, padding)
+}

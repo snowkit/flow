@@ -7,7 +7,11 @@ exports.run = function run(flow, data) {
         return;
     }
 
-    console.log('flow / running %s %s for %s',
+    if(flow.project.failed) {
+        return;
+    }
+
+    console.log('flow / running %s %s for %s\n',
         flow.project.parsed.name, flow.project.parsed.version, flow.target);
 
 } //run
