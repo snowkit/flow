@@ -27,11 +27,13 @@
                 flow.project.parsed.name, flow.project.parsed.version, flow.target);
 
                 //to build a project we need to cook it for the dependencies etc
-            flow.project.cooked = flow.project.cook(flow, flow.project.parsed);
+            flow.project.cooked = flow.project.cook(flow, flow.project.parsed, config);
 
             if(!flow.project.cooked) {
                 return flow.project.failed = true;
             }
+
+            // console.log('cooked project\n', flow.project.cooked);
 
         }
 

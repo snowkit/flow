@@ -10,7 +10,7 @@ var internal = {};
 
     //convert a parsed project into a fully parsed project,
     //complete with per target flags, values and so on
-exports.cook = function cook(flow, project) {
+exports.cook = function cook(flow, project, build_config) {
 
     flow.project.depends = flow.project.depends || {};
 
@@ -24,13 +24,19 @@ exports.cook = function cook(flow, project) {
     }
 
         //start at the project base
-    var cooked = util.deep_copy(project);
-        //store the dependency tree
-    cooked.depends = depends;
-        //now we parse project defines from the project
-    cooked.defines = cook_defines.defines(flow, cooked);
+    var cooked = {
+        source : util.deep_copy(project),
+        depends : depends,
+    }
 
+        //now we parse all project defines from the project
+    cooked.defines_all = cook_defines.defines(flow, cooked.source, depends);
+        //and the final list is filtered against the defines themselves, and the known targets
+    cooked.defines = cook_defines.filter(flow, cooked.defines_all, build_config);
 
+    console.log(cooked.defines);
+
+        //return it
     return cooked;
 
 } //cook

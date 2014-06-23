@@ -9,8 +9,8 @@ var   fs = require('graceful-fs')
 exports.default = 'flow.json';
 
 
-exports.cook = function cook(flow,project) {
-    return _cook.cook(flow, project);
+exports.cook = function cook(flow, project, build_config) {
+    return _cook.cook(flow, project, build_config);
 }
 
 exports.verify = function verify(flow, project_path, quiet) {
