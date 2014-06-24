@@ -12,7 +12,7 @@ exports.defines = function defines(flow, project, depends, build_config, existin
         //first check the root defines
     if(project.build.defines) {
         for(index in project.build.defines) {
-            list.push({ name:project.build.defines[index] });
+            list.push({ name:project.build.defines[index], file:project.__path });
         }
     }
 
@@ -22,7 +22,7 @@ exports.defines = function defines(flow, project, depends, build_config, existin
             var current = project.build.if[flag].defines;
             if(current) {
                 for(index in current) {
-                    list.push({ name:current[index], condition:'if', conditional:flag });
+                    list.push({ name:current[index], condition:'if', conditional:flag, file:project.__path });
                 }
             }
         }
@@ -34,7 +34,7 @@ exports.defines = function defines(flow, project, depends, build_config, existin
             var current = project.build.unless[flag].defines;
             if(current) {
                 for(index in current) {
-                    list.push({ name:current[index], condition:'unless', conditional:flag });
+                    list.push({ name:current[index], condition:'unless', conditional:flag, file:project.__path });
                 }
             }
         }
@@ -324,6 +324,7 @@ internal.parse_define = function(def) {
 
     var define = {
         name : split[0],
+        file : def.file
     };
 
     if(split.length > 1) {

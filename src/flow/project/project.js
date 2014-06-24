@@ -56,6 +56,9 @@ exports.verify = function verify(flow, project_path, quiet) {
             return fail_verify('flow projects require build options');
         }
 
+        parsed.__path = abs_path;
+        parsed.__file = project_file;
+
         result = {
             parsed : parsed,
             path : abs_path,

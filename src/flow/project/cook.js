@@ -30,12 +30,30 @@ exports.cook = function cook(flow, project, build_config) {
         defines_all : {}
     }
 
+        //after dependencies, we process the defines as the rest will depend on them
+    if(!internal.cook_defines(flow, cooked, build_config)) {
+            //error out if there were define errors
+        return null;
+    }
+
+        //return the cooked project
+    return cooked;
+
+} //cook
+
+
+
+//internal handlers
+internal.cook_defines = function(flow, cooked, build_config) {
+
+        //store the list of targets as met or unmet defines based on the target
+        //we are attempting to cook for
     for(index in build_config.known_targets) {
         var name = build_config.known_targets[index];
         cooked.defines_all[name] = { name:name, met:flow.target == name };
     }
         //now we parse all project defines from the project
-    cooked.defines_all = cook_defines.defines(flow, cooked.source, depends, build_config, cooked.defines_all);
+    cooked.defines_all = cook_defines.defines(flow, cooked.source, cooked.depends, build_config, cooked.defines_all);
         //and the final list is filtered against the defines themselves, and the known targets
     cooked.defines = cook_defines.filter(flow, cooked.defines_all, build_config);
 
@@ -45,17 +63,14 @@ exports.cook = function cook(flow, project, build_config) {
         return null;
     }
 
-    console.log("\n\nPOST PARSE\n");
+    console.log('defines parsed as \n')
+    console.log(cooked.defines_all);
     console.log(cooked.defines);
+    console.log('');
 
-        //return it
     return cooked;
 
-} //cook
-
-
-
-//internal handlers
+} //cook_defines
 
 internal.satisfy_dependency = function(flow, project) {
 
