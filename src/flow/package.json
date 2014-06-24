@@ -17,6 +17,7 @@
     "handlebars" : "~2.0.0",
     "graceful-fs" : "~3.0.2",
     "wrench" : "~1.5.8",
+    "fs-extra" : "~0.9.1",
     "jsonic" : "~0.1.1"
   }
 }

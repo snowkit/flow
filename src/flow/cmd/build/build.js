@@ -12,11 +12,6 @@ var internal = {};
 
     exports.run = function run(flow, opt) {
 
-            //default to the system if no target specified
-        flow.target = opt.target || flow.system;
-
-        flow.target_arch = flow.project.find_arch(flow);
-
         if(flow.target_arch === null) {
             return flow.project.failed = true;
         }
@@ -33,14 +28,14 @@ var internal = {};
 
         } else {
 
-            console.log('\nflow / building %s %s for %s',
+            console.log('\nflow / build - %s %s for %s',
                 flow.project.parsed.name, flow.project.parsed.version, flow.target);
 
                 //to build a project we need to prepare it first
             flow.project.prepare(flow, config);
 
             if(!flow.project.prepared) {
-                console.log('flow / project build failed at preparing\n');
+                console.log('flow / build - failed at preparing\n');
                 return flow.project.failed = true;
             }
 
@@ -48,7 +43,7 @@ var internal = {};
             flow.project.bake(flow, config);
 
             if(!flow.project.baked) {
-                console.log('flow / project build failed at baking\n');
+                console.log('flow / build - failed at baking\n');
                 return flow.project.failed = true;
             }
 
@@ -58,6 +53,9 @@ var internal = {};
             if(flow.flags.clean) {
                 flow.execute(flow, cmds['clean']);
             }
+
+                //first copy over all the files in the project
+            flow.execute(flow, cmds['files']);
 
         } //!lib
 
@@ -70,7 +68,7 @@ var internal = {};
     exports.verify = function verify(flow, done) {
 
         var result = {};
-        var target = flow.flags._next('build') || flow.flags._next('try');
+        var target = flow.target;
 
         var project = flow.project.verify(flow);
 

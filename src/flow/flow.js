@@ -12,6 +12,7 @@ var flow = {
     flow_path : process.argv[1],
     run_path : process.argv[2],
     system : process.argv[3],
+    quiet : {},
     version : require('./package.json').version,
     config : require('./config')
 };
@@ -44,6 +45,9 @@ var flow = {
 
     flow.flags = flagger.parse(args);
 
+        //once we have flags we init the projects
+    flow.project.init(flow);
+
         //first check critical flags
     if(flow.flags._has('version')) {
 
@@ -70,6 +74,11 @@ var flow = {
             //useful information
         console.log('flow / %s', flow.version);
         console.log('flow / current platform is %s', flow.system);
+        console.log('flow / target is %s', flow.target);
+
+        if(flow.target != 'web'){
+            console.log('flow / target arch is %s', flow.target_arch);
+        }
 
             //store old path because we will go back
         var cwd = process.cwd();

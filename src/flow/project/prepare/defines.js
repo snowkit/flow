@@ -119,12 +119,12 @@ exports.satisfy = function satisfy(flow, project, condition, conditional) {
     var tokenized = internal.multi_conditionals[conditional];
     if(tokenized) {
         var met = internal.satisfy_multi_condition(project.defines_all, tokenized);
-        return met === true;
+        return (condition == 'if') ? (met === true) : !(met === true);
     } else {
         if(project.defines[conditional]) {
-            return true;
+            return (condition == 'if') ? true : false;
         } else {
-            return false;
+            return (condition == 'if') ? false : true;
         }
     }
 

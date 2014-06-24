@@ -5,7 +5,7 @@ exports.bake = function bake(flow, build_config) {
 
     var project = flow.project.prepared;
 
-    console.log('flow / baking project %s\n', flow.project.parsed.name);
+    console.log('\nflow / bake - project %s\n', flow.project.parsed.name);
 
     flow.project.hxml = exports.hxml(flow, project, build_config );
 
@@ -43,21 +43,18 @@ exports.target = function(flow, project, build_config, split) {
 
     split = split || '\n';
 
-    var build_path = flow.project.build_path(flow, project);
-    var out_path = flow.project.out_path(flow, project) + '/';
-
-    var values = '-cp ' + build_path + 'haxe/';
+    var values = '-cp ' + flow.project.path_build + 'haxe/';
 
     switch(flow.target) {
 
         case 'mac': case 'linux': case 'windows':
         case 'android': case 'ios': {
-            values += split + '-cpp ' + build_path + 'cpp/';
+            values += split + '-cpp ' + flow.project.path_build + 'cpp/';
             break;
         } //native
 
         case 'web':{
-            values += split + '-js ' + out_path + project.source.product.app + '.js';
+            values += split + '-js ' + flow.project.path_output + project.source.product.app + '.js';
             break;
         } //web
 

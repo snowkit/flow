@@ -10,6 +10,17 @@ var   fs = require('graceful-fs')
 
 exports.default = 'flow.json';
 
+exports.init = function init(flow) {
+        //default to the system if no target specified,
+        //but needs to watch for command lines calling target
+    flow.target =
+        flow.flags._next('build') ||
+        flow.flags._next('try') ||
+        flow.flags._next('clean') ||
+        flow.system;
+
+    flow.target_arch = flow.project.find_arch(flow);
+}
 
 exports.verify = function verify(flow, project_path, quiet) {
 
@@ -18,8 +29,8 @@ exports.verify = function verify(flow, project_path, quiet) {
 
     var abs_path = path.resolve(project_file);
 
-    if(!quiet) {
-        console.log('flow / looking for project file %s', abs_path)
+    if(!flow.quiet.project) {
+        console.log('flow / project - looking for project file %s', abs_path)
     }
 
     var result;
@@ -86,9 +97,9 @@ exports.verify = function verify(flow, project_path, quiet) {
 
 
     //the final target path for the output
-exports.out_path = function out_path(flow, project) {
+exports.get_out_path = function get_out_path(flow, prepared) {
 
-    var dest_folder = path.normalize(project.source.product.output) + '/';
+    var dest_folder = path.normalize(prepared.source.product.output) + '/';
 
     dest_folder += flow.target;
 
@@ -101,9 +112,9 @@ exports.out_path = function out_path(flow, project) {
 } //out_path
 
     //the final build data path for the output
-exports.build_path = function build_path(flow, project) {
+exports.get_build_path = function get_build_path(flow, prepared) {
 
-    return exports.out_path(flow, project) + '.build/';
+    return exports.get_out_path(flow, prepared) + '.build/';
 
 } //build_path
 
