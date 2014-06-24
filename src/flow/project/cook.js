@@ -27,13 +27,25 @@ exports.cook = function cook(flow, project, build_config) {
     var cooked = {
         source : util.deep_copy(project),
         depends : depends,
+        defines_all : {}
     }
 
+    for(index in build_config.known_targets) {
+        var name = build_config.known_targets[index];
+        cooked.defines_all[name] = { name:name, met:flow.target == name };
+    }
         //now we parse all project defines from the project
-    cooked.defines_all = cook_defines.defines(flow, cooked.source, depends);
+    cooked.defines_all = cook_defines.defines(flow, cooked.source, depends, build_config, cooked.defines_all);
         //and the final list is filtered against the defines themselves, and the known targets
     cooked.defines = cook_defines.filter(flow, cooked.defines_all, build_config);
 
+    if(cooked.defines.err) {
+        console.log('flow / defines failed to parse. aborting build : \n');
+        console.log('> %s \n',cooked.defines.err);
+        return null;
+    }
+
+    console.log("\n\nPOST PARSE\n");
     console.log(cooked.defines);
 
         //return it

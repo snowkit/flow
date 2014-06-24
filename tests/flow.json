@@ -1,0 +1,89 @@
+{
+  name : 'test_flow',
+  version : '1.0.0',
+  author : 'snowkit',
+
+
+  build : {
+
+    main : 'Main',
+    output : 'bin',
+    app : 'flow_test',
+    package : 'org.snowkit.flow',
+    certificates : ...,
+    flags : ...,
+
+    sourcepaths : [ 'src' ],
+
+    dependencies : {
+      snow : '*',
+    },
+
+    defines : ['test_def=2'],
+    if: {
+      "linux || windows || mac" : {
+        defines : ['threeos']
+      },
+      "mac && ios" : {
+        defines : ['impossible']
+      },
+      "one && two" : {
+        defines : ['has_one_and_two']
+      },
+      threeos : {
+        defines:['has_threeos'],
+      },
+      mac : {
+        defines : ['is_mac', 'one=1']
+      },
+      is_mac : {
+        defines : ['has_is_mac', 'two=2']
+      },
+      derp : {
+        defines : ['has_is_mac']
+      }
+    },
+
+    unless: {
+      mac : {
+        defines:['not_mac']
+      }
+    }
+
+  },
+
+  snow : {
+    window : {
+
+      width : 960,
+      height : 640,
+      orientation : 'landscape',
+      fps : 60,
+      vsync : true,
+      resizable : true,
+
+      if:{
+        mobile : { fps:30 },
+        android : { vsync:false },
+        ios : { resizable:false }
+      },
+
+      unless:{
+         windows : { }
+      }
+
+    },
+
+    assets : {
+       path : 'config.json',
+       path : 'assets/sounds/ => sounds',
+       if:{
+           android : {
+             path:'assets/sounds/android/ = > sounds'
+           }
+       }
+    }
+
+  }
+
+}
