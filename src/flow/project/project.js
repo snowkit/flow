@@ -3,6 +3,7 @@ var   fs = require('graceful-fs')
     , path = require('path')
     , jsonic = require('jsonic')
     , nodeutil = require('util')
+    , util = require('../util/util')
     , _prepare = require('./prepare')
     , _bake = require('./bake')
 
@@ -45,30 +46,11 @@ exports.verify = function verify(flow, project_path, quiet) {
         return fail_verify('cannot find file ' + project_file);
     }
 
+    var parsed = null;
+
     try {
 
-        var parsed = jsonic( fs.readFileSync( abs_path,'utf8' ) );
-
-            //now check that it has valid information
-        if(!(parsed.name) || !(parsed.version)) {
-            return fail_verify('flow projects require a name and a version');
-        }
-
-            //now check that it also has build information,
-            //this may change because dependent projects may very well
-            //use the parent defaults ? not sure, makes more sense atm to require
-        if(!parsed.build) {
-            return fail_verify('flow projects require build options');
-        }
-
-        parsed.__path = abs_path;
-        parsed.__file = project_file;
-
-        result = {
-            parsed : parsed,
-            path : abs_path,
-            file : project_file
-        };
+        parsed = jsonic( fs.readFileSync( abs_path,'utf8' ) );
 
     } catch(e) {
 
@@ -77,7 +59,34 @@ exports.verify = function verify(flow, project_path, quiet) {
 
         return fail_verify(reason);
 
+    } //catch
+
+        //check that its valid
+    if(!parsed || parsed.constructor != Object) {
+        return fail_verify('flow projects are a json object, this appears to be : ' + parsed.constructor);
     }
+
+        //now check that it has valid information
+    if(!(parsed.name) || !(parsed.version)) {
+        return fail_verify('flow projects require a name and a version');
+    }
+
+        //safeguard against touching non existing build options
+    if(!parsed.build) {
+        parsed.build = {};
+    }
+        //then merge any base options from flow defaults into it
+    parsed.build = util.merge_combine(flow.config.project.build, parsed.build);
+
+    parsed.__path = abs_path;
+    parsed.__file = project_file;
+
+    result = {
+        parsed : parsed,
+        path : abs_path,
+        file : project_file
+    };
+
 
     return result;
 

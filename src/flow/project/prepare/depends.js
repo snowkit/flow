@@ -75,6 +75,7 @@ exports.parse = function parse(flow, project, result, depth) {
                 //if it's null, but not missing, it's a syntax issue
                 //in which case totally abort
             if(state.reason.indexOf('cannot find') == -1) {
+                console.log('\n', state.reason);
                 return result = null;
             }
                 //but if not, at least try and parse the version

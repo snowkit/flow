@@ -37,6 +37,10 @@ exports.prepare = function prepare(flow, build_config) {
         defines_all : {}
     }
 
+        //we then merge the project values against our own,
+        //so that they cascade and override each other
+    internal.prepare_cascade_project(flow, prepared, build_config);
+
         //after dependencies, we process the defines as the rest will depend on them
         //and error out if there are any parsing or other errors in there.
     if(!internal.prepare_defines(flow, prepared, build_config)) {
@@ -55,16 +59,19 @@ exports.prepare = function prepare(flow, build_config) {
 
     //internal handlers
 
-
 internal.prepare_dependencies = function(flow, project, build_config) {
 
     console.log('flow / building dependency tree');
 
     var _depends = depends.parse(flow, project);
 
+    if(_depends == null) {
+        return null;
+    }
+
     console.log('flow / done building tree... \n');
 
-    if(Object.size(_depends.failed)) {
+    if(util.object_size(_depends.failed)) {
 
         console.log('flow / prepare failed due to missing dependencies!');
         console.log('flow / you will probably need to use haxelib to correct this.\n');
@@ -74,6 +81,7 @@ internal.prepare_dependencies = function(flow, project, build_config) {
             console.log('> %s %s', depend.name, depend.version);
         }
 
+        console.log('');
         return null;
 
     } //depends.failed has size
@@ -82,9 +90,44 @@ internal.prepare_dependencies = function(flow, project, build_config) {
 
 } //prepare_dependencies
 
+internal.prepare_cascade_project = function(flow, prepared, build_config) {
+
+        //we go through all dependencies now and merge them only unique values persisting
+    for(name in prepared.depends) {
+        var depend = prepared.depends[name];
+        prepared.source = util.merge_unique(depend.project, prepared.source);
+    }
+
+        //and then bring in any flow configs
+        //from the project and store them in flow.config,
+        //overriding what's already in there on a value basis (not object bases)
+    flow.config = util.merge_combine(prepared.source.flow, flow.config);
+
+        //plus, we want to handle any aliases that the projects have asked for,
+        //so that their final baked project values are what they expect/asked
+    if(flow.config.alias) {
+        for(name in prepared.source) {
+            for(alias in flow.config.alias) {
+                var alias_dest = flow.config.alias[alias];
+                if(alias == name) {
+                    // console.log('found alias :o %s => %s', name, alias_dest);
+                    //merge it into the given alias, and remove the old one
+                    prepared.source[alias_dest] = util.merge_unique(prepared.source[name], prepared.source[alias_dest]);
+                    delete prepared.source[name];
+                }
+            }
+        }
+    }
+
+    // console.log('\nproject is \n');
+    // console.log(prepared.source);
+    // console.log('');
+
+} //prepare_cascade_project
+
 internal.prepare_defines = function(flow, prepared, build_config) {
 
-    console.log('flow / preparing defines \n');
+    // console.log('flow / preparing defines \n');
 
         //store the list of targets as met or unmet defines based on the target
         //we are attempting to prepare for
@@ -131,10 +174,10 @@ internal.prepare_defines = function(flow, prepared, build_config) {
 
 
     // console.log(prepared.defines_all);
-    console.log(bake.defines(flow, prepared, build_config));
+    // console.log(bake.defines(flow, prepared, build_config));
     // console.log(prepared.defines);
 
-    console.log('\nflow / done defines ... \n');
+    // console.log('\nflow / done defines ... \n');
 
     return prepared;
 
@@ -159,7 +202,7 @@ internal.prepare_codepaths = function (flow, prepared, build_config) {
 
 internal.prepare_flags = function(flow, prepared, build_config) {
 
-    console.log('flow / preparing flags \n');
+    // console.log('flow / preparing flags \n');
 
     prepared.flags = [];
     internal.prepare_codepaths(flow, prepared, build_config);
@@ -168,9 +211,9 @@ internal.prepare_flags = function(flow, prepared, build_config) {
         //append the debug flag if requested
     if(flow.flags.debug) { prepared.flags.push('-debug'); }
 
-    console.log(bake.flags(flow, prepared, build_config));
+    // console.log(bake.flags(flow, prepared, build_config));
 
-    console.log('\nflow / done flags ... \n');
+    // console.log('\nflow / done flags ... \n');
 
 } //prepare_flags
 

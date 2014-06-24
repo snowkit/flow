@@ -6,9 +6,12 @@ exports.bake = function bake(flow, build_config) {
 
     var project = flow.project.prepared;
 
-    console.log('flow / baking project %s', flow.project.parsed.name);
+    console.log('flow / baking project %s\n', flow.project.parsed.name);
 
     flow.project.hxml = exports.hxml(flow, project, build_config );
+
+    console.log(flow.project.hxml);
+    console.log('');
 
 } //project
 
@@ -77,12 +80,12 @@ exports.hxml = function(flow, project, build_config, split) {
 
     split = split || '\n';
 
-    var hxml_ = '-main ' + build_config.app_boot + split;
+    var hxml_ = '-main ' + flow.config.build.app_boot + split;
 
     hxml_ += exports.defines(flow, project, build_config, split);
     hxml_ += exports.flags(flow, project, build_config, split);
     hxml_ += exports.target(flow, project, build_config, split);
 
-    console.log(hxml_);
+    return hxml_;
 
 } //hxml

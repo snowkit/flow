@@ -1,5 +1,4 @@
 {
-    "app_boot"      : "FlowApp",
     "known_targets" : ["mac","windows","linux","ios","android","web"],
 
     "invalid_targets" : {

@@ -1,0 +1,15 @@
+{
+    "config" : "1.0.0-alpha-1",
+    "build" : {
+        "app_boot" : "FlowApp"
+    },
+    "project" : {
+        "build" : {
+            "product" : {
+                "main" : "Main",
+                "output" : "bin",
+                "codepaths" : [ "src" ]
+            }
+        }
+    }
+}

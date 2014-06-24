@@ -12,7 +12,8 @@ var flow = {
     flow_path : process.argv[1],
     run_path : process.argv[2],
     system : process.argv[3],
-    version : require('./package.json').version
+    version : require('./package.json').version,
+    config : require('./config')
 };
 
 //set up flow functions and properties
