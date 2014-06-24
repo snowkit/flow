@@ -1,6 +1,6 @@
 
 var   path = require('path')
-
+    , projects = require('./project')
 
 exports.bake = function bake(flow, build_config) {
 
@@ -12,6 +12,8 @@ exports.bake = function bake(flow, build_config) {
 
     console.log(flow.project.hxml);
     console.log('');
+
+    flow.project.baked = true;
 
 } //project
 
@@ -37,43 +39,34 @@ exports.flags = function flags(flow, project, build_config, split) {
 
 } //flags
 
+
 exports.target = function(flow, project, build_config, split) {
 
     split = split || '\n';
 
-        //:todo: these should be like build_path and buildetc
-    var dest_folder = path.normalize(project.source.product.output) + '/';
+    var build_path = projects.build_path(flow, project);
+    var out_path = projects.out_path(flow, project) + '/';
 
-        //the build output goes into it's own folder
-    dest_folder += flow.target;
-
-    if(flow.target_arch == '64') {
-        dest_folder += flow.target_arch;
-    }
+    var values = '-cp ' + build_path + 'haxe/';
 
     switch(flow.target) {
-        case 'mac':
-        case 'linux':
-        case 'windows':
-        case 'android':
-        case 'ios':
-        {
-            dest_folder += '.build/'
-            var _targets = '-cpp ' + dest_folder + 'cpp/';
-                _targets += split + '-cp ' + dest_folder + 'haxe/';
-            return _targets;
-            break; //yes, break too.
-        }
+
+        case 'mac': case 'linux': case 'windows':
+        case 'android': case 'ios': {
+            values += split + '-cpp ' + build_path + 'cpp/';
+            break;
+        } //native
 
         case 'web':{
-            var _targets = '-js ' + dest_folder + '/' + project.source.product.app + '.js';
-                _targets += split + '-cp ' + dest_folder + '.build/haxe/';
-            return _targets;
+            values += split + '-js ' + out_path + project.source.product.app + '.js';
             break;
-        }
-    }
+        } //web
 
-}
+    } //switch
+
+    return values;
+
+} //target
 
     //bakes the whole project into a usable complete hxml
 exports.hxml = function(flow, project, build_config, split) {

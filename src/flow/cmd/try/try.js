@@ -1,10 +1,10 @@
 
     var   cmds = require('../')
 
-// > flow try web -options
+// > flow try target --options
 //   is the same as
-// > flow build web -options
-// > flow run web -options
+// > flow build target --options
+// > flow run target --options
 
 exports.run = function run(flow, data) {
 

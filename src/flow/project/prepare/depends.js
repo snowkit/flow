@@ -12,7 +12,7 @@ exports.parse = function parse(flow, project, result, depth) {
     result = result || { found:{}, failed:{} };
     depth = depth || 1;
 
-    console.log('flow / %s parsing dependencies for %s', util.pad(depth*2, '', ' '), project.name);
+    // console.log('flow / %s parsing dependencies for %s', util.pad(depth*2, '', ' '), project.name);
 
     var depends = project.build.dependencies;
     var found = {};
@@ -27,10 +27,10 @@ exports.parse = function parse(flow, project, result, depth) {
 
             if(!has) {
                 failed[depend] = { name:depend, version:depend_version };
-                console.log('flow / %s - missing dependency %s %s', util.pad(depth*6, '', ' '), depend, depend_version);
+                console.log('flow / %s - missing dependency %s %s', util.pad(depth*3, '', ' '), depend, depend_version);
             } else {
                 found[depend] = { name:depend, version:depend_version, path:has.path };
-                console.log('flow / %s - found dependency %s %s', util.pad(depth*6, '', ' '), depend, depend_version);
+                console.log('flow / %s - found dependency %s %s', util.pad(depth*3, '', ' '), depend, depend_version);
             }
 
         } //each depends

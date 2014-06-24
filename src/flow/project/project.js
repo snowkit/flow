@@ -19,6 +19,28 @@ exports.bake = function bake(flow, project, build_config) {
     return _bake.bake(flow, project, build_config);
 }
 
+    //the final target path for the output
+exports.out_path = function out_path(flow, project) {
+
+    var dest_folder = path.normalize(project.source.product.output) + '/';
+
+    dest_folder += flow.target;
+
+    if(flow.target_arch == '64') {
+        dest_folder += flow.target_arch;
+    }
+
+    return dest_folder;
+
+} //out_path
+
+    //the final build data path for the output
+exports.build_path = function build_path(flow, project) {
+
+    return exports.out_path(flow, project) + '.build/';
+
+} //build_path
+
 exports.verify = function verify(flow, project_path, quiet) {
 
     var project_file = flow.flags.project || project_path;

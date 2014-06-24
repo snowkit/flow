@@ -23,20 +23,21 @@
         flow.project.path = opt.project.path;
         flow.project.file = opt.project.file;
 
-            //not a normal build, but building a library
-            //we defer this to it's own file
+            //if building a library we defer this to it's own commmand
         if(flow.flags.lib) {
+
             flow.execute(flow, cmds['_build_lib']);
+
         } else {
 
-
-            console.log('flow / building %s %s for %s',
+            console.log('\nflow / building %s %s for %s',
                 flow.project.parsed.name, flow.project.parsed.version, flow.target);
 
                 //to build a project we need to prepare it first
             flow.project.prepare(flow, config);
 
             if(!flow.project.prepared) {
+                console.log('flow / project build failed at preparing\n');
                 return flow.project.failed = true;
             }
 
@@ -44,11 +45,18 @@
             flow.project.bake(flow, config);
 
             if(!flow.project.baked) {
+                console.log('flow / project build failed at baking\n');
                 return flow.project.failed = true;
             }
 
+            //only if every stage required to run an actual build succeeded,
+            //do we clean up if requested. this allows failed configurations to not
+            //wipe the output folder too soon
+            if(flow.flags.clean) {
+                flow.execute(flow, cmds['clean']);
+            }
 
-        }
+        } //!lib
 
     }; //run
 
