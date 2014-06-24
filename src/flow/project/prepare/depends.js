@@ -1,4 +1,5 @@
 var   path = require('path')
+    , fs = require('graceful-fs')
     , util = require('../../util/util')
     , haxelib = require('../../util/haxelib')
     , projects = require('../project')
@@ -69,11 +70,23 @@ exports.parse = function parse(flow, project, result, depth) {
             //it's ok to be missing a project file,
             //because these are optional files
             //so we only use valid ones
-        if(state.parsed == null) {
+        if(lib.project == null) {
+
                 //if it's null, but not missing, it's a syntax issue
                 //in which case totally abort
             if(state.reason.indexOf('cannot find') == -1) {
                 return result = null;
+            }
+                //but if not, at least try and parse the version
+                //information from the haxelib.json because it will be defined
+                //in the flags later on before baking
+            var haxelib_json = path.join(lib.path, 'haxelib.json');
+            if(fs.existsSync(haxelib_json)) {
+                var json = JSON.parse( fs.readFileSync(haxelib_json, 'utf8') );
+                lib.project = { name:lib.name, version:json.version, build:{} };
+            } else {
+                //nothing we can do to define this, so ...
+                lib.project = { name:lib.name, version:'', build:{} };
             }
 
         } else {

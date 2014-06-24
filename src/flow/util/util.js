@@ -8,6 +8,16 @@ Object.size = function(obj) {
     return size;
 };
 
+exports.array_union = function(a,b) {
+    var r = a.slice(0);
+    b.forEach(function(i) { if (r.indexOf(i) < 0) r.push(i); });
+    return r;
+}
+
+exports.array_diff = function(a,b) {
+    return a.filter(function(i) {return b.indexOf(i) < 0;});
+}
+
 exports.deep_copy = function deep_copy(obj) {
   return JSON.parse(JSON.stringify(obj));
 }

@@ -2,6 +2,7 @@ var   path = require('path')
     , haxelib = require('../util/haxelib')
     , util = require('../util/util')
     , projects = require('./project')
+    , bake = require('./bake')
 
     , depends = require('./prepare/depends')
     , defines = require('./prepare/defines')
@@ -81,8 +82,6 @@ internal.prepare_dependencies = function(flow, project, build_config) {
 
 } //prepare_dependencies
 
-
-
 internal.prepare_defines = function(flow, prepared, build_config) {
 
     console.log('flow / preparing defines \n');
@@ -107,25 +106,71 @@ internal.prepare_defines = function(flow, prepared, build_config) {
         return null;
     }
 
-    console.log('flow / defines parsed as \n')
-    // console.log(prepared.defines_all);
-    console.log(prepared.defines);
-    console.log('');
 
-    console.log('flow / done defines ... \n');
+        //by default we store a list of dependencies and their versions as defines too
+    for(name in prepared.depends) {
+        var depend = prepared.depends[name];
+        if(depend.project) {
+            prepared.defines[depend.name] = { name:depend.name, value:depend.project.version };
+        } else {
+            prepared.defines[depend.name] = { name:depend.name };
+        }
+    }//each depends
+
+
+
+        //now store a list of defines as strings for later use
+    prepared.defines_list = [];
+
+    for(name in prepared.defines) {
+        var define = prepared.defines[name];
+        prepared.defines_list.push(
+            (define.value === undefined) ? define.name : define.name + '=' + define.value
+        );
+    }
+
+
+    // console.log(prepared.defines_all);
+    console.log(bake.defines(flow, prepared, build_config));
+    // console.log(prepared.defines);
+
+    console.log('\nflow / done defines ... \n');
 
     return prepared;
 
 } //prepare_defines
 
 
+internal.prepare_codepaths = function (flow, prepared, build_config) {
+
+        //store the code paths of each of the dependencies in the flag list
+    for(name in prepared.depends) {
+        var depend = prepared.depends[name];
+            prepared.flags.push('-cp ' + depend.path);
+    }//each depends
+
+        //store the product code paths flag list
+    if(prepared.source.product && prepared.source.product.codepaths) {
+        var _paths = prepared.source.product.codepaths.map(function(a) { return '-cp ' + a; });
+        prepared.flags = util.array_union(prepared.flags, _paths);
+    }//each depends
+
+} //prepare_codepaths
+
 internal.prepare_flags = function(flow, prepared, build_config) {
 
     console.log('flow / preparing flags \n');
 
+    prepared.flags = [];
+    internal.prepare_codepaths(flow, prepared, build_config);
     prepared.flags = flags.parse(flow, prepared, build_config);
 
-    console.log(prepared.flags);
-    console.log('flow / done flags ... \n');
+        //append the debug flag if requested
+    if(flow.flags.debug) { prepared.flags.push('-debug'); }
+
+    console.log(bake.flags(flow, prepared, build_config));
+
+    console.log('\nflow / done flags ... \n');
 
 } //prepare_flags
+
