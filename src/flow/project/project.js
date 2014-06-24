@@ -3,14 +3,19 @@ var   fs = require('graceful-fs')
     , path = require('path')
     , jsonic = require('jsonic')
     , nodeutil = require('util')
-    , _cook = require('./cook')
+    , _prepare = require('./prepare')
+    , _bake = require('./bake')
 
 
 exports.default = 'flow.json';
 
 
-exports.cook = function cook(flow, project, build_config) {
-    return _cook.cook(flow, project, build_config);
+exports.prepare = function prepare(flow, project, build_config) {
+    return _prepare.prepare(flow, project, build_config);
+}
+
+exports.bake = function bake(flow, project, build_config) {
+    return _bake.bake(flow, project, build_config);
 }
 
 exports.verify = function verify(flow, project_path, quiet) {

@@ -26,14 +26,20 @@
             console.log('flow / building %s %s for %s',
                 flow.project.parsed.name, flow.project.parsed.version, flow.target);
 
-                //to build a project we need to cook it for the dependencies etc
-            flow.project.cooked = flow.project.cook(flow, flow.project.parsed, config);
+                //to build a project we need to prepare it first
+            flow.project.prepare(flow, config);
 
-            if(!flow.project.cooked) {
+            if(!flow.project.prepared) {
                 return flow.project.failed = true;
             }
 
-            // console.log('cooked project\n', flow.project.cooked);
+                //the we bake it into a buildable form
+            flow.project.bake(flow, config);
+
+            if(!flow.project.baked) {
+                return flow.project.failed = true;
+            }
+
 
         }
 
