@@ -4,6 +4,9 @@
         , fs = require('graceful-fs')
 
 
+
+var internal = {};
+
 //Build step
 
 
@@ -12,7 +15,7 @@
             //default to the system if no target specified
         flow.target = opt.target || flow.system;
 
-        flow.target_arch = exports._find_arch(flow);
+        flow.target_arch = flow.project.find_arch(flow);
 
         if(flow.target_arch === null) {
             return flow.project.failed = true;
@@ -49,9 +52,9 @@
                 return flow.project.failed = true;
             }
 
-            //only if every stage required to run an actual build succeeded,
-            //do we clean up if requested. this allows failed configurations to not
-            //wipe the output folder too soon
+                //only if every stage required to run an actual build succeeded,
+                //do we clean up if requested. this allows failed configurations to not
+                //wipe the output folder too soon
             if(flow.flags.clean) {
                 flow.execute(flow, cmds['clean']);
             }
@@ -73,7 +76,7 @@
 
             //if no valid project was found
         if(!project.parsed) {
-            return done( exports._error_project(flow, project.reason), null );
+            return done( internal._error_project(flow, project.reason), null );
         }
 
         result.target = target;
@@ -90,14 +93,14 @@
 
                     //if not, invalidate
                 if(invalid.indexOf(target) != -1) {
-                    return done( exports._error_invalid(flow, target), null );
+                    return done( internal._error_invalid(flow, target), null );
                 }
 
                 return done(null, result);
 
             } else {
 
-                return done( exports._error_unknown(flow, target), null);
+                return done( internal._error_unknown(flow, target), null);
 
             } //not a known target
 
@@ -108,59 +111,6 @@
     }; //verify
 
 
-//helpers
-
-    exports._find_arch = function(flow) {
-
-        var arch = '';
-
-            //check if there is any explicit arch given
-        if(flow.flags.arch) {
-            var _arch = flow.flags.arch;
-            if(_arch === true) {
-                console.log('\nError\n--arch specified but no arch given\n\n> use --arch 86, --arch 64, --arch armv6 etc.\n');
-                return null;
-            } else {
-                arch = _arch;
-            }
-        }
-
-            //99.9% (guess) of used macs are x64 now,
-            //so default to x64. use --arch 32 if you want to force it
-        if(flow.target == 'mac') {
-            if(!arch) arch = '64';
-        }
-
-            //default to the host operating system arch on linux
-        if(flow.target == 'linux') {
-            if(!arch) {
-                if(process.arch == 'x64') {
-                    arch = '64';
-                } else if(process.arch == 'ia32') {
-                    arch = '32';
-                }
-            }
-        } //linux
-
-            //default to armv7 on mobile, use --arch armv6 etc to override
-        if(flow.target == 'ios' || flow.target == 'android') {
-            if(!arch) {
-                arch = 'armv7';
-            }
-        }
-
-            //until hxcpp gets x64 support, force 32 bit on windows
-        if(flow.target == 'windows') {
-            if(arch == '64') {
-                console.log('flow / hxcpp does not support 64 bit on windows at the moment. Please ask at http://github.com/haxefoundation/hxcpp/issues if you would like this to happen.');
-            }
-                //force 32
-            arch = '32';
-        } //windows
-
-        return arch;
-
-    } //arch
 
 //Error handlers
 
@@ -175,7 +125,7 @@
 
     }; //error
 
-    exports._error_project = function(flow, reason){
+    internal._error_project = function(flow, reason){
 
         if(reason && reason.length > 0) {
             return 'project file error \n\n > ' + reason;
@@ -185,7 +135,7 @@
 
     } //_error_project
 
-    exports._error_unknown = function(flow, target){
+    internal._error_unknown = function(flow, target){
 
         var err = 'unknown target `' + target + '`\n\n';
             err += '> known targets : ' + config.known_targets.join(', ');
@@ -194,7 +144,7 @@
 
     } //_error_unknown
 
-    exports._error_invalid = function(flow, target){
+    internal._error_invalid = function(flow, target){
 
         var err = 'invalid target `'+target+'` for system `'+flow.system+'` \n\n';
 

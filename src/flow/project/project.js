@@ -11,36 +11,6 @@ var   fs = require('graceful-fs')
 exports.default = 'flow.json';
 
 
-exports.prepare = function prepare(flow, project, build_config) {
-    return _prepare.prepare(flow, project, build_config);
-}
-
-exports.bake = function bake(flow, project, build_config) {
-    return _bake.bake(flow, project, build_config);
-}
-
-    //the final target path for the output
-exports.out_path = function out_path(flow, project) {
-
-    var dest_folder = path.normalize(project.source.product.output) + '/';
-
-    dest_folder += flow.target;
-
-    if(flow.target_arch == '64') {
-        dest_folder += flow.target_arch;
-    }
-
-    return dest_folder;
-
-} //out_path
-
-    //the final build data path for the output
-exports.build_path = function build_path(flow, project) {
-
-    return exports.out_path(flow, project) + '.build/';
-
-} //build_path
-
 exports.verify = function verify(flow, project_path, quiet) {
 
     var project_file = flow.flags.project || project_path;
@@ -115,4 +85,88 @@ exports.verify = function verify(flow, project_path, quiet) {
 } //verify
 
 
+    //the final target path for the output
+exports.out_path = function out_path(flow, project) {
 
+    var dest_folder = path.normalize(project.source.product.output) + '/';
+
+    dest_folder += flow.target;
+
+    if(flow.target_arch == '64') {
+        dest_folder += flow.target_arch;
+    }
+
+    return dest_folder;
+
+} //out_path
+
+    //the final build data path for the output
+exports.build_path = function build_path(flow, project) {
+
+    return exports.out_path(flow, project) + '.build/';
+
+} //build_path
+
+exports.prepare = function prepare(flow, project, build_config) {
+
+    return _prepare.prepare(flow, project, build_config);
+
+} //exports.prepare
+
+exports.bake = function bake(flow, project, build_config) {
+
+    return _bake.bake(flow, project, build_config);
+
+} //exports.bake
+
+exports.find_arch = function(flow) {
+
+    var arch = '';
+
+        //check if there is any explicit arch given
+    if(flow.flags.arch) {
+        var _arch = flow.flags.arch;
+        if(_arch === true) {
+            console.log('\nError\n--arch specified but no arch given\n\n> use --arch 86, --arch 64, --arch armv6 etc.\n');
+            return null;
+        } else {
+            arch = _arch;
+        }
+    }
+
+        //99.9% (guess) of used macs are x64 now,
+        //so default to x64. use --arch 32 if you want to force it
+    if(flow.target == 'mac') {
+        if(!arch) arch = '64';
+    }
+
+        //default to the host operating system arch on linux
+    if(flow.target == 'linux') {
+        if(!arch) {
+            if(process.arch == 'x64') {
+                arch = '64';
+            } else if(process.arch == 'ia32') {
+                arch = '32';
+            }
+        }
+    } //linux
+
+        //default to armv7 on mobile, use --arch armv6 etc to override
+    if(flow.target == 'ios' || flow.target == 'android') {
+        if(!arch) {
+            arch = 'armv7';
+        }
+    }
+
+        //until hxcpp gets x64 support, force 32 bit on windows
+    if(flow.target == 'windows') {
+        if(arch == '64') {
+            console.log('flow / hxcpp does not support 64 bit on windows at the moment. Please ask at http://github.com/haxefoundation/hxcpp/issues if you would like this to happen.');
+        }
+            //force 32
+        arch = '32';
+    } //windows
+
+    return arch;
+
+} //arch

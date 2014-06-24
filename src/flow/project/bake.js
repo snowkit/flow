@@ -1,6 +1,5 @@
 
 var   path = require('path')
-    , projects = require('./project')
 
 exports.bake = function bake(flow, build_config) {
 
@@ -44,8 +43,8 @@ exports.target = function(flow, project, build_config, split) {
 
     split = split || '\n';
 
-    var build_path = projects.build_path(flow, project);
-    var out_path = projects.out_path(flow, project) + '/';
+    var build_path = flow.project.build_path(flow, project);
+    var out_path = flow.project.out_path(flow, project) + '/';
 
     var values = '-cp ' + build_path + 'haxe/';
 

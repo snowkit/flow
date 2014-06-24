@@ -61,7 +61,7 @@ exports.parse = function parse(flow, project, result, depth) {
     for(depend in found) {
 
         var lib = found[depend];
-        var project_file = path.join(lib.path,projects.default);
+        var project_file = path.join(lib.path, flow.project.default);
         var state = projects.verify(flow, project_file, true);
 
             //store the project value for the dependency

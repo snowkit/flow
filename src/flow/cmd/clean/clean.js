@@ -1,9 +1,7 @@
 
-var   project = require('../../project/project')
-
 exports.run = function run(flow, data) {
 
-    console.log('flow / doing clean of %s ... ', project.build_path(flow, flow.project.prepared) );
+    console.log('flow / doing clean of %s ... ', flow.project.build_path(flow, flow.project.prepared) );
 
 } //run
 

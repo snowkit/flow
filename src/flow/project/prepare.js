@@ -1,7 +1,6 @@
 var   path = require('path')
     , haxelib = require('../util/haxelib')
     , util = require('../util/util')
-    , projects = require('./project')
     , bake = require('./bake')
 
     , depends = require('./prepare/depends')
