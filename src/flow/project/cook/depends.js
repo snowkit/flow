@@ -5,7 +5,7 @@ var   path = require('path')
 
 
     //return all dependencies, as {found:{}, failed:{}}
-exports.depends = function depends(flow, project, result, depth) {
+exports.parse = function parse(flow, project, result, depth) {
 
         //recursive, so use the one passed in otherwise
     result = result || { found:{}, failed:{} };
@@ -82,7 +82,7 @@ exports.depends = function depends(flow, project, result, depth) {
             //recursive dependencies
 
             if(!result.found[project.name]) {
-                result = exports.depends(flow, state.parsed, result, depth+1);
+                result = exports.parse(flow, state.parsed, result, depth+1);
             }
         }
 

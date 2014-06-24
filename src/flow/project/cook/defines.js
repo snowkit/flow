@@ -2,7 +2,7 @@ var   util = require('../../util/util');
 
 var internal = {};
 
-exports.defines = function defines(flow, project, depends, build_config, existing) {
+exports.parse = function parse(flow, project, depends, build_config, existing) {
 
         //start with given value
     existing = existing || {};
@@ -59,7 +59,7 @@ exports.defines = function defines(flow, project, depends, build_config, existin
                 //possible for a null project,
                 //i.e no flow.json in dependency
             if(depend.project) {
-                existing = exports.defines(flow, depend.project, null, build_config, existing);
+                existing = exports.parse(flow, depend.project, null, build_config, existing);
             }
         }
     } //depends
@@ -69,8 +69,9 @@ exports.defines = function defines(flow, project, depends, build_config, existin
 } //defines
 
 internal._unknown = -1;
-internal._unmet = false;
-internal._met = true;
+
+    //a cached list of conditionals and their tokenized values
+internal.multi_conditionals = {}
 
     //post parsing strip based on existing defines + known targets
 exports.filter = function filter(flow, defines, build_config) {
@@ -90,6 +91,7 @@ exports.filter = function filter(flow, defines, build_config) {
             } else {
                 if(tokenized) {
                     define.tokenized = tokenized;
+                    internal.multi_conditionals[define.conditional] = tokenized;
                 }
             }
         }
@@ -109,6 +111,24 @@ exports.filter = function filter(flow, defines, build_config) {
     return results;
 
 }
+    //just satisfy the single condition. this should be called only after
+    //the initial conditionals have all been parsed
+exports.satisfy = function satisfy(flow, project, condition, conditional) {
+
+    // console.log('check', conditional);
+    var tokenized = internal.multi_conditionals[conditional];
+    if(tokenized) {
+        var met = internal.satisfy_multi_condition(project.defines_all, tokenized);
+        return met === true;
+    } else {
+        if(project.defines[conditional]) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+} //satisfy
 
 internal.token_name = 0;
 internal.token_type = 1;
@@ -196,18 +216,17 @@ internal.satisfy_single_condition = function(defines, define) {
     }
 }
 
-internal.satisfy_multi_condition = function(defines, define) {
+internal.satisfy_multi_condition = function(defines_all, tokenized) {
 
- //for each step in the condition, we have a final resulting value of true or false
-    // console.log('define %s %s', define.name, define.condition, define.conditional)
+    //for each step in the condition, we have a final resulting value of true or false
 
         //first we check if ALL of the defines in question
         //are unknown, there is nothing we can do yet
     var is_unknown = true;
-    for(index in define.tokenized) {
-        var tokened = define.tokenized[index];
-        var value1 = defines[tokened.value];
-        var value2 = defines[tokened.against];
+    for(index in tokenized) {
+        var tokened = tokenized[index];
+        var value1 = defines_all[tokened.value];
+        var value2 = defines_all[tokened.against];
         if(value1.met != -1 || value2.met != -1) {
             is_unknown = false;
         }
@@ -215,16 +234,16 @@ internal.satisfy_multi_condition = function(defines, define) {
 
         //all of the potential flags in question are unknown, so don't bother
     if(is_unknown) {
-        // console.log('unknown flags for all conditions of ', define.tokenized);
+        // console.log('unknown flags for all conditions of ', tokenized);
         return -1;
     }
 
         //start at true
     var current;
-    for(index in define.tokenized) {
-        var tokened = define.tokenized[index];
-        var value1 = defines[tokened.value];
-        var value2 = defines[tokened.against];
+    for(index in tokenized) {
+        var tokened = tokenized[index];
+        var value1 = defines_all[tokened.value];
+        var value2 = defines_all[tokened.against];
 
         if(value1.met != -1 && value2.met != -1) {
             if(tokened.as == '||') {
@@ -253,6 +272,7 @@ internal.satisfy_multi_condition = function(defines, define) {
     // console.log(current);
 
     return current;
+
 }
 
     //walk down the list attempting to satisfy each
@@ -288,7 +308,7 @@ internal.satisfy_conditions = function(defines) {
             if(define.condition) {
                 if(define.tokenized) {
                     // console.log('do complex define ' + name);
-                    define.met = internal.satisfy_multi_condition(defines, define);
+                    define.met = internal.satisfy_multi_condition(defines, define.tokenized);
                 }
             }
         } //each define

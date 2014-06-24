@@ -3,8 +3,9 @@ var   path = require('path')
     , util = require('../util/util')
     , projects = require('./project')
 
-    , cook_depends = require('./cook/depends')
-    , cook_defines = require('./cook/defines')
+    , depends = require('./cook/depends')
+    , defines = require('./cook/defines')
+    , flags = require('./cook/flags')
 
 var internal = {};
 
@@ -16,25 +17,30 @@ exports.cook = function cook(flow, project, build_config) {
 
     console.log('\nflow / cooking project %s', project.name );
 
-    var depends = internal.satisfy_dependency(flow, project);
+        //dependencies are a special case as they affect everything, they
+        //come first and are required to be complete before anything else
+    var _depends = internal.cook_dependencies(flow, project, build_config);
 
         //get out early if missing any dependency
-    if(depends == null) {
+    if(_depends == null) {
         return null;
     }
 
         //start at the project base
     var cooked = {
         source : util.deep_copy(project),
-        depends : depends,
+        depends : _depends,
         defines_all : {}
     }
 
         //after dependencies, we process the defines as the rest will depend on them
+        //and error out if there are any parsing or other errors in there.
     if(!internal.cook_defines(flow, cooked, build_config)) {
-            //error out if there were define errors
         return null;
     }
+
+        //continued parsing on the build object, the haxe/build flags
+    internal.cook_flags(flow, cooked, build_config);
 
         //return the cooked project
     return cooked;
@@ -43,50 +49,24 @@ exports.cook = function cook(flow, project, build_config) {
 
 
 
-//internal handlers
-internal.cook_defines = function(flow, cooked, build_config) {
+    //internal handlers
 
-        //store the list of targets as met or unmet defines based on the target
-        //we are attempting to cook for
-    for(index in build_config.known_targets) {
-        var name = build_config.known_targets[index];
-        cooked.defines_all[name] = { name:name, met:flow.target == name };
-    }
-        //now we parse all project defines from the project
-    cooked.defines_all = cook_defines.defines(flow, cooked.source, cooked.depends, build_config, cooked.defines_all);
-        //and the final list is filtered against the defines themselves, and the known targets
-    cooked.defines = cook_defines.filter(flow, cooked.defines_all, build_config);
 
-    if(cooked.defines.err) {
-        console.log('flow / defines failed to parse. aborting build : \n');
-        console.log('> %s \n',cooked.defines.err);
-        return null;
-    }
-
-    console.log('defines parsed as \n')
-    console.log(cooked.defines_all);
-    console.log(cooked.defines);
-    console.log('');
-
-    return cooked;
-
-} //cook_defines
-
-internal.satisfy_dependency = function(flow, project) {
+internal.cook_dependencies = function(flow, project, build_config) {
 
     console.log('flow / building dependency tree');
 
-    var depends = cook_depends.depends(flow, project);
+    var _depends = depends.parse(flow, project);
 
     console.log('flow / done building tree... \n');
 
-    if(Object.size(depends.failed)) {
+    if(Object.size(_depends.failed)) {
 
         console.log('flow / cook failed due to missing dependencies!');
         console.log('flow / you will probably need to use haxelib to correct this.\n');
 
-        for(name in depends.failed) {
-            var depend = depends.failed[name];
+        for(name in _depends.failed) {
+            var depend = _depends.failed[name];
             console.log('> %s %s', depend.name, depend.version);
         }
 
@@ -94,6 +74,55 @@ internal.satisfy_dependency = function(flow, project) {
 
     } //depends.failed has size
 
-    return depends.found;
+    return _depends.found;
 
-} //satisfy_dependency
+} //cook_dependencies
+
+
+
+internal.cook_defines = function(flow, cooked, build_config) {
+
+    console.log('flow / cooking defines \n');
+
+        //store the list of targets as met or unmet defines based on the target
+        //we are attempting to cook for
+    for(index in build_config.known_targets) {
+        var name = build_config.known_targets[index];
+        cooked.defines_all[name] = { name:name, met:flow.target == name };
+    }
+
+
+        //now we parse all project defines from the project
+    cooked.defines_all = defines.parse(flow, cooked.source, cooked.depends, build_config, cooked.defines_all);
+        //and the final list is filtered against the defines themselves, and the known targets
+    cooked.defines = defines.filter(flow, cooked.defines_all, build_config);
+
+
+    if(cooked.defines.err) {
+        console.log('flow / defines failed to parse. aborting build : \n');
+        console.log('> %s \n',cooked.defines.err);
+        return null;
+    }
+
+    console.log('flow / defines parsed as \n')
+    // console.log(cooked.defines_all);
+    console.log(cooked.defines);
+    console.log('');
+
+    console.log('flow / done defines ... \n');
+
+    return cooked;
+
+} //cook_defines
+
+
+internal.cook_flags = function(flow, cooked, build_config) {
+
+    console.log('flow / cooking flags \n');
+
+    cooked.flags = flags.parse(flow, cooked, build_config);
+
+    console.log(cooked.flags);
+    console.log('flow / done flags ... \n');
+
+} //cook_flags
