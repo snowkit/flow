@@ -16,16 +16,28 @@ exports.parse = function parse(flow, prepared, project, srcpath, build_config) {
     internal.parse_files(flow, prepared, project.files, project_file_list);
     internal.parse_files(flow, prepared, project.build.files, build_file_list);
 
-    if(srcpath) {
-        project_file_list = project_file_list.map(function(p){
-            p.source = path.join(srcpath,p.source);
-            return p;
-        });
 
-        build_file_list = build_file_list.map(function(p){
-            p.source = path.join(srcpath,p.source);
-            return p;
-        });
+    var project_root = path.dirname(flow.project.parsed.__path);
+    var project_out = flow.project.path_output;
+
+        //make sure this file is within the bounds of the project + dependency scope
+        //as well as append the given source path (i.e dependency abs file)
+    if(srcpath) {
+
+            //first map it to the given source path
+        project_file_list = internal.append_source(flow, project_file_list, srcpath);
+        build_file_list = internal.append_source(flow, build_file_list, srcpath);
+
+            //then filter unsafe/non-relative paths
+        project_file_list = internal.filter_unsafe(flow, project_file_list, srcpath, project_out, project_root);
+        build_file_list = internal.filter_unsafe(flow, build_file_list, srcpath, project_out, project_root);
+
+    } else {
+
+            //then filter unsafe/non-relative paths
+        project_file_list = internal.filter_unsafe(flow, project_file_list, project_root, project_out, project_root);
+        build_file_list = internal.filter_unsafe(flow, build_file_list, project_root, project_out, project_root);
+
     }
 
     return {
@@ -35,6 +47,47 @@ exports.parse = function parse(flow, prepared, project, srcpath, build_config) {
 
 } //parse
 
+
+internal.append_source = function(flow, list, srcpath) {
+
+    return list.map(function(p){
+        p.source_name = p.source;
+        p.source = path.join(srcpath, p.source);
+        return p;
+    });
+
+} //append_source
+
+internal.filter_unsafe = function(flow, list, srcpath, dstpath, rootpath) {
+
+    return list.filter(function(p){
+
+        var is_source_safe = true;
+        var is_dest_safe = true;
+
+        var local_dest = path.join(dstpath, p.dest);
+        var abs_dest = path.resolve(rootpath, local_dest);
+
+        var rel_src = path.relative(srcpath, p.source);
+        var rel_dst = path.relative(rootpath, local_dest);
+
+        if(rel_src.indexOf('..') != -1) {
+            is_source_safe = false;
+            flow.log(2, '>     - files - ignoring source file due to unsafe path. %s should be inside %s (becomes %s)',
+                p.source_name ? p.source_name : p.source, srcpath, p.source);
+        }
+
+        if(rel_dst.indexOf('..') != -1) {
+            is_dest_safe = false;
+            flow.log(2, '>     - files - ignoring dest file due to unsafe path. %s should be inside %s (becomes %s)',
+                p.dest, rootpath, abs_dest);
+        }
+
+        return is_source_safe && is_dest_safe;
+
+    });
+
+} //filter_unsafe
 
 internal.parse_files = function(flow, project, root, file_list) {
 
