@@ -137,6 +137,10 @@ exports.get_out_binary = function(flow, prepared) {
         outpath = path.join(outroot, app_name) + '.app/Contents/MacOS/';
     }
 
+    if(flow.target == 'windows') {
+        outpath += '.exe';
+    }
+
     return path.join(outpath, app_name);
 
 } //get_out_binary
