@@ -1,7 +1,7 @@
 {
     "config" : "1.0.0-alpha-1",
     "build" : {
-        "timing" : true,
+        "timing" : false,
         "app_boot" : "FlowApp",
         "error_on_files_missing" : false,
         "command_line_based" : false,

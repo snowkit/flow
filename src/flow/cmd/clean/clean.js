@@ -10,12 +10,12 @@ exports.run = function run(flow, do_all) {
     if(flow.timing) console.time('clean');
 
     if(do_all) {
-        console.log('flow / clean - cleaning %s ... \n', flow.project.parsed.product.output );
+        flow.log(2, 'clean - cleaning %s ... \n', flow.project.parsed.product.output );
         wrench.rmdirSyncRecursive(path.resolve(flow.run_path, flow.project.parsed.product.output), true);
     } else {
-        console.log('flow / clean - cleaning %s ... ', flow.project.path_build );
+        flow.log(2, 'clean - cleaning %s ... ', flow.project.path_build );
         wrench.rmdirSyncRecursive(path.resolve(flow.run_path, flow.project.path_build), true);
-        console.log('flow / clean - cleaning %s ... \n', flow.project.path_output );
+        flow.log(2, 'clean - cleaning %s ... \n', flow.project.path_output );
         wrench.rmdirSyncRecursive(path.resolve(flow.run_path, flow.project.path_output), true);
     }
 

@@ -46,7 +46,7 @@ exports.verify = function verify(flow, project_path, quiet) {
     var abs_path = path.resolve(project_file);
 
     if(!flow.quiet.project && !quiet) {
-        console.log('flow / project - looking for project file %s', abs_path)
+        flow.log(2, 'project - looking for project file %s', abs_path)
     }
 
     var result;
@@ -186,7 +186,7 @@ exports.find_arch = function(flow) {
     if(flow.flags.arch) {
         var _arch = flow.flags.arch;
         if(_arch === true) {
-            console.log('\nError\n--arch specified but no arch given\n\n> use --arch 86, --arch 64, --arch armv6 etc.\n');
+            flow.log(1, '\nError\n--arch specified but no arch given\n\n> use --arch 86, --arch 64, --arch armv6 etc.\n');
             return null;
         } else {
             arch = _arch;
@@ -220,7 +220,7 @@ exports.find_arch = function(flow) {
         //until hxcpp gets x64 support, force 32 bit on windows
     if(flow.target == 'windows') {
         if(arch == '64') {
-            console.log('flow / hxcpp does not support 64 bit on windows at the moment. Please ask at http://github.com/haxefoundation/hxcpp/issues if you would like this to happen.');
+            flow.log(1, 'hxcpp does not support 64 bit on windows at the moment. Please ask at http://github.com/haxefoundation/hxcpp/issues if you would like this to happen.');
         }
             //force 32
         arch = '32';

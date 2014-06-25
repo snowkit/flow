@@ -23,7 +23,7 @@ HaxeCompileError.prototype = Error.prototype;
 
 exports.run = function(flow, config, done) {
 
-    if(flow.timing) console.time('flow / build - total');
+    if(flow.timing) console.time('build - total');
 
         //if requested we clean up, do so
     if(flow.flags.clean) {
@@ -41,23 +41,23 @@ exports.run = function(flow, config, done) {
     var hxml_path = path.join(flow.project.path_build, hxml_file);
 
         //write out the baked build hxml for the config
-        if(flow.timing) console.time('flow / build - write hxml');
+        if(flow.timing) console.time('build - write hxml');
 
     internal.write_hxml(flow, config, hxml_path);
 
-        if(flow.timing) console.timeEnd('flow / build - write hxml');
+        if(flow.timing) console.timeEnd('build - write hxml');
 
         //then run the haxe build stage, if it fails, early out
         //but since the console will be logging the output from haxe,
         // no need to log it again.
-    if(flow.timing) console.time('flow / build - haxe');
+    if(flow.timing) console.time('build - haxe');
 
-    internal.build_haxe(flow, config, hxml_file, function(err) {
-        
-        if(flow.timing) console.timeEnd('flow / build - haxe');
+    internal.build_haxe(flow, config, hxml_file, function(err, out) {
 
-        if(err) {
-            console.log('\nflow / build - stopping because of errors in haxe compile \n');
+        if(flow.timing) console.timeEnd('build - haxe');
+
+        if(err || out.indexOf('Aborted') != -1) {
+            flow.log(1,'\n build - stopping because of errors in haxe compile \n');
             return flow.project.failed = true;
         }
 
@@ -93,7 +93,9 @@ internal.post_haxe = function(flow, config, done) {
 
 internal.complete = function(flow, config, done) {
 
-    if(flow.timing) console.timeEnd('flow / build - total');
+    if(flow.timing) console.timeEnd('build - total');
+
+    flow.log(3,'');
 
     if(done) done(flow.project.failed);
 
@@ -125,14 +127,15 @@ internal.post_build = function(flow, config, done) {
 
 internal.build_haxe = function(flow, config, hxml_file, done) {
 
-    console.log('flow / build - running haxe compile against %s', hxml_file );
+    flow.log(2, 'build - running haxe ...');
+    flow.log(3, 'haxe %s', hxml_file );
 
     var opt = {
         // quiet : false,
         cwd: path.resolve(flow.run_path, flow.project.path_build)
     }
 
-    cmd.exec('haxe', [hxml_file], opt, done);
+    cmd.exec(flow, 'haxe', [hxml_file], opt, done);
 
     return false;
 
@@ -153,7 +156,7 @@ internal.get_hxml_file = function(flow, config) {
 
 internal.write_hxml = function(flow, config, write_to) {
 
-    console.log('flow / build - writing hxml to ' + write_to);
+    flow.log(3, 'build - writing hxml to ' + write_to);
 
     fs.writeFileSync(write_to, flow.project.hxml, 'utf8');
 

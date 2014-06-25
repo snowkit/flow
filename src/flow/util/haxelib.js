@@ -15,13 +15,13 @@ var internal = {};
     HaxelibError.prototype = Error.prototype;
 
         //caches all libs and values from haxelib list
-    exports.init = function init(done) {
+    exports.init = function init(flow, done) {
 
             //always reset these because we are flushing cache
         libs = {};
 
             //find haxelib library path
-        cmd.exec('haxelib', ['config'], {quiet:true}, function(code, out, err) {
+        cmd.exec(flow, 'haxelib', ['config'], {quiet:true}, function(code, out, err) {
 
             if(code != 0) {
                 var reason = '> haxelib config cannot be called. Is haxe/haxelib installed?\n';
@@ -30,11 +30,11 @@ var internal = {};
 
             exports.haxelib_path = out.trim();
 
-            // console.log('haxelib path %s', exports.haxelib_path);
+            flow.log(3, 'haxelib path %s', exports.haxelib_path);
 
                 //find and cache the list
 
-            cmd.exec('haxelib', ['list'], {quiet:true}, function(lcode, lout, lerr) {
+            cmd.exec(flow, 'haxelib', ['list'], {quiet:true}, function(lcode, lout, lerr) {
 
                 var list = lout.trim();
                 var name_ver = /^([a-zA-Z-_]*)(:{1})\s(.*)$/igm;
@@ -100,7 +100,7 @@ var internal = {};
             //current if none specified
         version = version = "*";
 
-        console.log('flow / haxelib get path for %s(%s)', name, version );
+        flow.log(3, 'haxelib get path for %s(%s)', name, version );
 
         return libs[name].versions[version].path;
 

@@ -5,12 +5,12 @@ exports.bake = function bake(flow, build_config) {
 
     var project = flow.project.prepared;
 
-    console.log('\nflow / bake - project %s\n', flow.project.parsed.name);
+    flow.log(2, 'bake - project %s\n', flow.project.parsed.name);
 
     flow.project.hxml = exports.hxml(flow, project, build_config );
 
-    console.log(flow.project.hxml);
-    console.log('');
+    flow.log(3, flow.project.hxml);
+    flow.log(3, '');
 
     flow.project.baked = true;
 

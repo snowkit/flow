@@ -10,15 +10,14 @@ var   exec = require('child_process').exec
 
         //run a process with set working directory, and args,
         //returns the results as a string for immediate use (blocking)
-    exports.exec = function(cmd, args, opt, done) {
-
+    exports.exec = function(flow, cmd, args, opt, done) {
 
         var prevwd = process.cwd();
 
         args = args || [];
         opt = opt || { env:process.env };
 
-        // console.log('flow / running process : %s', cmd, args.join(' '));
+        flow.log(3, 'process util - running : %s', cmd, args.join(' '));
 
         var _process = spawn(cmd, args, opt);
         var stderr = '';
@@ -41,7 +40,7 @@ var   exec = require('child_process').exec
         });
 
         _process.on('close', function (code) {
-            // console.log('child process exited with code ' + code);
+            flow.log(4, 'process util - child process %s exited with code %d', cmd, code);
             process.chdir(prevwd);
             if(done) done(code, stdout, stderr);
         });
@@ -78,12 +77,8 @@ var   exec = require('child_process').exec
                 return;
             }
 
-            try {
-                process.stdout.write(stdout_current.substr(stdout_previous.length));
-                stdout_previous = stdout_current;
-            } catch(e) {
-                console.log(e);
-            }
+            process.stdout.write(stdout_current.substr(stdout_previous.length));
+            stdout_previous = stdout_current;
 
         } //update_stdout
 

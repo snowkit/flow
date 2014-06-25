@@ -10,12 +10,12 @@ var internal = {};
 
 exports.post_build = function(flow, config, done) {
 
-    console.log('flow / build - running cpp post process');
+    flow.log(3,'build - running cpp post process');
 
     //the post build is so that we can move the binary file
     //from the output path if needed etc, run extra scripts and so on
 
-            if(flow.timing) console.time('flow / build - binary copy');
+            if(flow.timing) console.time('build - binary copy');
 
     var source_binary = flow.config.build.app_boot;
 
@@ -27,12 +27,12 @@ exports.post_build = function(flow, config, done) {
 
     util.copy_path(flow, source_path, flow.project.path_binary);
 
-            if(flow.timing) console.timeEnd('flow / build - binary copy');
+            if(flow.timing) console.timeEnd('build - binary copy');
 
         if(flow.system == 'mac' || flow.system == 'linux') {
-            if(flow.timing) console.time('flow / build - binary chmod');
-            cmd.exec('chmod', ['+x',flow.project.path_binary], {quiet:true}, function(code,out,err){
-                if(flow.timing) console.timeEnd('flow / build - binary chmod');
+            if(flow.timing) console.time('build - binary chmod');
+            cmd.exec(flow, 'chmod', ['+x',flow.project.path_binary], {quiet:true}, function(code,out,err){
+                if(flow.timing) console.timeEnd('build - binary chmod');
                 if(done) done(code,out,err);
             });
         } else {
@@ -43,14 +43,14 @@ exports.post_build = function(flow, config, done) {
 
 exports.post_haxe = function(flow, config, done) {
 
-            if(flow.timing) console.time('flow / build - hxcpp');
+            if(flow.timing) console.time('build - hxcpp');
 
     internal.build_hxcpp(flow, config, function(err) {
 
-            if(flow.timing) console.timeEnd('flow / build - hxcpp');
+            if(flow.timing) console.timeEnd('build - hxcpp');
 
         if(err) {
-            console.log('\nflow / build - stopping because of errors in hxcpp compile \n');
+            flow.log(1, '\n build - stopping because of errors in hxcpp compile \n');
             return flow.project.failed = true;
         }
 
@@ -67,18 +67,19 @@ internal.build_hxcpp = function(flow, config, done) {
     var hxcpp_file = 'Build.xml';
     var args = [hxcpp_file];
 
-    if(flow.target_native && flow.target_arch == '64') { 
-        args.push('-DHXCPP_M64'); 
+    if(flow.target_native && flow.target_arch == '64') {
+        args.push('-DHXCPP_M64');
     }
 
-    console.log('flow / build - running hxcpp compile against %s', hxcpp_file );
+    flow.log(2, 'build - running hxcpp ...');
+    flow.log(3, 'haxelib run hxcpp %s', hxcpp_file );
 
     var opt = {
         quiet : false,
         cwd: path.resolve(flow.run_path, cpp_path)
     }
 
-    cmd.exec('haxelib', ['run','hxcpp'].concat(args), opt, done);
+    cmd.exec(flow, 'haxelib', ['run','hxcpp'].concat(args), opt, done);
 
 
 } //build_hxcpp

@@ -1,7 +1,7 @@
 
 exports.run = function run(flow, data) {
 
-    console.log('flow / building lib %s for %s', flow.flags.lib, flow.target);
+    flow.log(2, 'building lib %s for %s', flow.flags.lib, flow.target);
 
 } //run
 

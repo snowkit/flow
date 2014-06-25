@@ -11,7 +11,9 @@ exports.run = function run(flow, files) {
     internal.copy_project_files(flow, files.project_files);
     internal.copy_build_files(flow, files.build_files);
 
-    console.log('');
+    flow.log(3,'');
+    flow.log(3,'files - done');
+    flow.log(3,'');
 
 } //run
 
@@ -20,7 +22,7 @@ exports.run = function run(flow, files) {
     //as a flat array of { source : dest } from prepared
 exports.verify = function verify(flow, done) {
 
-    console.log('flow / files - verifying ... ');
+    flow.log(3, 'files - verifying ... ');
 
     var final_project_files = [];
     var final_build_files = [];
@@ -36,7 +38,7 @@ exports.verify = function verify(flow, done) {
 
         var file = flow.project.prepared.files.project_files[index];
 
-        // console.log('flow / files - checking for `' + file.source +'`');
+        flow.log(4, 'files - checking for project file `' + file.source +'`');
         if(!fs.existsSync(file.source)) {
             warning += '       > missing files source path ' + file.source + '\n';
         } else {
@@ -49,7 +51,7 @@ exports.verify = function verify(flow, done) {
 
         var file = flow.project.prepared.files.build_files[index];
 
-        // console.log('flow / files - checking for `' + file.source +'`');
+        flow.log(4, 'files - checking for build file `' + file.source +'`');
         if(!fs.existsSync(file.source)) {
             warning += '       > missing files source path ' + file.source + '\n';
         } else {
@@ -76,13 +78,14 @@ internal.copy_project_files = function(flow, files) {
 
         var output = flow.project.path_output;
 
-        console.log('flow / files - copying project assets to %s\n', output);
+        flow.log(2, 'files - copying project assets to %s', output);
+        flow.log(3,'');
 
                 //first deal with the files in the project itself
             for(index in files) {
 
                 var node = files[index];
-                console.log('   copying %s to %s%s', node.source, output, node.dest);
+                flow.log(3, '   copying %s to %s%s', node.source, output, node.dest);
 
                 var dest = path.normalize(path.join(output, node.dest));
                 util.copy_path(flow, node.source, dest);
@@ -99,13 +102,14 @@ internal.copy_build_files = function(flow, files) {
 
         var output = flow.project.path_build;
 
-        console.log('\nflow / files - copying project build files to %s\n', output);
+        flow.log(3,'');
+        flow.log(2, 'files - copying project build files to %s\n', output);
 
                 //then we deal with the build files, to copy over to the build folder not the output folder
             for(index in files) {
 
                 var node = files[index];
-                console.log('   copying build file %s to %s%s', node.source, output, node.dest);
+                flow.log(3,'   copying build file %s to %s%s', node.source, output, node.dest);
 
                 var dest = path.normalize(path.join(output,node.dest));
                 util.copy_path(flow, node.source, dest);
@@ -118,9 +122,15 @@ internal.copy_build_files = function(flow, files) {
 
 internal._missing_warning = function(flow, msg, type) {
 
-    console.log('\n    %s', type);
-    console.log('      failed to find some files list in project tree!\n');
-    console.log('%s', msg);
+    var level = 3;
+
+    if(type == 'Error') {
+        level = 1;
+    }
+
+    flow.log(level, '\n    %s', type);
+    flow.log(level, '      failed to find some files list in project tree!\n');
+    flow.log(level, '%s', msg);
 
 } //_missing_warning
 

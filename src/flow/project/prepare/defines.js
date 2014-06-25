@@ -97,7 +97,7 @@ exports.filter = function filter(flow, defines, build_config) {
         }
     } //each in define
 
-    internal.satisfy_conditions(defines);
+    internal.satisfy_conditions(flow, defines);
 
         //now push a simplified list as the results, only by met type
     for(name in defines) {
@@ -115,7 +115,8 @@ exports.filter = function filter(flow, defines, build_config) {
     //the initial conditionals have all been parsed
 exports.satisfy = function satisfy(flow, project, condition, conditional) {
 
-    // console.log('check', conditional);
+    flow.log(4, 'defines - satisfy check', conditional);
+
     var tokenized = internal.multi_conditionals[conditional];
     if(tokenized) {
         var met = internal.satisfy_multi_condition(project.defines_all, tokenized);
@@ -192,7 +193,7 @@ internal.satisfy_single_condition = function(defines, define) {
 
             //check if the define is known yet
         if(defines[define.conditional].met == -1) {
-            // console.log('   conditional unknown yet %s / %s', define.name, define.conditional);
+            flow.log(4, '   conditional unknown yet %s / %s', define.name, define.conditional);
             return -1;
         }
 
@@ -211,10 +212,11 @@ internal.satisfy_single_condition = function(defines, define) {
         }
 
     } else {
-        // console.log('dependency against %s failed as its not found at all', define.conditional);
+        flow.log(4, 'defines - condition against %s failed as its not found at all', define.conditional);
         return false;
     }
-}
+
+} //satisfy_single_condition
 
 internal.satisfy_multi_condition = function(defines_all, tokenized) {
 
@@ -234,7 +236,7 @@ internal.satisfy_multi_condition = function(defines_all, tokenized) {
 
         //all of the potential flags in question are unknown, so don't bother
     if(is_unknown) {
-        // console.log('unknown flags for all conditions of ', tokenized);
+        flow.log(4, 'defines - unknown flags for all conditions of ', tokenized);
         return -1;
     }
 
@@ -269,16 +271,16 @@ internal.satisfy_multi_condition = function(defines_all, tokenized) {
 
     } //each tokenized
 
-    // console.log(current);
+    flow.log(4, 'defines - satisfy multi condition current', current);
 
     return current;
 
-}
+} //satisfy_multi_condition
 
     //walk down the list attempting to satisfy each
     //condition in the list. if a condition is met,
     //it is removed from the working list
-internal.satisfy_conditions = function(defines) {
+internal.satisfy_conditions = function(flow, defines) {
 
     var found_unknown = true;
     var max_depth = 20;
@@ -307,7 +309,7 @@ internal.satisfy_conditions = function(defines) {
             var define = defines[name];
             if(define.condition) {
                 if(define.tokenized) {
-                    // console.log('do complex define ' + name);
+                    flow.log(4, 'defines - do complex define %s', name);
                     define.met = internal.satisfy_multi_condition(defines, define.tokenized);
                 }
             }
@@ -316,22 +318,26 @@ internal.satisfy_conditions = function(defines) {
         var still_unknown = false;
         for(name in defines) {
             if(defines[name].met == -1) {
-                // console.log('unknown found ' + name);
+                flow.log(4, 'defines - unknown found %s', name);
                 still_unknown = true;
                 break;
             }
         }
 
         if(!still_unknown) {
-            // console.log('stopping because found no more unknowns');
+            flow.log(4, 'defines - stopping because found no more unknowns');
             found_unknown = false;
         } else {
-            // console.log('still found unknowns');
+            flow.log(4, 'defines - still found unknowns');
         }
 
         depth++;
 
     } //while found unknowns or reached a max depth
+
+    if(depth >= max_depth) {
+        flow.log(4, 'defines - stopping because too many loops in define tree(%d)', max_depth);
+    }
 
 } //satisfy conditions
 

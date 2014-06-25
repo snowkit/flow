@@ -1,7 +1,7 @@
 
 
 exports.run = function run(flow, data) {
-    console.log('flow / doing package');
+    flow.log(2, 'package - run');
 } //run
 
 exports.verify = function verify(flow, done) {

@@ -8,7 +8,7 @@ var internal = {};
     //returns an array of { source:dest } for the files in project
 exports.parse = function parse(flow, prepared, project, srcpath, build_config) {
 
-    // console.log('flow / preparing files');
+    flow.log(3, 'prepare - files');
 
     var project_file_list = [];
     var build_file_list = [];
@@ -79,7 +79,7 @@ internal.parse_file = function(flow, project, _node, file_list) {
     var _path = internal.parse_node(flow, project, _node );
 
     if(_path === null) {
-        console.log('flow / files - parsing failed for %s in %s', name, project.source.__path);
+        flow.log(1, 'files - parsing failed for %s in %s', name, project.source.__path);
     }
 
     if(_path) {
@@ -101,7 +101,7 @@ internal.parse_node = function(flow, project, _node) {
         _file_path = _node.path;
     } else {
         if(_node.constructor != String) {
-            console.log('\nflow / files - nodes can only be "path", "path => dest" or { path:"path => dest", ... }, given %s is invalid', _node.constructor.name);
+            flow.log(1, '\n files - nodes can only be "path", "path => dest" or { path:"path => dest", ... }, given %s is invalid', _node.constructor.name);
             return null;
         }
     }
@@ -109,7 +109,7 @@ internal.parse_node = function(flow, project, _node) {
     var parts = _file_path.split('=>');
 
     if(parts.length > 2) {
-        console.log('\nflow / files - paths require only "source => dest", found %d components instead of 2\n', parts.length);
+        flow.log(1, '\n files - paths require only "source => dest", found %d components instead of 2\n', parts.length);
         return null;
     }
 

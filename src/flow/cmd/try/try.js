@@ -21,5 +21,5 @@ exports.verify = function verify(flow, done) {
 }
 
 exports.error = function(flow, err) {
-    console.log('flow / try / error %s', err);
+    flow.log(1, 'try / error %s', err);
 }

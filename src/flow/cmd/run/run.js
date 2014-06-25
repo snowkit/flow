@@ -16,7 +16,7 @@ exports.run = function run(flow, data) {
         return;
     }
 
-    console.log('flow / running %s %s for %s\n',
+    flow.log(2, 'running %s %s for %s\n',
         flow.project.parsed.name, flow.project.parsed.version, flow.target);
 
     if(flow.target_native) {
@@ -40,7 +40,7 @@ exports.verify = function verify(flow, done) {
 exports.error = function(flow, err) {
 
     if(err && err.length > 0) {
-        console.log('flow / run / error %s', err);
+        flow.log(1, 'run / error %s', err);
     }
 
 } //error

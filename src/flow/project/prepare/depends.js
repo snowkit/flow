@@ -13,7 +13,7 @@ exports.parse = function parse(flow, project, result, depth) {
     result = result || { found:{}, failed:{} };
     depth = depth || 1;
 
-    // prepare.log(flow, 'flow / %s parsing dependencies for %s', util.pad(depth*2, '', ' '), project.name);
+    prepare.log(flow, 3, '%s parsing dependencies for %s', util.pad(depth*2, '', ' '), project.name);
 
     var depends = project.build.dependencies;
     var found = {};
@@ -28,17 +28,17 @@ exports.parse = function parse(flow, project, result, depth) {
 
             if(!has) {
                 failed[depend] = { name:depend, version:depend_version };
-                prepare.log(flow, 'flow /         - %s - missing dependency %s %s', util.pad(depth*2, '', ' '), depend, depend_version);
+                prepare.log(flow, 3, '        - %s - missing dependency %s %s', util.pad(depth*2, '', ' '), depend, depend_version);
             } else {
                 found[depend] = { name:depend, version:depend_version, path:has.path };
-                prepare.log(flow, 'flow /         - %s - found dependency %s %s', util.pad(depth*2, '', ' '), depend, depend_version);
+                prepare.log(flow, 3, '        - %s - found dependency %s %s', util.pad(depth*2, '', ' '), depend, depend_version);
             }
 
         } //each depends
 
     } else {//has dependencies
 
-        prepare.log(flow, 'flow / prepare - %s %s lists no dependencies', util.pad(depth*3, '', ' '), project.name);
+        prepare.log(flow, 3, 'prepare - %s %s lists no dependencies', util.pad(depth*3, '', ' '), project.name);
 
     }
 
@@ -76,7 +76,7 @@ exports.parse = function parse(flow, project, result, depth) {
                 //if it's null, but not missing, it's a syntax issue
                 //in which case totally abort
             if(state.reason.indexOf('cannot find') == -1) {
-                prepare.log(flow, '\n', state.reason);
+                prepare.log(flow, 1, '\n', state.reason);
                 return result = null;
             }
                 //but if not, at least try and parse the version

@@ -6,9 +6,9 @@ exports.run = function run(flow, err) {
         console.error('> %s', err);
     }
 
-    console.log('\nflow options : ');
-    console.log('> blah');
-    console.log('');
+    flow.log(1, '\nflow options : ');
+    flow.log(1, '> blah');
+    flow.log(1, '');
 
 }
 

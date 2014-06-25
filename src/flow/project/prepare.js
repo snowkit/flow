@@ -19,7 +19,7 @@ exports.prepare = function prepare(flow, build_config) {
         //preparation starts with the parsed project
     var project = flow.project.parsed;
 
-    internal.log(flow, '\nflow / prepare - project %s', project.name );
+    internal.log(flow, 2, 'prepare - project %s', project.name );
 
         //dependencies are a special case as they affect everything, they
         //come first and are required to be complete before anything else
@@ -66,10 +66,9 @@ exports.prepare = function prepare(flow, build_config) {
     //internal handlers
 
 internal.log = function(flow) {
-    var args = Array.prototype.slice.call(arguments);
-    args.shift();
+    var args = Array.prototype.slice.call(arguments,1);
     if(!flow.quiet.prepare) {
-        console.log.apply(console, args);
+        flow.log.apply(flow, args);
     }
 }
 
@@ -78,7 +77,7 @@ exports.log = internal.log;
 
 internal.prepare_dependencies = function(flow, project, build_config) {
 
-    internal.log(flow, 'flow / prepare - dependency tree ...');
+    internal.log(flow, 3, 'prepare - dependency tree ...');
 
     var _depends = depends.parse(flow, project);
 
@@ -88,12 +87,12 @@ internal.prepare_dependencies = function(flow, project, build_config) {
 
     if(util.object_size(_depends.failed)) {
 
-        internal.log(flow, 'flow / prepare - failed due to missing dependencies!');
-        internal.log(flow, 'flow / you will probably need to use haxelib to correct this.\n');
+        internal.log(flow, 1, 'prepare - failed due to missing dependencies!');
+        internal.log(flow, 1, 'you will probably need to use haxelib to correct this.\n');
 
         for(name in _depends.failed) {
             var depend = _depends.failed[name];
-            internal.log(flow, '> %s %s', depend.name, depend.version);
+            internal.log(flow, 1, '> %s %s', depend.name, depend.version);
         }
 
         internal.log(flow, '');
@@ -101,7 +100,7 @@ internal.prepare_dependencies = function(flow, project, build_config) {
 
     } //depends.failed has size
 
-    internal.log(flow, 'flow / prepare - dependency tree - ok');
+    internal.log(flow, 3, 'prepare - dependency tree - ok');
 
     return _depends.found;
 
@@ -138,7 +137,7 @@ internal.prepare_cascade_project = function(flow, prepared, build_config) {
             for(alias in flow.config.alias) {
                 var alias_dest = flow.config.alias[alias];
                 if(alias == name) {
-                    // internal.log(flow, 'found alias :o %s => %s', name, alias_dest);
+                    internal.log(flow, 3, 'prepare - found alias %s => %s', name, alias_dest);
                     //merge it into the given alias, and remove the old one
                     prepared.source[alias_dest] = util.merge_unique(prepared.source[name], prepared.source[alias_dest]);
                     delete prepared.source[name];
@@ -147,13 +146,15 @@ internal.prepare_cascade_project = function(flow, prepared, build_config) {
         } //for each node in prepared.source project
     } //if config has alias
 
-    // internal.log(flow, '\nproject is \n');
-    // internal.log(flow, prepared.source);
-    // internal.log(flow, '');
+    internal.log(flow, 3,'\nproject is \n');
+    internal.log(flow, 3, prepared.source);
+    internal.log(flow, 3, '');
 
 } //prepare_cascade_project
 
 internal.prepare_defines = function(flow, prepared, build_config) {
+
+    internal.log(flow, 3, 'prepare - defines ...');
 
     //store the list of targets as met or unmet defines based on the target
         //we are attempting to prepare for
@@ -170,8 +171,8 @@ internal.prepare_defines = function(flow, prepared, build_config) {
 
 
     if(prepared.defines.err) {
-        internal.log(flow, 'flow / defines failed to parse. aborting build : \n');
-        internal.log(flow, '> %s \n',prepared.defines.err);
+        internal.log(flow, 1, 'prepare - defines failed to parse. aborting build : \n');
+        internal.log(flow, 1, '> %s \n',prepared.defines.err);
         return null;
     }
 
@@ -199,11 +200,11 @@ internal.prepare_defines = function(flow, prepared, build_config) {
     }
 
 
-    // internal.log(flow, prepared.defines_all);
-    // internal.log(flow, bake.defines(flow, prepared, build_config));
-    // internal.log(flow, prepared.defines);
+    internal.log(flow, 5, prepared.defines_all);
+    internal.log(flow, 4, bake.defines(flow, prepared, build_config));
+    internal.log(flow, 5, prepared.defines);
 
-    internal.log(flow, 'flow / prepare - defines - ok');
+    internal.log(flow, 3, 'prepare - defines - ok');
 
     return prepared;
 
@@ -230,6 +231,8 @@ internal.prepare_codepaths = function (flow, prepared, build_config) {
 
 internal.prepare_flags = function(flow, prepared, build_config) {
 
+    internal.log(flow, 3, 'prepare - flags ...');
+
     prepared.flags = [];
     internal.prepare_codepaths(flow, prepared, build_config);
     prepared.flags = flags.parse(flow, prepared, build_config);
@@ -237,13 +240,15 @@ internal.prepare_flags = function(flow, prepared, build_config) {
         //append the debug flag if requested
     if(flow.flags.debug) { prepared.flags.push('-debug'); }
 
-    // internal.log(flow, bake.flags(flow, prepared, build_config));
+    internal.log(flow, 4, bake.flags(flow, prepared, build_config));
 
-    internal.log(flow, 'flow / prepare - flags - ok');
+    internal.log(flow, 3, 'prepare - flags - ok');
 
 } //prepare_flags
 
 internal.prepare_files = function(flow, prepared, build_config) {
+
+    internal.log(flow, 3, 'prepare - files ...');
 
     var result = files.parse(flow, prepared, prepared.source, null, build_config);
 
@@ -263,7 +268,7 @@ internal.prepare_files = function(flow, prepared, build_config) {
 
     prepared.files = result;
 
-    internal.log(flow, 'flow / prepare - files - ok');
+    internal.log(flow, 3, 'prepare - files - ok');
 
 } //prepare_files
 

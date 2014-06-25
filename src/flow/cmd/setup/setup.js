@@ -4,10 +4,10 @@ var haxelib = require('../../util/haxelib');
 
 exports.run = function run(flow, data) {
 
-    console.log('flow / doing setup');
+    flow.log(2, 'doing setup');
 
     var snow = haxelib.get(flow,'snow');
-    console.log('found snow', snow);
+    flow.log(2, 'found snow', snow);
 
 } //run
 

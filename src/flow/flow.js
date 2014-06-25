@@ -14,6 +14,7 @@ var flow = {
     run_path : process.argv[2],
     system : process.argv[3],
     quiet : {},
+    log_level : 2,
     project : project,
     version : require('./package.json').version,
     config : require('./config'),
@@ -28,6 +29,15 @@ var flow = {
             }
 
         }); //verify
+    },
+    log : function(level) {
+        var args = Array.prototype.slice.call(arguments,1);
+        if(level <= this.log_level && this.log_level != 0) {
+            if(args[0] && args[0].constructor != Object) {
+                args[0] = level+'.flow / ' + args[0];
+            }
+            console.log.apply(console, args);
+        }
     }
 };
 
@@ -40,7 +50,8 @@ internal.run = function() {
     var cwd = process.cwd();
 
         //builds happen in the working path
-    console.log('flow / running in %s', flow.run_path);
+    flow.log('');
+    flow.log(2, 'running in %s', flow.run_path);
     process.chdir(flow.run_path);
 
             //get the requested command
@@ -69,6 +80,10 @@ internal.run = function() {
 
     flow.flags = flagger.parse(args);
 
+    if(flow.flags.log !== undefined) {
+        flow.log_level = flow.flags.log;
+    }
+
     //first check critical flags
     if(flow.flags._has('version')) {
 
@@ -84,18 +99,18 @@ internal.run = function() {
         flow.project.init(flow);
 
             //useful immediate information
-        console.log('flow / %s', flow.version);
-        console.log('flow / current platform is %s', flow.system);
-        console.log('flow / target is %s', flow.target);
+        flow.log(2, '%s', flow.version);
+        flow.log(2, 'current platform is %s', flow.system);
+        flow.log(2, 'target is %s', flow.target);
 
         if(flow.target != 'web'){
-            console.log('flow / target arch is %s', flow.target_arch);
+            flow.log(2, 'target arch is %s', flow.target_arch);
         }
 
             //init haxelib cache,
             //and when it's complete,
             //run the main path
-        haxelib.init(internal.run);
+        haxelib.init(flow, internal.run);
 
     } //non critical flags
 
