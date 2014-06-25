@@ -65,6 +65,11 @@ internal.build_hxcpp = function(flow, config, done) {
 
     var cpp_path = path.join(flow.project.path_build, 'cpp/');
     var hxcpp_file = 'Build.xml';
+    var args = [hxcpp_file];
+
+    if(flow.target_native && flow.target_arch == '64') { 
+        args.push('-DHXCPP_M64'); 
+    }
 
     console.log('flow / build - running hxcpp compile against %s', hxcpp_file );
 
@@ -73,7 +78,7 @@ internal.build_hxcpp = function(flow, config, done) {
         cwd: path.resolve(flow.run_path, cpp_path)
     }
 
-    cmd.exec('haxelib', ['run','hxcpp',hxcpp_file], opt, done);
+    cmd.exec('haxelib', ['run','hxcpp'].concat(args), opt, done);
 
 
 } //build_hxcpp

@@ -51,7 +51,9 @@ exports.run = function(flow, config, done) {
         //but since the console will be logging the output from haxe,
         // no need to log it again.
     if(flow.timing) console.time('flow / build - haxe');
+
     internal.build_haxe(flow, config, hxml_file, function(err) {
+        
         if(flow.timing) console.timeEnd('flow / build - haxe');
 
         if(err) {

@@ -26,7 +26,9 @@ class Flow {
         node_path += '-$system';
 
         if(system == 'linux') {
-            system += get_arch();
+            var arch = get_arch();
+            if(arch == '') arch = '32';
+            node_path += arch;
         }
 
         //we do `node script.js run_path system <other>`
@@ -55,6 +57,7 @@ class Flow {
 
                 var process = new sys.io.Process('uname',['-m']);
                 var value = process.stdout.readAll().toString();
+
                 (value.indexOf('64') != -1) ? return '64' : '';
 
             case 'windows' :
@@ -64,7 +67,7 @@ class Flow {
 
         } //switch
 
-        return '32';
+        return '';
 
     }
 
