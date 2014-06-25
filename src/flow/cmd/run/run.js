@@ -19,7 +19,6 @@ exports.run = function run(flow, data) {
     console.log('flow / running %s %s for %s\n',
         flow.project.parsed.name, flow.project.parsed.version, flow.target);
 
-
     if(flow.target_native) {
         native.run(flow);
     } else if(flow.target_web) {
