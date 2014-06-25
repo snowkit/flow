@@ -1,0 +1,30 @@
+#! /usr/bin/env node
+
+var jscrush = require("../jscrush");
+var sys = require("util");
+
+read_whole_file("-", function (err, code) {
+  try {
+    var result = jscrush(code);
+    sys.print(result);
+  }
+  catch (e) {
+    sys.error(e);
+    process.exit(1);
+  }
+});
+
+function read_whole_file(filename, cb) {
+    if (filename == "-") {
+        var chunks = [];
+        process.stdin.setEncoding('utf-8');
+        process.stdin.on('data', function (chunk) {
+            chunks.push(chunk);
+        }).on('end', function () {
+            cb(null, chunks.join(""));
+        });
+        process.openStdin();
+    } else {
+        fs.readFile(filename, "utf-8", cb);
+    }
+}

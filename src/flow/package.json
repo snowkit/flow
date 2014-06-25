@@ -18,6 +18,8 @@
     "graceful-fs" : "~3.0.2",
     "wrench" : "~1.5.8",
     "fs-extra" : "~0.9.1",
-    "jsonic" : "~0.1.1"
+    "jsonic" : "~0.1.1",
+    "uglify-js" : "~2.4.14",
+    "jscrush" : "latest"
   }
 }

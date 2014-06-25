@@ -7,6 +7,9 @@
         , cmd = require('../../util/process')
         , util = require('../../util/util')
 
+        , buildcpp = require('./build.cpp')
+        , buildweb = require('./build.web')
+
 
 var internal = {};
 
@@ -56,77 +59,67 @@ exports.run = function(flow, config, done) {
             return flow.project.failed = true;
         }
 
-            //on native targets we run hxcpp against the now
-            //generated build files in the build output
-        if(flow.target_native) {
-
-            if(flow.timing) console.time('flow / build - hxcpp');
-            internal.build_hxcpp(flow, config, function(err) {
-                if(flow.timing) console.timeEnd('flow / build - hxcpp');
-
-                if(err) {
-                    console.log('\nflow / build - stopping because of errors in hxcpp compile \n');
-                    return flow.project.failed = true;
-                }
-
-                internal.post_build_cpp(flow, config, function(){
-                    internal.post_build(flow, config, done);
-                });
-
-            }); //run hxcpp
-
-        } else { //native targets
-
-            internal.post_build(flow, config, done);
-
-        } //!native
+        internal.post_haxe(flow, config, done);
 
     }); //run haxe
 
 } //run
 
+internal.post_haxe = function(flow, config, done) {
 
-internal.post_build = function(flow, config, done) {
+        //on native targets we run hxcpp against the now
+        //generated build files in the build output
+    if(flow.target_native) {
+
+        buildcpp.post_haxe(flow, config, function(err){
+            internal.post_build(flow, config, done);
+        });
+
+    } else if(flow.target_web) {
+
+        buildweb.post_haxe(flow, config, function(err){
+            internal.post_build(flow, config, done);
+        });
+
+    } else { //native targets
+
+        internal.post_build(flow, config, done);
+
+    } //!native
+
+} //post_haxe
+
+internal.complete = function(flow, config, done) {
 
     if(flow.timing) console.timeEnd('flow / build - total');
 
-    if(done) {
-        done(flow.project.failed);
-    }
+    if(done) done(flow.project.failed);
+
+} //complete
+
+internal.post_build = function(flow, config, done) {
+
+
+    if(flow.target_native) {
+
+        buildcpp.post_build(flow, config, function(err){
+            internal.complete(flow, config, done);
+        });
+
+    } else if(flow.target_web) {
+
+        buildweb.post_build(flow, config, function(err){
+            internal.complete(flow, config, done);
+        });
+
+    } else { //native targets
+
+        internal.complete(flow, config, done);
+
+    } //!native
 
 } //post_build
 
-internal.post_build_cpp = function(flow, config, done) {
-
-    console.log('flow / build - running cpp post process');
-
-    //the post build is so that we can move the binary file
-    //from the output path if needed etc, run extra scripts and so on
-    if(flow.timing) console.time('flow / build - binary copy');
-
-        var source_binary = flow.config.build.app_boot;
-
-        if(flow.target == 'windows') {
-            source_binary += '.exe';
-        }
-
-        var source_path = path.join(flow.project.path_build, 'cpp/' + source_binary);
-
-        util.copy_path(flow, source_path, flow.project.path_binary);
-
-    if(flow.timing) console.timeEnd('flow / build - binary copy');
-
-        if(flow.system == 'mac' || flow.system == 'linux') {
-            if(flow.timing) console.time('flow / build - binary chmod');
-            cmd.exec('chmod', ['+x',flow.project.path_binary], {quiet:true}, function(code,out,err){
-                if(flow.timing) console.timeEnd('flow / build - binary chmod');
-                if(done) done(code,out,err);
-            });
-        } else {
-            if(done) done();
-        }
-
-} //post_build
 
 internal.build_haxe = function(flow, config, hxml_file, done) {
 
@@ -142,23 +135,6 @@ internal.build_haxe = function(flow, config, hxml_file, done) {
     return false;
 
 } //build_haxe
-
-internal.build_hxcpp = function(flow, config, done) {
-
-    var cpp_path = path.join(flow.project.path_build, 'cpp/');
-    var hxcpp_file = 'Build.xml';
-
-    console.log('flow / build - running hxcpp compile against %s', hxcpp_file );
-
-    var opt = {
-        quiet : false,
-        cwd: path.resolve(flow.run_path, cpp_path)
-    }
-
-    cmd.exec('haxelib', ['run','hxcpp',hxcpp_file], opt, done);
-
-
-} //build_hxcpp
 
 internal.get_hxml_file = function(flow, config) {
 
