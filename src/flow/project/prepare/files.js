@@ -1,41 +1,70 @@
 
 var   defines = require('./defines')
+    , path = require('path')
 
 
 var internal = {};
 
     //returns an array of { source:dest } for the files in project
-exports.parse = function parse(flow, project, build_config) {
+exports.parse = function parse(flow, prepared, project, srcpath, build_config) {
 
     // console.log('flow / preparing files');
 
-    var file_list = [];
+    var project_file_list = [];
+    var build_file_list = [];
+
+    internal.parse_files(flow, prepared, project.files, project_file_list);
+    internal.parse_files(flow, prepared, project.build.files, build_file_list);
+
+    if(srcpath) {
+        project_file_list = project_file_list.map(function(p){
+            p.source = path.join(srcpath,p.source);
+            return p;
+        });
+
+        build_file_list = build_file_list.map(function(p){
+            p.source = path.join(srcpath,p.source);
+            return p;
+        });
+    }
+
+    return {
+        project_files : project_file_list,
+        build_files : build_file_list
+    };
+
+} //parse
+
+
+internal.parse_files = function(flow, project, root, file_list) {
+
+    if(!root) return;
 
         //start with the root object
-    internal.parse_node_list(flow, project, project.source.files, file_list);
+    internal.parse_node_list(flow, project, root, file_list);
 
     //parse any potentially conditional files
-    if(project.source.files.if) {
-        for(conditional in project.source.files.if) {
-            var current = project.source.files.if[conditional];
+    if(root.if) {
+        for(conditional in root.if) {
+            var current = root.if[conditional];
             if(defines.satisfy(flow, project, 'if', conditional)){
                 internal.parse_node_list(flow, project, current, file_list);
             }
         } //each condition
     } //if
 
-    if(project.source.files.unless) {
-        for(conditional in project.source.files.unless) {
-            var current = project.source.files.unless[conditional];
+    if(root.unless) {
+        for(conditional in root.unless) {
+            var current = root.unless[conditional];
             if(defines.satisfy(flow, project, 'unless', conditional)){
                 internal.parse_node_list(flow, project, current, file_list);
             }
         } //each condition
     } //unless
 
-    return file_list;
+} //parse_project_files
 
-} //parse
+
 
 internal.parse_node_list = function(flow, project, list, file_list) {
     for(name in list) {
@@ -51,8 +80,6 @@ internal.parse_file = function(flow, project, _node, file_list) {
 
     if(_path === null) {
         console.log('flow / files - parsing failed for %s in %s', name, project.source.__path);
-        // console.log('flow / files - this is NOT a critical build error, but the files will not exist in the build, so might result in runtime errors.\n')
-        // console.log('> %s', _node);
     }
 
     if(_path) {

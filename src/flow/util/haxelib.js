@@ -4,6 +4,8 @@ var   cmd = require('./process')
 
 //caches a list of installed haxelibs for the remaining execution,
 var libs = {};
+var internal = {};
+
 
     function HaxelibError(message) {
         this.name = "HaxelibError";
@@ -13,77 +15,44 @@ var libs = {};
     HaxelibError.prototype = Error.prototype;
 
         //caches all libs and values from haxelib list
-    exports.init = function init(flow) {
+    exports.init = function init(done) {
 
             //always reset these because we are flushing cache
         libs = {};
 
             //find haxelib library path
-        var out = cmd.execsync('haxelib config');
-        if(out.code != 0) {
-            var reason = '> haxelib config cannot be called. Is haxe/haxelib installed?\n';
-            throw new HaxelibError(reason);
-        }
+        cmd.exec('haxelib', ['config'], {quiet:true}, function(code, out, err) {
 
-        var haxelib_path = out.output.trim();
+            if(code != 0) {
+                var reason = '> haxelib config cannot be called. Is haxe/haxelib installed?\n';
+                throw new HaxelibError(reason);
+            }
 
-            //find and cache the list
+            exports.haxelib_path = out.trim();
 
-        var out = cmd.execsync('haxelib list');
-        var list = out.output.trim();
-        var name_ver = /^([a-zA-Z-_]*)(:{1})\s(.*)$/igm;
+            // console.log('haxelib path %s', exports.haxelib_path);
 
-        var match = name_ver.exec(list);
-        while (match != null) {
-            var name = match[1];
-            libs[name] = { name:name, _versions_ : match[3] }
-            match = name_ver.exec(list);
-        }
+                //find and cache the list
 
-            //now we must split up the version string into usable values
-        for(lib in libs) {
+            cmd.exec('haxelib', ['list'], {quiet:true}, function(lcode, lout, lerr) {
 
-            var _lib = libs[lib];
-            var _vlist = _lib._versions_.split(' ');
+                var list = lout.trim();
+                var name_ver = /^([a-zA-Z-_]*)(:{1})\s(.*)$/igm;
 
-            _lib.versions = {};
-
-            for(index in _vlist) {
-
-                var v = _vlist[index].trim();
-                var current = v.indexOf('[') != -1;
-
-                    //strip [ ] if current
-                if(current) {
-                    v = v.replace(/\[(.*)\]/gi,'$1');
+                var match = name_ver.exec(list);
+                while (match != null) {
+                    var name = match[1];
+                    libs[name] = { name:name, _versions_ : match[3] }
+                    match = name_ver.exec(list);
                 }
 
-                var lib_path = '';
-                if(v.substr(0,4) == 'dev:') {
-                        //dev path is already here, so store it
-                    lib_path = v.replace(/dev:/gi,'');
-                        //set name to dev
-                    v = 'dev';
-                } else if(v == 'git') {
-                        //git folder is in the root like so
-                    lib_path = haxelib_path + '/' + name + '/git';
-                } else {
-                        //the other types becomes /v,e,r/
-                    lib_path = haxelib_path + '/' + v.replace(/\./gi,',');
-                }
+                internal.parse_versions();
 
-                lib_path = path.normalize(lib_path) + '/';
-                _lib.versions[v] = { version:v, path:lib_path };
+                if(done) done();
 
-                if(current) {
-                    _lib.versions['*'] = { version:v, path:lib_path };
-                }
+            });
 
-                    //remove _versions_
-                delete _lib._versions_;
-
-            } //each in vlist
-        } //each in libs
+        });
 
     } //init
 
@@ -142,3 +111,51 @@ var libs = {};
         return libs[name];
 
     } //get
+
+internal.parse_versions = function() {
+
+    for(lib in libs) {
+
+        var _lib = libs[lib];
+        var _vlist = _lib._versions_.split(' ');
+
+        _lib.versions = {};
+
+        for(index in _vlist) {
+
+            var v = _vlist[index].trim();
+            var current = v.indexOf('[') != -1;
+
+                //strip [ ] if current
+            if(current) {
+                v = v.replace(/\[(.*)\]/gi,'$1');
+            }
+
+            var lib_path = '';
+            if(v.substr(0,4) == 'dev:') {
+                    //dev path is already here, so store it
+                lib_path = v.replace(/dev:/gi,'');
+                    //set name to dev
+                v = 'dev';
+            } else if(v == 'git') {
+                    //git folder is in the root like so
+                lib_path = exports.haxelib_path + '/' + lib + '/git';
+            } else {
+                    //the other types becomes /v,e,r/
+                lib_path = exports.haxelib_path + '/' + v.replace(/\./gi,',');
+            }
+
+            lib_path = path.normalize(lib_path) + '/';
+            _lib.versions[v] = { version:v, path:lib_path };
+
+            if(current) {
+                _lib.versions['*'] = { version:v, path:lib_path };
+            }
+
+                //remove _versions_
+            delete _lib._versions_;
+
+        } //each in vlist
+    } //each in libs
+
+}

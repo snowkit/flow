@@ -1,9 +1,7 @@
 
     var   config = require('./config')
         , cmds = require('../')
-        , fs = require('graceful-fs')
-
-
+        , builder = require('./builder')
 
 var internal = {};
 
@@ -47,15 +45,16 @@ var internal = {};
                 return flow.project.failed = true;
             }
 
-                //only if every stage required to run an actual build succeeded,
-                //do we clean up if requested. this allows failed configurations to not
-                //wipe the output folder too soon
-            if(flow.flags.clean) {
-                flow.execute(flow, cmds['clean']);
-            }
-
-                //first copy over all the files in the project
-            flow.execute(flow, cmds['files']);
+                //finally, if all is ok,
+                //run an actual build
+            builder.run(flow, config, function(err){
+                if(!err) {
+                        //if build + run was asked
+                    if(flow.action == 'try') {
+                        flow.execute(flow, cmds['run']);
+                    }
+                }
+            });
 
         } //!lib
 
@@ -122,6 +121,8 @@ var internal = {};
         }
 
     }; //error
+
+//Internal helpers
 
     internal._error_project = function(flow, reason){
 

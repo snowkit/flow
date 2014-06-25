@@ -20,7 +20,23 @@ exports.init = function init(flow) {
         flow.system;
 
     flow.target_arch = flow.project.find_arch(flow);
-}
+
+    switch(flow.target) {
+
+        case 'mac': case 'windows': case 'linux':
+        case 'ios': case 'android': {
+            flow.target_native = true;
+            break;
+        }
+
+        case 'web': {
+            flow.target_web = true;
+            break;
+        }
+
+    }
+
+} //init
 
 exports.verify = function verify(flow, project_path, quiet) {
 
@@ -29,7 +45,7 @@ exports.verify = function verify(flow, project_path, quiet) {
 
     var abs_path = path.resolve(project_file);
 
-    if(!flow.quiet.project) {
+    if(!flow.quiet.project && !quiet) {
         console.log('flow / project - looking for project file %s', abs_path)
     }
 
@@ -97,7 +113,7 @@ exports.verify = function verify(flow, project_path, quiet) {
 
 
     //the final target path for the output
-exports.get_out_path = function get_out_path(flow, prepared) {
+exports.get_out_root = function(flow, prepared) {
 
     var dest_folder = path.normalize(prepared.source.product.output) + '/';
 
@@ -109,12 +125,40 @@ exports.get_out_path = function get_out_path(flow, prepared) {
 
     return dest_folder;
 
+} //get_out_root
+
+exports.get_out_binary = function(flow, prepared) {
+
+    var app_name = prepared.source.product.app;
+    var outpath = exports.get_out_path(flow, prepared);
+    var outroot = exports.get_out_root(flow, prepared);
+
+    if(flow.target == 'mac') {
+        outpath = path.join(outroot, app_name) + '.app/Contents/MacOS/';
+    }
+
+    return path.join(outpath, app_name);
+
+} //get_out_binary
+
+exports.get_out_path = function get_out_path(flow, prepared) {
+
+    var dest_folder = exports.get_out_root(flow, prepared);
+
+        //some targets have considerations for their destination
+    if(flow.target == 'mac') {
+        var postfix = prepared.source.product.app + '.app/Contents/' + flow.config.build.mac.default_output;
+        dest_folder = path.join(dest_folder, postfix);
+    }
+
+    return dest_folder;
+
 } //out_path
 
     //the final build data path for the output
 exports.get_build_path = function get_build_path(flow, prepared) {
 
-    return exports.get_out_path(flow, prepared) + '.build/';
+    return exports.get_out_root(flow, prepared) + '.build/';
 
 } //build_path
 

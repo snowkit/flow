@@ -2,6 +2,7 @@
 //helpers for simple process use
 
 var   exec = require('child_process').exec
+    , spawn = require('child_process').spawn
     , fs = require('fs')
     , os = require('os')
     , path = require('path')
@@ -9,18 +10,40 @@ var   exec = require('child_process').exec
 
         //run a process with set working directory, and args,
         //returns the results as a string for immediate use (blocking)
-    exports.exec = function run(cmd, opt, done) {
+    exports.exec = function(cmd, args, opt, done) {
+
+
+        var prevwd = process.cwd();
 
         args = args || [];
+        opt = opt || { env:process.env };
 
-        console.log('flow / running process %s %s', cmd);
+        // console.log('flow / running process : %s', cmd, args.join(' '));
 
-        var _process = exec(cmd, opt, function(err, stdout, stderr){
-            if(err) {
-                done(err, stderr);
-            } else {
-                done(null, stdout);
+        var _process = spawn(cmd, args, opt);
+        var stderr = '';
+        var stdout = '';
+
+        _process.stdout.on('data', function (data) {
+            var latest = data.toString('utf8');
+            stdout += latest;
+            if(!opt.quiet) {
+                process.stdout.write(latest);
             }
+        });
+
+        _process.stderr.on('data', function (data) {
+            var latest = data.toString('utf8');
+            stderr += latest;
+            if(!opt.quiet) {
+                process.stdout.write(latest);
+            }
+        });
+
+        _process.on('close', function (code) {
+            // console.log('child process exited with code ' + code);
+            process.chdir(prevwd);
+            if(done) done(code, stdout, stderr);
         });
 
     } //exec
@@ -29,7 +52,11 @@ var   exec = require('child_process').exec
             //https://github.com/arturadib/shelljs/blob/master/src/exec.js
             //http://strongloop.com/strongblog/whats-new-in-node-js-v0-12-execsync-a-synchronous-api-for-child-processes/
         //while waiting for 0.12 node releases
-    exports.execsync = function execsync(cmd) {
+    exports.execsync = function(cmd, opt) {
+
+        // console.time('execsync');
+
+        opt = opt || { quiet:true, cwd:'' };
 
         var tmpdir = os.tmpdir(),
             script_file = path.resolve(path.join(tmpdir,util.random_file())),
@@ -38,10 +65,11 @@ var   exec = require('child_process').exec
             sleep_file = path.resolve(path.join(tmpdir,util.random_file())),
             stdout_previous = ''
 
-        var silent = true;
+        var quiet = (opt.quiet === undefined) ? true : opt.quiet;
+
         function update_stdout() {
 
-            if(silent || !fs.existsSync(stdout_file)) {
+            if(quiet || !fs.existsSync(stdout_file)) {
                 return;
             }
 
@@ -50,8 +78,12 @@ var   exec = require('child_process').exec
                 return;
             }
 
-            process.stdout.write(stdout_current.substr(stdout_previous.length));
-            stdout_previous = stdout_current;
+            try {
+                process.stdout.write(stdout_current.substr(stdout_previous.length));
+                stdout_previous = stdout_current;
+            } catch(e) {
+                console.log(e);
+            }
 
         } //update_stdout
 
@@ -64,7 +96,7 @@ var   exec = require('child_process').exec
         var script =
             "var child = require('child_process')," +
             "     fs = require('fs');" +
-            "child.exec('"+escape(cmd)+"', {env: process.env, maxBuffer: 20*1024*1024}, function(err) {" +
+            "child.exec('"+escape(cmd)+"', {cwd:'"+escape(opt.cwd)+"',env: process.env, maxBuffer: 20*1024*1024}, function(err) {" +
             "  fs.writeFileSync('"+escape(code_file)+"', err ? err.code.toString() : '0');" +
         "});";
 
@@ -75,6 +107,7 @@ var   exec = require('child_process').exec
         fs.writeFileSync(script_file, script);
         exec('"'+process.execPath+'" '+script_file, {
             env : process.env,
+            cwd : opt.cwd,
             maxBuffer: 20*1024*1024
         });
 
@@ -92,6 +125,8 @@ var   exec = require('child_process').exec
         try { fs.unlinkSync(stdout_file); } catch(e) {}
         try { fs.unlinkSync(code_file); }   catch(e) {}
         try { fs.unlinkSync(sleep_file); }  catch(e) {}
+
+        // console.timeEnd('execsync');
 
         return {
             code: code,

@@ -1,4 +1,9 @@
 
+var   fs = require('graceful-fs')
+    , path = require('path')
+    , wrench = require('wrench')
+    , fse = require('fs-extra')
+
 
 exports.object_size = function(obj) {
     var size = 0, key;
@@ -75,3 +80,47 @@ exports.random_file = function random_file() {
 exports.pad = function pad(width, string, padding) {
   return (width <= string.length) ? string : exports.pad(width, padding + string, padding)
 }
+
+//file stuff
+
+exports.copy_path = function(flow, source, dest) {
+    if(fs.statSync(source).isDirectory()) {
+        exports.copy_folder_recursively(flow, source, dest);
+    } else {
+        wrench.mkdirSyncRecursive(path.dirname(dest), 0755);
+        fse.copySync(source, dest);
+    }
+}
+
+
+exports.copy_folder_recursively = function(flow, _source, _dest, _overwrite) {
+
+    // console.log('-    copying ' + _source + ' to ' + _dest );
+
+    if(_overwrite == undefined) _overwrite = true;
+
+        //make sure the destination exists
+        //before copying any files to the location
+    wrench.mkdirSyncRecursive(_dest, 0755);
+
+        //obtain a list of items from the source
+    var _source_list = wrench.readdirSyncRecursive(path.resolve(flow.run_path, _source));
+
+        //for each source item, check if it's a directory
+    var _source_file_list = [];
+
+    for(var i = 0; i < _source_list.length; ++i) {
+        var _is_dir = fs.statSync( path.join(_source, _source_list[i]) ).isDirectory();
+        if(!_is_dir) {
+            _source_file_list.push(_source_list[i]);
+        }
+    }
+
+        //for each file only, copy it across
+    for(var i = 0; i < _source_file_list.length; ++i) {
+        var _dest_file = path.join(_dest,_source_file_list[i]);
+        fse.ensureFileSync(_dest_file);
+        fse.copySync( path.join(_source, _source_file_list[i]), _dest_file );
+    }
+
+} //copy_folder_recursively

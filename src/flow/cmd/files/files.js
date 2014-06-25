@@ -1,32 +1,20 @@
 
 var   fs = require('graceful-fs')
     , path = require('path')
-    , wrench = require('wrench')
-    , fse = require('fs-extra')
+    , util = require('../../util/util')
 
 var internal = {};
 
-
 exports.run = function run(flow, files) {
 
-    console.log('flow / files - copying project assets to ', flow.project.path_output);
-
-    console.log('');
-    for(index in files) {
-        var node = files[index];
-        console.log('   copying %s to %s%s', node.source, flow.project.path_output, node.dest);
-        var dest = path.normalize(path.join(flow.project.path_output,node.dest));
-        if(fs.statSync(node.source).isDirectory()) {
-            internal.copy_folder_recursively(flow, node.source, dest);
-        } else {
-            wrench.mkdirSyncRecursive(path.dirname(dest), 0755);
-            fse.copySync(node.source, dest);
-        }
-    }
+        //copy local project + build files
+    internal.copy_project_files(flow, files.project_files);
+    internal.copy_build_files(flow, files.build_files);
 
     console.log('');
 
 } //run
+
 
     //in this case, verify will return a list of files
     //as a flat array of { source : dest } from prepared
@@ -34,7 +22,9 @@ exports.verify = function verify(flow, done) {
 
     console.log('flow / files - verifying ... ');
 
-    var final_list = [];
+    var final_project_files = [];
+    var final_build_files = [];
+
     var warning = '';
     var err = null;
 
@@ -42,17 +32,31 @@ exports.verify = function verify(flow, done) {
         //we throw an error because this is likely
         //unexpected. this can be configured from the
         //flow : { } object in the project
-    for(index in flow.project.prepared.files) {
+    for(index in flow.project.prepared.files.project_files) {
 
-        var file = flow.project.prepared.files[index];
+        var file = flow.project.prepared.files.project_files[index];
+
         // console.log('flow / files - checking for `' + file.source +'`');
         if(!fs.existsSync(file.source)) {
             warning += '       > missing files source path ' + file.source + '\n';
         } else {
-            final_list.push(file);
+            final_project_files.push(file);
         }
 
     } //index in prepared files
+
+    for(index in flow.project.prepared.files.build_files) {
+
+        var file = flow.project.prepared.files.build_files[index];
+
+        // console.log('flow / files - checking for `' + file.source +'`');
+        if(!fs.existsSync(file.source)) {
+            warning += '       > missing files source path ' + file.source + '\n';
+        } else {
+            final_build_files.push(file);
+        }
+
+    } //index in prepared build files
 
     if(flow.config.build.error_on_missing_files) {
         err = warning;
@@ -62,15 +66,63 @@ exports.verify = function verify(flow, done) {
         }
     }
 
-    done(err, final_list);
+    done(err, { project_files:final_project_files, build_files:final_build_files });
 
 } //verify
 
+internal.copy_project_files = function(flow, files) {
+
+    if(files.length > 0) {
+
+        var output = flow.project.path_output;
+
+        console.log('flow / files - copying project assets to %s\n', output);
+
+                //first deal with the files in the project itself
+            for(index in files) {
+
+                var node = files[index];
+                console.log('   copying %s to %s%s', node.source, output, node.dest);
+
+                var dest = path.normalize(path.join(output, node.dest));
+                util.copy_path(flow, node.source, dest);
+
+            } //each project file
+
+    } //files.length > 0
+
+} //copy_project_files
+
+internal.copy_build_files = function(flow, files) {
+
+    if(files.length > 0) {
+
+        var output = flow.project.path_build;
+
+        console.log('\nflow / files - copying project build files to %s\n', output);
+
+                //then we deal with the build files, to copy over to the build folder not the output folder
+            for(index in files) {
+
+                var node = files[index];
+                console.log('   copying build file %s to %s%s', node.source, output, node.dest);
+
+                var dest = path.normalize(path.join(output,node.dest));
+                util.copy_path(flow, node.source, dest);
+
+            } //each project file
+
+    } //files.length > 0
+
+} //copy_build_files
+
 internal._missing_warning = function(flow, msg, type) {
+
     console.log('\n    %s', type);
     console.log('      failed to find some files list in project tree!\n');
     console.log('%s', msg);
-}
+
+} //_missing_warning
 
 exports.error = function(flow, err) {
 
@@ -78,35 +130,3 @@ exports.error = function(flow, err) {
 
 } //error
 
-
-internal.copy_folder_recursively = function(flow, _source, _dest, _overwrite) {
-
-    // console.log('-    copying ' + _source + ' to ' + _dest );
-
-    if(_overwrite == undefined) _overwrite = true;
-
-        //make sure the destination exists
-        //before copying any files to the location
-    wrench.mkdirSyncRecursive(_dest, 0755);
-
-        //obtain a list of items from the source
-    var _source_list = wrench.readdirSyncRecursive(path.resolve(flow.run_path, _source));
-
-        //for each source item, check if it's a directory
-    var _source_file_list = [];
-
-    for(var i = 0; i < _source_list.length; ++i) {
-        var _is_dir = fs.statSync( path.join(_source, _source_list[i]) ).isDirectory();
-        if(!_is_dir) {
-            _source_file_list.push(_source_list[i]);
-        }
-    }
-
-        //for each file only, copy it across
-    for(var i = 0; i < _source_file_list.length; ++i) {
-        var _dest_file = path.join(_dest,_source_file_list[i]);
-        fse.ensureFileSync(_dest_file);
-        fse.copySync( path.join(_source, _source_file_list[i]), _dest_file );
-    }
-
-} //copy_folder_recursively

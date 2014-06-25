@@ -43,18 +43,23 @@ exports.target = function(flow, project, build_config, split) {
 
     split = split || '\n';
 
-    var values = '-cp ' + flow.project.path_build + 'haxe/';
+    var values = '-cp haxe/';
 
     switch(flow.target) {
 
         case 'mac': case 'linux': case 'windows':
         case 'android': case 'ios': {
-            values += split + '-cpp ' + flow.project.path_build + 'cpp/';
+            values += split + '-cpp cpp/';
             break;
         } //native
 
         case 'web':{
-            values += split + '-js ' + flow.project.path_output + project.source.product.app + '.js';
+                //js the file can go straight out to the dest path
+            var out_file = path.join(flow.project.path_output, project.source.product.app+'.js');
+            var abs_out_path = path.join(flow.run_path, flow.project.path_build);
+            out_file = path.relative(abs_out_path, out_file);
+
+            values += split + '-js ' + out_file;
             break;
         } //web
 
@@ -65,7 +70,7 @@ exports.target = function(flow, project, build_config, split) {
 } //target
 
     //bakes the whole project into a usable complete hxml
-exports.hxml = function(flow, project, build_config, split) {
+exports.hxml = function(flow, project, build_config, with_compile, split) {
 
     split = split || '\n';
 
@@ -74,6 +79,13 @@ exports.hxml = function(flow, project, build_config, split) {
     hxml_ += exports.defines(flow, project, build_config, split);
     hxml_ += exports.flags(flow, project, build_config, split);
     hxml_ += exports.target(flow, project, build_config, split);
+
+        //since we want to manually invoke the builds
+        //with custom configs we tell haxe only to generate
+        //the files, not invoke the post generate compiler (i.e hxcpp for cpp, etc)
+    if(!with_compile) {
+        hxml_ += split + '-D no-compilation';
+    }
 
     return hxml_;
 

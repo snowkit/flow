@@ -7,6 +7,8 @@ var internal = {};
 
 exports.run = function run(flow, do_all) {
 
+    if(flow.timing) console.time('clean');
+
     if(do_all) {
         console.log('flow / clean - cleaning %s ... \n', flow.project.parsed.product.output );
         wrench.rmdirSyncRecursive(path.resolve(flow.run_path, flow.project.parsed.product.output), true);
@@ -16,6 +18,8 @@ exports.run = function run(flow, do_all) {
         console.log('flow / clean - cleaning %s ... \n', flow.project.path_output );
         wrench.rmdirSyncRecursive(path.resolve(flow.run_path, flow.project.path_output), true);
     }
+
+    if(flow.timing) console.timeEnd('clean');
 
 } //run
 

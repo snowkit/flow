@@ -8,8 +8,11 @@
 
 exports.run = function run(flow, data) {
 
+        //this is so build can use this to check if
+        //it should execute run as well
+    flow.action = 'try';
+
     flow.execute(flow, cmds['build']);
-    flow.execute(flow, cmds['run']);
 
 } //run
 

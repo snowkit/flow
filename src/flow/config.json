@@ -1,8 +1,14 @@
 {
     "config" : "1.0.0-alpha-1",
     "build" : {
+        "timing" : true,
         "app_boot" : "FlowApp",
-        "error_on_files_missing" : false
+        "error_on_files_missing" : false,
+        "command_line_based" : false,
+        "mac" : {
+            "default_binary_path" : "MacOS",
+            "default_output" : "Resources"
+        }
     },
     "project" : {
         "build" : {
