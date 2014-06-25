@@ -122,6 +122,8 @@ internal.post_build_cpp = function(flow, config, done) {
                 if(flow.timing) console.timeEnd('flow / build - binary chmod');
                 if(done) done(code,out,err);
             });
+        } else {
+            if(done) done();
         }
 
 } //post_build
