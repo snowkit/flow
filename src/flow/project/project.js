@@ -138,7 +138,7 @@ exports.get_out_binary = function(flow, prepared) {
     }
 
     if(flow.target == 'windows') {
-        outpath += '.exe';
+        app_name += '.exe';
     }
 
     return path.join(outpath, app_name);

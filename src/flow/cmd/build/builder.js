@@ -104,8 +104,17 @@ internal.post_build_cpp = function(flow, config, done) {
     //from the output path if needed etc, run extra scripts and so on
     if(flow.timing) console.time('flow / build - binary copy');
 
-        var binary_source = path.join(flow.project.path_build, 'cpp/' + flow.config.build.app_boot);
-        util.copy_path(flow, binary_source, flow.project.path_binary);
+        var source_binary = flow.config.build.app_boot;
+
+        if(flow.target == 'windows') {
+            source_binary += '.exe';
+        }
+
+        console.log(flow.project.path_binary);
+
+        var source_path = path.join(flow.project.path_build, 'cpp/' + source_binary);
+
+        util.copy_path(flow, source_path, flow.project.path_binary);
 
     if(flow.timing) console.timeEnd('flow / build - binary copy');
 
