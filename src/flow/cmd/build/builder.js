@@ -110,8 +110,6 @@ internal.post_build_cpp = function(flow, config, done) {
             source_binary += '.exe';
         }
 
-        console.log(flow.project.path_binary);
-
         var source_path = path.join(flow.project.path_build, 'cpp/' + source_binary);
 
         util.copy_path(flow, source_path, flow.project.path_binary);
