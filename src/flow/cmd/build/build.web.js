@@ -6,7 +6,7 @@
 
 exports.post_build = function(flow, config, done) {
 
-    var out_file = path.join(flow.project.path_output, flow.project.prepared.source.product.app);
+    var out_file = path.join(flow.project.path_output, flow.project.prepared.source.project.app.name);
     var min_code = fs.readFileSync(out_file + '.js', 'utf8');
 
         //minify step

@@ -1,44 +1,43 @@
-var   util = require('../../util/util');
+var   util = require('../../util/util')
+    , conditions = require('./conditions')
+
 
 var internal = {};
+    internal._unknown = -1;
 
-exports.parse = function parse(flow, project, depends, build_config, existing) {
 
-        //start with given value
+exports.parse = function parse(flow, source, depends, build_config, existing) {
+
+        //start with given value if any
     existing = existing || {};
 
         //check for the defines flag on the build object
     var list = [];
         //first check the root defines
-    if(project.build.defines) {
-        for(index in project.build.defines) {
-            list.push({ name:project.build.defines[index], file:project.__path });
+    var node = source.project.build;
+    if(node) {
+        for(index in node.defines) {
+            list.push({
+                name:source.project.build.defines[index],
+                file:source.__path
+            });
         }
     }
 
         //then check for any if: conditional
-    if(project.build.if) {
-        for(flag in project.build.if) {
-            var current = project.build.if[flag].defines;
-            if(current) {
-                for(index in current) {
-                    list.push({ name:current[index], condition:'if', conditional:flag, file:project.__path });
+    if(source.if) {
+        for(flag in source.if) {
+            var node = source.if[flag].build;
+            if(node && node.defines) {
+                for(index in node.defines) {
+                    list.push({ name:node.defines[index],
+                        condition:flag,
+                        file:source.__path
+                    });
                 }
-            }
-        }
-    }
-
-        //and unless: conditional
-    if(project.build.unless) {
-        for(flag in project.build.unless) {
-            var current = project.build.unless[flag].defines;
-            if(current) {
-                for(index in current) {
-                    list.push({ name:current[index], condition:'unless', conditional:flag, file:project.__path });
-                }
-            }
-        }
-    }
+            } //node && node.defines
+        } //flag in if
+    } //if source.if
 
         //for each define, parse it
     for(index in list) {
@@ -68,157 +67,88 @@ exports.parse = function parse(flow, project, depends, build_config, existing) {
 
 } //defines
 
-internal._unknown = -1;
-
-    //a cached list of conditionals and their tokenized values
-internal.multi_conditionals = {}
 
     //post parsing strip based on existing defines + known targets
 exports.filter = function filter(flow, defines, build_config) {
 
     var results = {};
 
-        //for each define we token any conditionals,
-        //and store it's met value as "met_unknown", later becoming either met or unmet
-
-    for(name in defines) {
-        var define = defines[name];
-        if(define.met === undefined) define.met = internal._unknown;
-        if(define.condition) {
-            var tokenized = internal.parse_conditional(define.conditional);
-            if(tokenized && tokenized.err) {
-                return tokenized;
-            } else {
-                if(tokenized) {
-                    define.tokenized = tokenized;
-                    internal.multi_conditionals[define.conditional] = tokenized;
-                }
-            }
-        }
-    } //each in define
-
     internal.satisfy_conditions(flow, defines);
+
+    console.log(defines);
 
         //now push a simplified list as the results, only by met type
     for(name in defines) {
         var define = defines[name];
         if(define.met == true) {
             results[name] = { name:define.name };
-            if(define.value) { results[name].value = define.value };
+            if(define.value) {
+                results[name].value = define.value
+            };
         }
     }
+
+    console.log('');
+    console.log(results);
 
     return results;
 
 }
     //just satisfy the single condition. this should be called only after
     //the initial conditionals have all been parsed
-exports.satisfy = function satisfy(flow, project, condition, conditional) {
+// exports.satisfy = function satisfy(flow, project, condition, conditional) {
 
-    flow.log(4, 'defines - satisfy check', conditional);
+//     flow.log(4, 'defines - satisfy check', conditional);
 
-    var tokenized = internal.multi_conditionals[conditional];
-    if(tokenized) {
-        var met = internal.satisfy_multi_condition(project.defines_all, tokenized);
-        return (condition == 'if') ? (met === true) : !(met === true);
-    } else {
-        if(project.defines[conditional]) {
-            return (condition == 'if') ? true : false;
-        } else {
-            return (condition == 'if') ? false : true;
-        }
+//     var tokenized = conditions.conditions[conditional];
+//     if(tokenized) {
+//         var met = internal.resolve_multi(project.defines_all, tokenized);
+//         return (met === true);
+//     } else {
+//         return project.defines[conditional] ? true : false;
+//     }
+
+// } //satisfy
+
+
+internal.resolve_single = function(flow, defines, define) {
+
+    var condition = define.condition;
+    var inverse = false;
+
+        //if this is an inverse condition
+    if(condition.indexOf('!') != -1) {
+        inverse = true;
+        condition = define.condition.replace('!','').trim();
     }
-
-} //satisfy
-
-internal.token_name = 0;
-internal.token_type = 1;
-
-internal.token_types = ['||','&&'];
-
-    //return an array of tokenized values in the form of
-    // { value:'mac', against:'ios', as:'||' }
-    //the met always starts out as true, because this
-    //only parses them, the satisfy will flag them down
-internal.parse_conditional = function(cond) {
-  //first split the tokens up by space
-    var tokens = cond.split(' ');
-    tokens.map(function(token){ return token.trim(); });
-
-        //more than one?
-    if(tokens.length > 1) {
-        var result = [];
-        var current = { value:tokens[0], as:'', against:'' };
-        var expect = internal.token_type;
-        for(index in tokens) {
-            if(index > 0) {
-                if(expect == internal.token_type) {
-                    if(internal.token_types.indexOf(tokens[index]) == -1) {
-                            //parse error,
-                        return { err:'at "' +cond+'", expecting ' + internal.token_types.join(' or ') + ' but got "' + tokens[index] + '"' };
-                    } else {
-                        current.as = tokens[index];
-                        expect = internal.token_name;
-                    }
-                } else if(expect == internal.token_name) {
-                    if(internal.token_types.indexOf(tokens[index]) != -1) {
-                            //parse error,
-                        return { err:'at "' +cond+'", expecting a name but got a token "' + tokens[index] + '" instead' };
-                    } else {
-                        current.against = tokens[index];
-                        expect = internal.token_type;
-                        result.push(current);
-                        current = { value:tokens[index], as:'', against:'' };
-                    }
-                }
-            }
-        }
-
-        return result;
-
-    } else {
-            //a single token on it's own must be a name, it cannot be a tokentype
-        if( internal.token_types.indexOf(tokens[0]) != -1) {
-            return { err:'at "'+tokens[0]+'" - a define by itself cannot be a token type, such as ' + internal.token_types.join(', ') };
-        } else {
-            return;
-        }
-    }
-}
-
-internal.satisfy_single_condition = function(defines, define) {
 
         //if its even found at all
-    if(defines[define.conditional]) {
+    if(defines[condition]) {
 
             //check if the define is known yet
-        if(defines[define.conditional].met == -1) {
-            flow.log(4, '   conditional unknown yet %s / %s', define.name, define.conditional);
+        if(defines[condition].met == -1) {
+            flow.log(2, '   conditional unknown yet %s / %s', define.name, condition);
             return -1;
         }
 
-        if(define.condition == 'if') {
-            if(defines[define.conditional].met === true) {
-                return true;
-            } else {
-                return false;
-            }
-        } else if(define.condition == 'unless') {
-            if(defines[define.conditional].met === true) {
-                return false;
-            } else {
-                return true;
-            }
+        console.log('condition', condition);
+        console.log('inverse', inverse);
+        console.log('met', defines[condition].met);
+
+        if(defines[condition].met === true) {
+            return inverse ? false : true;
+        } else {
+            return inverse ? true : false;
         }
 
     } else {
-        flow.log(4, 'defines - condition against %s failed as its not found at all', define.conditional);
+        flow.log(2, 'defines - condition against %s failed as its not found at all', condition);
         return false;
     }
 
-} //satisfy_single_condition
+} //resolve_single
 
-internal.satisfy_multi_condition = function(defines_all, tokenized) {
+internal.resolve_multi = function(flow, defines_all, tokenized) {
 
     //for each step in the condition, we have a final resulting value of true or false
 
@@ -275,7 +205,7 @@ internal.satisfy_multi_condition = function(defines_all, tokenized) {
 
     return current;
 
-} //satisfy_multi_condition
+} //resolve_multi
 
     //walk down the list attempting to satisfy each
     //condition in the list. if a condition is met,
@@ -287,16 +217,18 @@ internal.satisfy_conditions = function(flow, defines) {
     var depth = 0;
 
     while(found_unknown && (depth<max_depth)) {
+
             //first do all simple conditions to flatten the
             //amount of unresolved conditionals
+
         for(name in defines) {
             var define = defines[name];
                 //only care about conditional
             if(define.condition) {
-                    //simple non multiple conditions
-                if(!define.tokenized) {
-                    define.met = internal.satisfy_single_condition(defines, define);
-                }
+                var condition = conditions.conditions[define.condition];
+                if(condition && condition.as === undefined) {
+                    define.met = internal.resolve_single(flow, defines, define);
+                } //if condition
             } else {
                 if(define.met === undefined || define.met == -1) {
                     define.met = true;
@@ -305,13 +237,15 @@ internal.satisfy_conditions = function(flow, defines) {
         } //each define
 
             //then run against all complex conditionals
+
         for(name in defines) {
             var define = defines[name];
             if(define.condition) {
-                if(define.tokenized) {
-                    flow.log(4, 'defines - do complex define %s', name);
-                    define.met = internal.satisfy_multi_condition(defines, define.tokenized);
-                }
+                var condition = conditions.conditions[define.condition];
+                if(condition && condition.as !== undefined) {
+                    flow.log(2, 'defines - do complex define %s', name);
+                    define.met = internal.resolve_multi(defines, define.tokenized);
+                } //condition.as
             }
         } //each define
 
@@ -350,7 +284,8 @@ internal.parse_define = function(def) {
 
     var define = {
         name : split[0],
-        file : def.file
+        file : def.file,
+        met : internal._unknown
     };
 
     if(split.length > 1) {
@@ -359,7 +294,6 @@ internal.parse_define = function(def) {
 
     if(def.condition) {
         define.condition = def.condition;
-        define.conditional = def.conditional;
     }
 
 

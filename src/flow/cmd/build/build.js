@@ -27,13 +27,13 @@ var internal = {};
         } else {
 
             flow.log(2,'build - %s %s for %s',
-                flow.project.parsed.name, flow.project.parsed.version, flow.target);
+                flow.project.parsed.project.name, flow.project.parsed.project.version, flow.target);
 
                 //to build a project we need to prepare it first
             flow.project.prepare(flow, config);
 
             if(!flow.project.prepared) {
-                flow.log(1, 'build - failed at preparing\n');
+                flow.log(1, 'build - failed at `prepare`\n');
                 return flow.project.failed = true;
             }
 
@@ -41,7 +41,7 @@ var internal = {};
             flow.project.bake(flow, config);
 
             if(!flow.project.baked) {
-                flow.log(1, 'build - failed at baking\n');
+                flow.log(1, 'build - failed at `bake`\n');
                 return flow.project.failed = true;
             }
 
@@ -114,7 +114,7 @@ var internal = {};
 
     exports.error = function error(flow, err) {
 
-        flow.log(1, '\n build command error');
+        flow.log(1, 'build command error');
 
         if(err && err.length > 0) {
             flow.log(1,'%s\n', err);

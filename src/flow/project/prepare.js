@@ -2,8 +2,10 @@ var   path = require('path')
     , haxelib = require('../util/haxelib')
     , util = require('../util/util')
     , bake = require('./bake')
+    , bars = require('handlebars')
 
     , depends = require('./prepare/depends')
+    , conditions = require('./prepare/conditions')
     , defines = require('./prepare/defines')
     , flags = require('./prepare/flags')
     , files = require('./prepare/files')
@@ -17,13 +19,13 @@ exports.prepare = function prepare(flow, build_config) {
     flow.project.depends = flow.project.depends || {};
 
         //preparation starts with the parsed project
-    var project = flow.project.parsed;
+    var parsed = flow.project.parsed;
 
-    internal.log(flow, 2, 'prepare - project %s', project.name );
+    internal.log(flow, 2, 'prepare - project %s', parsed.project.name );
 
         //dependencies are a special case as they affect everything, they
         //come first and are required to be complete before anything else
-    var _depends = internal.prepare_dependencies(flow, project, build_config);
+    var _depends = internal.prepare_dependencies(flow, parsed, build_config);
 
         //get out early if missing any dependency
     if(_depends == null) {
@@ -32,7 +34,7 @@ exports.prepare = function prepare(flow, build_config) {
 
         //start at the project base
     var prepared = {
-        source : util.deep_copy(project),
+        source : util.deep_copy(parsed),
         depends : _depends,
         defines_all : {}
     }
@@ -47,19 +49,23 @@ exports.prepare = function prepare(flow, build_config) {
     flow.project.path_output_root = flow.project.get_out_root(flow, prepared) + '/';
     flow.project.path_binary = flow.project.get_out_binary(flow, prepared)
 
-        //after dependencies, we process the defines as the rest will depend on them
-        //and error out if there are any parsing or other errors in there.
-    if(!internal.prepare_defines(flow, prepared, build_config)) {
-        return null;
-    }
+        //this step simply pulls out any conditionals in any root node,
+        //tokenizes it, verifies it and pushes it into a cache for later
+        //checks against a condition being met
+    internal.prepare_project(flow, prepared, build_config);
 
-        //continued parsing on the build object, the haxe/build flags
-    internal.prepare_flags(flow, prepared, build_config);
-        //parse the project files node into an easy to consume form
-    internal.prepare_files(flow, prepared, build_config);
 
-        //finally, store it in the project as valid and return
-    flow.project.prepared = prepared;
+    flow.project.failed = true;
+
+    return null;
+
+    //     //continued parsing on the build object, the haxe/build flags
+    // internal.prepare_flags(flow, prepared, build_config);
+    //     //parse the project files node into an easy to consume form
+    // internal.prepare_files(flow, prepared, build_config);
+
+    //     //finally, store it in the project as valid and return
+    // flow.project.prepared = prepared;
 
 } //prepare
 
@@ -75,11 +81,11 @@ internal.log = function(flow) {
     //expose for children code
 exports.log = internal.log;
 
-internal.prepare_dependencies = function(flow, project, build_config) {
+internal.prepare_dependencies = function(flow, parsed, build_config) {
 
     internal.log(flow, 3, 'prepare - dependency tree ...');
 
-    var _depends = depends.parse(flow, project);
+    var _depends = depends.parse(flow, parsed);
 
     if(_depends == null) {
         return null;
@@ -108,7 +114,7 @@ internal.prepare_dependencies = function(flow, project, build_config) {
 
 internal.prepare_cascade_project = function(flow, prepared, build_config) {
 
-        //we go through all dependencies now and merge
+    //we go through all dependencies now and merge
         //them with only unique values persisting, i.e respecting last value
     for(name in prepared.depends) {
         var depend = prepared.depends[name];
@@ -119,11 +125,11 @@ internal.prepare_cascade_project = function(flow, prepared, build_config) {
         //these are relative paths to the project they originate in, and should be left alone,
         //used later by the files preparation to resolve their paths against the dependency correctly
     if(flow.project.parsed.build.files) {
-        prepared.source.build.files = util.deep_copy(flow.project.parsed.build.files, {});
-    } else { delete prepared.source.build.files; }
+        prepared.source.project.build.files = util.deep_copy(flow.project.parsed.build.files, {});
+    } else { delete prepared.source.project.build.files; }
     if(flow.project.parsed.files) {
-        prepared.source.files = util.deep_copy(flow.project.parsed.files, {});
-    } else { delete prepared.source.files; }
+        prepared.source.project.files = util.deep_copy(flow.project.parsed.files, {});
+    } else { delete prepared.source.project.files; }
 
         //and then bring in any flow configs
         //from the project and store them in flow.config,
@@ -152,6 +158,59 @@ internal.prepare_cascade_project = function(flow, prepared, build_config) {
 
 } //prepare_cascade_project
 
+internal.fail = function(flow, prepared, section, msg) {
+
+    internal.log(flow, 1, '');
+    internal.log(flow, 1, 'Error');
+    internal.log(flow, 1, 'prepare - stopping due to errors in %s :\n', section);
+    internal.log(flow, 1, '> ', msg);
+    internal.log(flow, 1, '');
+
+    return flow.project.failed = true;
+
+}
+
+internal.prepare_project = function(flow, prepared, build_config) {
+
+    internal.log(flow, 2, 'prepare - project ...');
+
+
+    //conditions
+
+            //these are cached first because their tokenized version
+            //is used to compare against known and unknown defines when
+            //preparing the defines themselves, so we go first
+        internal.log(flow, 3, 'prepare - project - conditions ...');
+
+            var cond = conditions.parse(flow, prepared, build_config);
+
+            if(cond.err) {
+                return internal.fail(flow, prepared, 'conditions', cond.err);
+            }
+
+        internal.log(flow, 3, 'prepare - project - conditions - ok');
+
+    //defines
+
+            //after dependencies, we process the defines as the rest will depend on them
+            //and error out if there are any parsing or other errors in there.
+        internal.log(flow, 3, 'prepare - project - defines ...');
+
+            var def = internal.prepare_defines(flow, prepared, build_config);
+
+            if(def.err) {
+                return internal.fail(flow, prepared, 'defines', def.err);
+            }
+
+        internal.log(flow, 3, 'prepare - project - defines - ok');
+
+
+
+    internal.log(flow, 2, 'prepare - project - ok');
+
+} //prepare_conditionals
+
+
 internal.prepare_defines = function(flow, prepared, build_config) {
 
     internal.log(flow, 3, 'prepare - defines ...');
@@ -163,17 +222,14 @@ internal.prepare_defines = function(flow, prepared, build_config) {
         prepared.defines_all[name] = { name:name, met:flow.target == name };
     }
 
-
         //now we parse all project defines from the project
     prepared.defines_all = defines.parse(flow, prepared.source, prepared.depends, build_config, prepared.defines_all);
         //and the final list is filtered against the defines themselves, and the known targets
     prepared.defines = defines.filter(flow, prepared.defines_all, build_config);
 
-
+        //if any errors, return out early
     if(prepared.defines.err) {
-        internal.log(flow, 1, 'prepare - defines failed to parse. aborting build : \n');
-        internal.log(flow, 1, '> %s \n',prepared.defines.err);
-        return null;
+        return prepared.defines.err;
     }
 
 
@@ -218,9 +274,9 @@ internal.prepare_codepaths = function (flow, prepared, build_config) {
             prepared.flags.push('-cp ' + depend.path);
     }//each depends
 
-        //store the product code paths flag list
-    if(prepared.source.product && prepared.source.product.codepaths) {
-        var _paths = prepared.source.product.codepaths.map(function(a) {
+        //store the app code paths flag list
+    if(prepared.source.project.app && prepared.source.project.app.codepaths) {
+        var _paths = prepared.source.project.app.codepaths.map(function(a) {
             var _path = path.relative(flow.project.path_build, path.join(flow.run_path, a));
             return '-cp ' + _path;
         });

@@ -7,15 +7,15 @@ var   path = require('path')
 
 
     //return all dependencies, as {found:{}, failed:{}}
-exports.parse = function parse(flow, project, result, depth) {
+exports.parse = function parse(flow, parsed, result, depth) {
 
         //recursive, so use the one passed in otherwise
     result = result || { found:{}, failed:{} };
     depth = depth || 1;
 
-    prepare.log(flow, 3, '%s parsing dependencies for %s', util.pad(depth*2, '', ' '), project.name);
+    prepare.log(flow, 3, '%s parsing dependencies for %s', util.pad(depth*2, '', ' '), parsed.name);
 
-    var depends = project.build.dependencies;
+    var depends = parsed.build.dependencies;
     var found = {};
     var failed = {};
 
@@ -38,7 +38,7 @@ exports.parse = function parse(flow, project, result, depth) {
 
     } else {//has dependencies
 
-        prepare.log(flow, 3, 'prepare - %s %s lists no dependencies', util.pad(depth*3, '', ' '), project.name);
+        prepare.log(flow, 3, 'prepare - %s %s lists no dependencies', util.pad(depth*3, '', ' '), parsed.name);
 
     }
 
@@ -96,7 +96,7 @@ exports.parse = function parse(flow, project, result, depth) {
             //but only if the found deps dont contain our name, to avoid
             //recursive dependencies
 
-            if(!result.found[project.name]) {
+            if(!result.found[parsed.name]) {
                 result = exports.parse(flow, state.parsed, result, depth+1);
             }
         }

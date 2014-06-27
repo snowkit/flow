@@ -4,7 +4,7 @@
         "timing" : false,
         "app_boot" : "FlowApp",
         "error_on_files_missing" : false,
-        "command_line_based" : false,
+        "command_line_based" : true,
         "mac" : {
             "default_binary_path" : "MacOS",
             "default_output" : "Resources"

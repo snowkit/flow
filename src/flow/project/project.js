@@ -6,8 +6,10 @@ var   fs = require('graceful-fs')
     , util = require('../util/util')
     , _prepare = require('./prepare')
     , _bake = require('./bake')
+    , bars = require('handlebars')
 
 
+var internal = {};
 exports.default = 'flow.json';
 
 exports.init = function init(flow) {
@@ -38,6 +40,31 @@ exports.init = function init(flow) {
 
 } //init
 
+
+bars.registerHelper('if', function (v1, op_opt, v2, options) {
+
+    if(options === undefined) {
+        if(v2 === undefined) {
+            return v1 ? op_opt.fn(this) : op_opt.inverse(this);
+        }
+    }
+
+    var _true = false;
+    switch (op_opt) {
+        case '==':  _true = v1 == v2;   break;
+        case '===': _true = v1 === v2;  break;
+        case '!==': _true = v1 !== v2;  break;
+        case '<':   _true = v1 < v2;    break;
+        case '<=':  _true = v1 <= v2;   break;
+        case '>':   _true = v1 > v2;    break;
+        case '>=':  _true = v1 >= v2;   break;
+        case '||':  _true = v1 || v2;   break;
+        case '&&':  _true = v1 && v2;   break;
+    }
+    return _true ? options.fn(this) : options.inverse(this);
+});
+
+
 exports.verify = function verify(flow, project_path, quiet) {
 
     var project_file = flow.flags.project || project_path;
@@ -67,9 +94,15 @@ exports.verify = function verify(flow, project_path, quiet) {
 
     var parsed = null;
 
+    var file_contents = fs.readFileSync( abs_path,'utf8' );
+
+    if(!file_contents) {
+        return fail_verify('file content is invalid : ' + file_contents);
+    }
+
     try {
 
-        parsed = jsonic( fs.readFileSync( abs_path,'utf8' ) );
+        parsed = jsonic( file_contents );
 
     } catch(e) {
 
@@ -82,13 +115,22 @@ exports.verify = function verify(flow, project_path, quiet) {
 
         //check that its valid
     if(!parsed || parsed.constructor != Object) {
-        return fail_verify('flow projects are a json object, this appears to be : ' + parsed.constructor);
+        return fail_verify('flow projects are a json object, this appears to be : ' + parsed.constructor.name);
     }
 
         //now check that it has valid information
-    if(!(parsed.name) || !(parsed.version)) {
-        return fail_verify('flow projects require a name and a version');
+    if(!(parsed.project)) {
+        return fail_verify('flow projects require a { project:{ name:"", version:"" } } minimum. missing "project"');
     }
+
+    if(!(parsed.project.version)) {
+        return fail_verify('flow projects require a { project:{ name:"", version:"" } } minimum. missing "version"');
+    }
+
+    if(!(parsed.project.name)) {
+        return fail_verify('flow projects require a { project:{ name:"", version:"" } } minimum. missing "name"');
+    }
+
 
         //safeguard against touching non existing build options
     if(!parsed.build) {
@@ -115,7 +157,7 @@ exports.verify = function verify(flow, project_path, quiet) {
     //the final target path for the output
 exports.get_out_root = function(flow, prepared) {
 
-    var dest_folder = path.normalize(prepared.source.product.output) + '/';
+    var dest_folder = path.normalize(prepared.source.project.app.output) + '/';
 
     dest_folder += flow.target;
 
@@ -129,11 +171,11 @@ exports.get_out_root = function(flow, prepared) {
 
 exports.get_out_binary = function(flow, prepared) {
 
-    var app_name = prepared.source.product.app;
+    var app_name = prepared.source.project.app.name;
     var outpath = exports.get_out_path(flow, prepared);
     var outroot = exports.get_out_root(flow, prepared);
 
-    if(flow.target == 'mac') {
+    if(flow.target == 'mac' && !flow.config.build.command_line_based) {
         outpath = path.join(outroot, app_name) + '.app/Contents/MacOS/';
     }
 
@@ -150,8 +192,8 @@ exports.get_out_path = function get_out_path(flow, prepared) {
     var dest_folder = exports.get_out_root(flow, prepared);
 
         //some targets have considerations for their destination
-    if(flow.target == 'mac') {
-        var postfix = prepared.source.product.app + '.app/Contents/' + flow.config.build.mac.default_output;
+    if(flow.target == 'mac' && !flow.config.build.command_line_based) {
+        var postfix = prepared.source.project.product.app + '.app/Contents/' + flow.config.build.mac.default_output;
         dest_folder = path.join(dest_folder, postfix);
     }
 
