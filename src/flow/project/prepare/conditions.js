@@ -11,7 +11,7 @@ exports.parse = function(flow, prepared, build_config) {
 
         for(flag in prepared.source.if) {
             var save = internal.parse_condition(flag);
-            if(save.err) {
+            if(save && save.err) {
                 return save;
             } else {
                 exports.conditions[flag] = save;
@@ -131,7 +131,7 @@ internal.parse_condition = function(cond) {
         if( internal.token_types.indexOf(tokens[0]) != -1) {
             return { err:'at "'+tokens[0]+'" - a define by itself cannot be a token type, such as ' + internal.token_types.join(', ') };
         } else {
-            return;
+            return { condition:tokens[0] };
         }
     }
 

@@ -73,7 +73,7 @@ exports.filter = function filter(flow, defines, build_config) {
 
     var results = {};
 
-    internal.satisfy_conditions(flow, defines);
+    internal.resolve_defines(flow, defines);
 
     console.log(defines);
 
@@ -127,13 +127,9 @@ internal.resolve_single = function(flow, defines, define) {
 
             //check if the define is known yet
         if(defines[condition].met == -1) {
-            flow.log(2, '   conditional unknown yet %s / %s', define.name, condition);
+            flow.log(4, '   conditional unknown yet %s / %s', define.name, condition);
             return -1;
         }
-
-        console.log('condition', condition);
-        console.log('inverse', inverse);
-        console.log('met', defines[condition].met);
 
         if(defines[condition].met === true) {
             return inverse ? false : true;
@@ -142,7 +138,7 @@ internal.resolve_single = function(flow, defines, define) {
         }
 
     } else {
-        flow.log(2, 'defines - condition against %s failed as its not found at all', condition);
+        flow.log(4, 'defines - condition against %s failed as its not found at all', condition);
         return false;
     }
 
@@ -157,42 +153,62 @@ internal.resolve_multi = function(flow, defines_all, tokenized) {
     var is_unknown = true;
     for(index in tokenized) {
         var tokened = tokenized[index];
-        var value1 = defines_all[tokened.value];
-        var value2 = defines_all[tokened.against];
-        if(value1.met != -1 || value2.met != -1) {
+        var cond = defines_all[tokened.condition];
+        if(cond.met != -1) {
             is_unknown = false;
         }
     }
 
         //all of the potential flags in question are unknown, so don't bother
     if(is_unknown) {
-        flow.log(4, 'defines - unknown flags for all conditions of ', tokenized);
+        flow.log(2, 'defines - unknown flags for all conditions of ', tokenized);
         return -1;
     }
 
-        //start at true
-    var current;
-    for(index in tokenized) {
-        var tokened = tokenized[index];
-        var value1 = defines_all[tokened.value];
-        var value2 = defines_all[tokened.against];
+    var state;
 
-        if(value1.met != -1 && value2.met != -1) {
+    for(index in tokenized) {
+
+            //we only want to do n-1 amount,
+            //because we look ahead at the next item.
+            //we can assume there will be > 1 because of the check
+            //before calling this function
+        if(index == tokenized.length-1) {
+            continue;
+        }
+
+        var i = parseInt(index);
+        var tokened = tokenized[i];
+        var next = tokenized[i+1];
+
+        var curdef = defines_all[tokened.condition];
+        var nextdef = defines_all[next.condition];
+
+            //if both are known, we can build state
+        if(curdef.met != -1 && nextdef.met != -1) {
+
+            var curmet = tokened.inverse ? !curdef.met : curdef.met;
+            var nextmet = next.inverse ? !nextdef.met : nextdef.met;
+
             if(tokened.as == '||') {
-                current = value1.met || value2.met;
+                state = curmet || nextmet;
             } else if(tokened.as == '&&') {
-                current = value1.met && value2.met;
+                state = curmet && nextmet;
             }
+
         } else {
-            //one of these isn't known yet, if it's an || and one of them is met
-            //we can already determine that the condition is met
+
+                //one of these isn't known yet, if it's an || and one of them is met
+                //we can already determine that the condition is met by or logic
             if(tokened.as == '||') {
-                if(value1.met == -1) {
-                    if(value2.met === true) {
+                if(curdef.met == -1) {
+                    var nextmet = next.inverse ? !nextdef.met : nextdef.met;
+                    if(nextmet === true) {
                         return true;
                     }
-                } else if(value2.met == -1) {
-                    if(value1.met === true) {
+                } else if(nextdef.met == -1) {
+                    var curmet = tokened.inverse ? !curdef.met : curdef.met;
+                    if(curmet === true) {
                         return true;
                     }
                 }
@@ -201,16 +217,16 @@ internal.resolve_multi = function(flow, defines_all, tokenized) {
 
     } //each tokenized
 
-    flow.log(4, 'defines - satisfy multi condition current', current);
+    flow.log(2, 'defines - satisfy multi condition state', state);
 
-    return current;
+    return state;
 
 } //resolve_multi
 
     //walk down the list attempting to satisfy each
     //condition in the list. if a condition is met,
     //it is removed from the working list
-internal.satisfy_conditions = function(flow, defines) {
+internal.resolve_defines = function(flow, defines) {
 
     var found_unknown = true;
     var max_depth = 20;
@@ -226,7 +242,7 @@ internal.satisfy_conditions = function(flow, defines) {
                 //only care about conditional
             if(define.condition) {
                 var condition = conditions.conditions[define.condition];
-                if(condition && condition.as === undefined) {
+                if(condition && condition.length == 1) {
                     define.met = internal.resolve_single(flow, defines, define);
                 } //if condition
             } else {
@@ -242,9 +258,8 @@ internal.satisfy_conditions = function(flow, defines) {
             var define = defines[name];
             if(define.condition) {
                 var condition = conditions.conditions[define.condition];
-                if(condition && condition.as !== undefined) {
-                    flow.log(2, 'defines - do complex define %s', name);
-                    define.met = internal.resolve_multi(defines, define.tokenized);
+                if(condition && condition.length > 1) {
+                    define.met = internal.resolve_multi(flow, defines, condition);
                 } //condition.as
             }
         } //each define
