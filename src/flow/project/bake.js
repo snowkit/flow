@@ -74,7 +74,7 @@ exports.hxml = function(flow, project, build_config, with_compile, split) {
 
     split = split || '\n';
 
-    var hxml_ = '-main ' + flow.config.build.boot + split;
+    var hxml_ = '-main ' + flow.config.build.boot.path + split;
 
     hxml_ += exports.defines(flow, project, build_config, split);
     hxml_ += exports.flags(flow, project, build_config, split);

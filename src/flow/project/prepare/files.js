@@ -6,15 +6,15 @@ var   defines = require('./defines')
 var internal = {};
 
     //returns an array of { source:dest } for the files in project
-exports.parse = function parse(flow, prepared, project, srcpath, build_config) {
+exports.parse = function parse(flow, prepared, source, srcpath, build_config) {
 
     flow.log(3, 'prepare - files');
 
     var project_file_list = [];
     var build_file_list = [];
 
-    internal.parse_files(flow, prepared, project.files, project_file_list);
-    internal.parse_files(flow, prepared, project.build.files, build_file_list);
+    internal.parse_files(flow, prepared, source.project.files, project_file_list);
+    internal.parse_files(flow, prepared, source.project.build.files, build_file_list);
 
     var project_root = path.dirname(flow.project.parsed.__path);
     var project_out = flow.project.path_output;
@@ -49,37 +49,40 @@ exports.parse = function parse(flow, prepared, project, srcpath, build_config) {
 
 internal.append_source = function(flow, list, srcpath) {
 
-    return list.map(function(p){
-        p.source_name = p.source;
-        p.source = path.join(srcpath, p.source);
-        return p;
+    return list.map(function(file){
+
+        file.source_name = file.source;
+        file.source = path.join(srcpath, file.source);
+
+        return file;
+
     });
 
 } //append_source
 
 internal.filter_unsafe = function(flow, list, srcpath, dstpath, rootpath) {
 
-    return list.filter(function(p){
+    return list.filter(function(file){
 
         var is_source_safe = true;
         var is_dest_safe = true;
 
-        var local_dest = path.join(dstpath, p.dest);
+        var local_dest = path.join(dstpath, file.dest);
         var abs_dest = path.resolve(rootpath, local_dest);
 
-        var rel_src = path.relative(srcpath, p.source);
+        var rel_src = path.relative(srcpath, file.source);
         var rel_dst = path.relative(rootpath, local_dest);
 
         if(rel_src.indexOf('..') != -1) {
             is_source_safe = false;
             flow.log(2, '>     - files - ignoring source file due to unsafe path. %s should be inside %s (becomes %s)',
-                p.source_name ? p.source_name : p.source, srcpath, p.source);
+                file.source_name ? file.source_name : file.source, srcpath, file.source);
         }
 
         if(rel_dst.indexOf('..') != -1) {
             is_dest_safe = false;
             flow.log(2, '>     - files - ignoring dest file due to unsafe path. %s should be inside %s (becomes %s)',
-                p.dest, rootpath, abs_dest);
+                file.dest, rootpath, abs_dest);
         }
 
         return is_source_safe && is_dest_safe;
@@ -162,7 +165,7 @@ internal.parse_node = function(flow, project, _node) {
     }
 
         //clean up whitespaces
-    parts = parts.map(function(p) { return p.trim(); });
+    parts = parts.map(function(part) { return part.trim(); });
 
     return { source:parts[0], dest:parts[1] };
 

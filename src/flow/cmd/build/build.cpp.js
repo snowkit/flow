@@ -17,7 +17,7 @@ exports.post_build = function(flow, config, done) {
 
             if(flow.timing) console.time('build - binary copy');
 
-    var source_binary = flow.config.build.boot;
+    var source_binary = flow.config.build.boot.path;
 
     if(flow.target == 'windows') {
         source_binary += '.exe';
