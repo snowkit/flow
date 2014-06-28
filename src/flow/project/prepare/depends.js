@@ -13,9 +13,9 @@ exports.parse = function parse(flow, parsed, result, depth) {
     result = result || { found:{}, failed:{} };
     depth = depth || 1;
 
-    prepare.log(flow, 3, '%s parsing dependencies for %s', util.pad(depth*2, '', ' '), parsed.name);
+    prepare.log(flow, 3, '%s parsing dependencies for %s', util.pad(depth*2, '', ' '), parsed.project.name);
 
-    var depends = parsed.build.dependencies;
+    var depends = parsed.project.build.dependencies;
     var found = {};
     var failed = {};
 
@@ -38,7 +38,7 @@ exports.parse = function parse(flow, parsed, result, depth) {
 
     } else {//has dependencies
 
-        prepare.log(flow, 3, 'prepare - %s %s lists no dependencies', util.pad(depth*3, '', ' '), parsed.name);
+        prepare.log(flow, 3, 'prepare - %s %s lists no dependencies', util.pad(depth*3, '', ' '), parsed.project.name);
 
     }
 
@@ -96,7 +96,7 @@ exports.parse = function parse(flow, parsed, result, depth) {
             //but only if the found deps dont contain our name, to avoid
             //recursive dependencies
 
-            if(!result.found[parsed.name]) {
+            if(!result.found[parsed.project.name]) {
                 result = exports.parse(flow, state.parsed, result, depth+1);
             }
         }

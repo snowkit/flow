@@ -2,7 +2,7 @@
     "config" : "1.0.0-alpha-1",
     "build" : {
         "timing" : false,
-        "app_boot" : "FlowApp",
+        "boot" : "FlowApp",
         "error_on_files_missing" : false,
         "command_line_based" : true,
         "mac" : {

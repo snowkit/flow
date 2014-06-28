@@ -54,18 +54,8 @@ exports.prepare = function prepare(flow, build_config) {
         //checks against a condition being met
     internal.prepare_project(flow, prepared, build_config);
 
-
-    flow.project.failed = true;
-
-    return null;
-
-    //     //continued parsing on the build object, the haxe/build flags
-    // internal.prepare_flags(flow, prepared, build_config);
-    //     //parse the project files node into an easy to consume form
-    // internal.prepare_files(flow, prepared, build_config);
-
-    //     //finally, store it in the project as valid and return
-    // flow.project.prepared = prepared;
+        //finally, store it in the project as valid and return
+    flow.project.prepared = prepared;
 
 } //prepare
 
@@ -124,12 +114,15 @@ internal.prepare_cascade_project = function(flow, prepared, build_config) {
         //an exception to this rule is files : {} and build : { files : {} } because
         //these are relative paths to the project they originate in, and should be left alone,
         //used later by the files preparation to resolve their paths against the dependency correctly
-    if(flow.project.parsed.build.files) {
-        prepared.source.project.build.files = util.deep_copy(flow.project.parsed.build.files, {});
+    if(flow.project.parsed.project.build.files) {
+        prepared.source.project.build.files = util.deep_copy(flow.project.parsed.project.build.files, {});
     } else { delete prepared.source.project.build.files; }
-    if(flow.project.parsed.files) {
-        prepared.source.project.files = util.deep_copy(flow.project.parsed.files, {});
+    if(flow.project.parsed.project.files) {
+        prepared.source.project.files = util.deep_copy(flow.project.parsed.project.files, {});
     } else { delete prepared.source.project.files; }
+
+    console.log(prepared.source.project.build.files);
+    console.log(prepared.source.project.files);
 
         //and then bring in any flow configs
         //from the project and store them in flow.config,
@@ -182,28 +175,31 @@ internal.prepare_project = function(flow, prepared, build_config) {
             //preparing the defines themselves, so we go first
         internal.log(flow, 3, 'prepare - project - conditions ...');
 
-            var cond = conditions.parse(flow, prepared, build_config);
+            var state = conditions.parse(flow, prepared, build_config);
 
-            if(cond.err) {
-                return internal.fail(flow, prepared, 'conditions', cond.err);
+            if(state.err) {
+                return internal.fail(flow, prepared, 'conditions', state.err);
             }
 
         internal.log(flow, 3, 'prepare - project - conditions - ok');
 
     //defines
 
-            //after dependencies, we process the defines as the rest will depend on them
-            //and error out if there are any parsing or other errors in there.
-        internal.log(flow, 3, 'prepare - project - defines ...');
+                //process the defines as the rest will depend on them
+                //and error out if there are any parsing or other errors in there.
+            state = internal.prepare_defines(flow, prepared, build_config);
 
-            var def = internal.prepare_defines(flow, prepared, build_config);
-
-            if(def.err) {
-                return internal.fail(flow, prepared, 'defines', def.err);
+            if(state.err) {
+                return internal.fail(flow, prepared, 'defines', state.err);
             }
 
-        internal.log(flow, 3, 'prepare - project - defines - ok');
+    //flags
 
+            internal.prepare_flags(flow, prepared, build_config);
+
+    //files
+
+            internal.prepare_files(flow, prepared, build_config);
 
 
     internal.log(flow, 2, 'prepare - project - ok');
@@ -287,18 +283,18 @@ internal.prepare_codepaths = function (flow, prepared, build_config) {
 
 internal.prepare_flags = function(flow, prepared, build_config) {
 
-    internal.log(flow, 3, 'prepare - flags ...');
+    internal.log(flow, 3, 'prepare - project - flags ...');
 
-    prepared.flags = [];
-    internal.prepare_codepaths(flow, prepared, build_config);
-    prepared.flags = flags.parse(flow, prepared, build_config);
+        prepared.flags = [];
+        internal.prepare_codepaths(flow, prepared, build_config);
+        prepared.flags = flags.parse(flow, prepared, build_config);
 
-        //append the debug flag if requested
-    if(flow.flags.debug) { prepared.flags.push('-debug'); }
+            //append the debug flag if requested
+        if(flow.flags.debug) { prepared.flags.push('-debug'); }
 
-    internal.log(flow, 4, bake.flags(flow, prepared, build_config));
+        internal.log(flow, 4, bake.flags(flow, prepared, build_config));
 
-    internal.log(flow, 3, 'prepare - flags - ok');
+    internal.log(flow, 3, 'prepare - project - flags - ok');
 
 } //prepare_flags
 
@@ -306,23 +302,23 @@ internal.prepare_files = function(flow, prepared, build_config) {
 
     internal.log(flow, 3, 'prepare - files ...');
 
-    var result = files.parse(flow, prepared, prepared.source, null, build_config);
+        var result = files.parse(flow, prepared, prepared.source, null, build_config);
 
-        //now, check each dependency and get their files, making them
-        //absolute to their path, such that they can be copied
-    for(index in prepared.depends) {
+            //now, check each dependency and get their files, making them
+            //absolute to their path, such that they can be copied
+        for(index in prepared.depends) {
 
-        var depend = prepared.depends[index];
-        var sourcepath = path.dirname(depend.project.__path);
-        var depfiles = files.parse(flow, prepared, depend.project, sourcepath, build_config);
+            var depend = prepared.depends[index];
+            var sourcepath = path.dirname(depend.project.__path);
+            var depfiles = files.parse(flow, prepared, depend.project, sourcepath, build_config);
 
-            //merge them into the final list
-        result.build_files = util.array_union(result.build_files, depfiles.build_files);
-        result.project_files = util.array_union(result.project_files, depfiles.project_files);
+                //merge them into the final list
+            result.build_files = util.array_union(result.build_files, depfiles.build_files);
+            result.project_files = util.array_union(result.project_files, depfiles.project_files);
 
-    } //each depends
+        } //each depends
 
-    prepared.files = result;
+        prepared.files = result;
 
     internal.log(flow, 3, 'prepare - files - ok');
 

@@ -133,11 +133,11 @@ exports.verify = function verify(flow, project_path, quiet) {
 
 
         //safeguard against touching non existing build options
-    if(!parsed.build) {
-        parsed.build = {};
+    if(!parsed.project.build) {
+        parsed.project.build = {};
     }
         //then merge any base options from flow defaults into it
-    parsed.build = util.merge_combine(flow.config.project.build, parsed.build);
+    parsed.build = util.merge_combine(flow.config.project.build, parsed.project.build);
 
     parsed.__path = abs_path;
     parsed.__file = project_file;
@@ -193,7 +193,7 @@ exports.get_out_path = function get_out_path(flow, prepared) {
 
         //some targets have considerations for their destination
     if(flow.target == 'mac' && !flow.config.build.command_line_based) {
-        var postfix = prepared.source.project.product.app + '.app/Contents/' + flow.config.build.mac.default_output;
+        var postfix = prepared.source.project.app.name + '.app/Contents/' + flow.config.build.mac.default_output;
         dest_folder = path.join(dest_folder, postfix);
     }
 

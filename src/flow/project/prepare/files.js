@@ -16,7 +16,6 @@ exports.parse = function parse(flow, prepared, project, srcpath, build_config) {
     internal.parse_files(flow, prepared, project.files, project_file_list);
     internal.parse_files(flow, prepared, project.build.files, build_file_list);
 
-
     var project_root = path.dirname(flow.project.parsed.__path);
     var project_out = flow.project.path_output;
 
@@ -97,23 +96,14 @@ internal.parse_files = function(flow, project, root, file_list) {
     internal.parse_node_list(flow, project, root, file_list);
 
     //parse any potentially conditional files
-    if(root.if) {
-        for(conditional in root.if) {
-            var current = root.if[conditional];
-            if(defines.satisfy(flow, project, 'if', conditional)){
-                internal.parse_node_list(flow, project, current, file_list);
-            }
-        } //each condition
-    } //if
-
-    if(root.unless) {
-        for(conditional in root.unless) {
-            var current = root.unless[conditional];
-            if(defines.satisfy(flow, project, 'unless', conditional)){
-                internal.parse_node_list(flow, project, current, file_list);
-            }
-        } //each condition
-    } //unless
+    // if(root.if) {
+    //     for(conditional in root.if) {
+    //         var current = root.if[conditional];
+    //         if(defines.satisfy(flow, project, 'if', conditional)){
+    //             internal.parse_node_list(flow, project, current, file_list);
+    //         }
+    //     } //each condition
+    // } //if
 
 } //parse_project_files
 

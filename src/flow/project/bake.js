@@ -5,7 +5,7 @@ exports.bake = function bake(flow, build_config) {
 
     var project = flow.project.prepared;
 
-    flow.log(2, 'bake - project %s\n', flow.project.parsed.name);
+    flow.log(2, 'bake - project %s\n', flow.project.parsed.project.name);
 
     flow.project.hxml = exports.hxml(flow, project, build_config );
 
@@ -74,7 +74,7 @@ exports.hxml = function(flow, project, build_config, with_compile, split) {
 
     split = split || '\n';
 
-    var hxml_ = '-main ' + flow.config.build.app_boot + split;
+    var hxml_ = '-main ' + flow.config.build.boot + split;
 
     hxml_ += exports.defines(flow, project, build_config, split);
     hxml_ += exports.flags(flow, project, build_config, split);

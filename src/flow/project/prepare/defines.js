@@ -4,6 +4,7 @@ var   util = require('../../util/util')
 
 var internal = {};
     internal._unknown = -1;
+    internal.cache_conditions = {};
 
 
 exports.parse = function parse(flow, source, depends, build_config, existing) {
@@ -75,8 +76,6 @@ exports.filter = function filter(flow, defines, build_config) {
 
     internal.resolve_defines(flow, defines);
 
-    console.log(defines);
-
         //now push a simplified list as the results, only by met type
     for(name in defines) {
         var define = defines[name];
@@ -88,27 +87,23 @@ exports.filter = function filter(flow, defines, build_config) {
         }
     }
 
-    console.log('');
-    console.log(results);
-
     return results;
 
 }
-    //just satisfy the single condition. this should be called only after
-    //the initial conditionals have all been parsed
-// exports.satisfy = function satisfy(flow, project, condition, conditional) {
 
-//     flow.log(4, 'defines - satisfy check', conditional);
+    // just satisfy the single condition. this should be called only after
+    // the initial conditionals have all been parsed
+exports.satisfy = function satisfy(flow, project, condition) {
 
-//     var tokenized = conditions.conditions[conditional];
-//     if(tokenized) {
-//         var met = internal.resolve_multi(project.defines_all, tokenized);
-//         return (met === true);
-//     } else {
-//         return project.defines[conditional] ? true : false;
-//     }
+    flow.log(2, 'defines - satisfy check', condition);
 
-// } //satisfy
+    if(conditions.conditions[condition]) {
+        return internal.cache_conditions[condition];
+    } else {
+        return project.defines[condition] ? true : false;
+    }
+
+} //satisfy
 
 
 internal.resolve_single = function(flow, defines, define) {
@@ -153,8 +148,7 @@ internal.resolve_multi = function(flow, defines_all, tokenized) {
     var is_unknown = true;
     for(index in tokenized) {
         var tokened = tokenized[index];
-        var cond = defines_all[tokened.condition];
-        if(cond.met != -1) {
+        if(defines_all[tokened.condition].met != -1) {
             is_unknown = false;
         }
     }
@@ -201,6 +195,7 @@ internal.resolve_multi = function(flow, defines_all, tokenized) {
                 //one of these isn't known yet, if it's an || and one of them is met
                 //we can already determine that the condition is met by or logic
             if(tokened.as == '||') {
+
                 if(curdef.met == -1) {
                     var nextmet = next.inverse ? !nextdef.met : nextdef.met;
                     if(nextmet === true) {
@@ -212,8 +207,10 @@ internal.resolve_multi = function(flow, defines_all, tokenized) {
                         return true;
                     }
                 }
-            }
-        }
+
+            } //if ||
+
+        } //curdef.met !-1 nextdef.met !-1
 
     } //each tokenized
 
@@ -260,6 +257,7 @@ internal.resolve_defines = function(flow, defines) {
                 var condition = conditions.conditions[define.condition];
                 if(condition && condition.length > 1) {
                     define.met = internal.resolve_multi(flow, defines, condition);
+                    internal.cache_conditions[define.condition] = define.met;
                 } //condition.as
             }
         } //each define
@@ -285,7 +283,7 @@ internal.resolve_defines = function(flow, defines) {
     } //while found unknowns or reached a max depth
 
     if(depth >= max_depth) {
-        flow.log(4, 'defines - stopping because too many loops in define tree(%d)', max_depth);
+        flow.log(4, 'defines - stopping because too many loops in define tree(%d). check for cyclic references in your defines', max_depth);
     }
 
 } //satisfy conditions

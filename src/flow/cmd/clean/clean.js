@@ -10,8 +10,8 @@ exports.run = function run(flow, do_all) {
     if(flow.timing) console.time('clean');
 
     if(do_all) {
-        flow.log(2, 'clean - cleaning %s ... \n', flow.project.parsed.app.output );
-        wrench.rmdirSyncRecursive(path.resolve(flow.run_path, flow.project.parsed.app.output), true);
+        flow.log(2, 'clean - cleaning %s ... \n', flow.project.parsed.project.app.output );
+        wrench.rmdirSyncRecursive(path.resolve(flow.run_path, flow.project.parsed.project.app.output), true);
     } else {
         flow.log(2, 'clean - cleaning %s ... ', flow.project.path_build );
         wrench.rmdirSyncRecursive(path.resolve(flow.run_path, flow.project.path_build), true);

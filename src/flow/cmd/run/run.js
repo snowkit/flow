@@ -17,7 +17,7 @@ exports.run = function run(flow, data) {
     }
 
     flow.log(2, 'running %s %s for %s\n',
-        flow.project.parsed.name, flow.project.parsed.version, flow.target);
+        flow.project.parsed.project.name, flow.project.parsed.project.version, flow.target);
 
     if(flow.target_native) {
         native.run(flow);
