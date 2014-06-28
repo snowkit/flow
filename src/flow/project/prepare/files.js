@@ -13,8 +13,31 @@ exports.parse = function parse(flow, prepared, source, srcpath, build_config) {
     var project_file_list = [];
     var build_file_list = [];
 
-    internal.parse_files(flow, prepared, source.project.files, project_file_list);
-    internal.parse_files(flow, prepared, source.project.build.files, build_file_list);
+        //parse normal files nodes
+    internal.parse_node_list(flow, prepared, source.project.files, project_file_list);
+    internal.parse_node_list(flow, prepared, source.project.build.files, build_file_list);
+
+        //then parse the conditional files/build.files nodes if any
+    if(source.if) {
+        for(condition in source.if) {
+
+            var files = source.if[condition].files;
+            if(files) {
+                if(defines.satisfy(flow, prepared, condition)){
+                    internal.parse_node_list(flow, prepared, files, project_file_list);
+                }
+            }
+
+            if(source.if[condition].build) {
+                var build_files = source.if[condition].build.files;
+                if(build_files) {
+                    if(defines.satisfy(flow, prepared, condition)){
+                        internal.parse_node_list(flow, prepared, build_files, project_file_list);
+                    }
+                }
+            }
+        } //each condition
+    } //if
 
     var project_root = path.dirname(flow.project.parsed.__path);
     var project_out = flow.project.path_output;
@@ -38,6 +61,9 @@ exports.parse = function parse(flow, prepared, source, srcpath, build_config) {
         build_file_list = internal.filter_unsafe(flow, build_file_list, project_root, project_out, project_root);
 
     }
+
+    console.log(project_file_list);
+    console.log(build_file_list);
 
     return {
         project_files : project_file_list,
@@ -90,27 +116,6 @@ internal.filter_unsafe = function(flow, list, srcpath, dstpath, rootpath) {
     });
 
 } //filter_unsafe
-
-internal.parse_files = function(flow, project, root, file_list) {
-
-    if(!root) return;
-
-        //start with the root object
-    internal.parse_node_list(flow, project, root, file_list);
-
-    //parse any potentially conditional files
-    // if(root.if) {
-    //     for(conditional in root.if) {
-    //         var current = root.if[conditional];
-    //         if(defines.satisfy(flow, project, 'if', conditional)){
-    //             internal.parse_node_list(flow, project, current, file_list);
-    //         }
-    //     } //each condition
-    // } //if
-
-} //parse_project_files
-
-
 
 internal.parse_node_list = function(flow, project, list, file_list) {
     for(name in list) {

@@ -126,8 +126,6 @@ internal.prepare_cascade_project = function(flow, prepared, build_config) {
         //overriding what's already in there on a value basis (not object bases)
     flow.config = util.merge_combine(prepared.source.flow, flow.config);
 
-    console.log(flow.config);
-
         //plus, we want to handle any aliases that the projects have asked for,
         //so that their final baked project values are what they expect/asked
     if(flow.config.alias) {

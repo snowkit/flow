@@ -20,8 +20,6 @@ exports.parse = function(flow, prepared, build_config) {
 
     } //prepared.if
 
-    // console.log(exports.conditions);
-
     return {};
 
 } //parse
@@ -131,7 +129,7 @@ internal.parse_condition = function(cond) {
         if( internal.token_types.indexOf(tokens[0]) != -1) {
             return { err:'at "'+tokens[0]+'" - a define by itself cannot be a token type, such as ' + internal.token_types.join(', ') };
         } else {
-            return { condition:tokens[0] };
+            return [{ condition:tokens[0] }];
         }
     }
 

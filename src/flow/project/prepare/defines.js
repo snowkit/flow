@@ -97,7 +97,9 @@ exports.satisfy = function satisfy(flow, project, condition) {
 
     flow.log(2, 'defines - satisfy check', condition);
 
-    if(conditions.conditions[condition]) {
+    var cond = conditions.conditions[condition];
+
+    if(cond.length > 1) {
         return internal.cache_conditions[condition];
     } else {
         return project.defines[condition] ? true : false;
@@ -236,10 +238,9 @@ internal.resolve_defines = function(flow, defines) {
 
         for(name in defines) {
             var define = defines[name];
-                //only care about conditional
             if(define.condition) {
                 var condition = conditions.conditions[define.condition];
-                if(condition && condition.length == 1) {
+                if(condition && condition.length) {
                     define.met = internal.resolve_single(flow, defines, define);
                 } //if condition
             } else {
