@@ -3,6 +3,7 @@ var   path = require('path')
     , util = require('../util/util')
     , bake = require('./bake')
     , bars = require('handlebars')
+    , gate = require('json-gate')
 
     , depends = require('./prepare/depends')
     , conditions = require('./prepare/conditions')
@@ -189,11 +190,38 @@ internal.prepare_project = function(flow, prepared, build_config) {
 
             internal.prepare_files(flow, prepared, build_config);
 
+    //user object schema
+
+            internal.prepare_schema(flow, prepared, build_config);
+
 
     internal.log(flow, 2, 'prepare - project - ok');
 
 } //prepare_conditionals
 
+
+internal.prepare_schema = function(flow, prepared, build_config) {
+
+    for(name in flow.config.schema) {
+        console.log('schema', name);
+        var detail = flow.config.schema[name];
+        var schema = gate.createSchema(detail);
+        var json = prepared.source[name] || {};
+        console.log(json);
+        // if(json) {
+            try {
+                schema.validate(json);
+            } catch(e) {
+                console.log(e);
+            }
+
+            console.log(json);
+        // } else {
+            // flow.log(1, 'prepare - schema requested for %s, but no node in project', name);
+        // }
+    }
+
+} //prepare_schema
 
 internal.prepare_defines = function(flow, prepared, build_config) {
 

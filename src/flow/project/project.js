@@ -40,6 +40,9 @@ exports.init = function init(flow) {
 
 } //init
 
+bars.registerHelper('toString', function( value ) {
+    return ( value === void 0 ) ? 'undefined' : value.toString();
+});
 
 bars.registerHelper('if', function (v1, op_opt, v2, options) {
 
