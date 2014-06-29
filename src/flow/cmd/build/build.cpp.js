@@ -19,8 +19,9 @@ exports.post_build = function(flow, config, done) {
 
     var source_binary = flow.config.build.boot;
 
-    if(flow.target == 'windows') {
-        source_binary += '.exe';
+    var plat = flow.config[flow.target];
+    if(plat && plat.binary_extension) {
+        source_binary += '.'+plat.binary_extension;
     }
 
     var source_path = path.join(flow.project.path_build, 'cpp/' + source_binary);

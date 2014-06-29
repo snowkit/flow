@@ -203,23 +203,19 @@ internal.prepare_project = function(flow, prepared, build_config) {
 internal.prepare_schema = function(flow, prepared, build_config) {
 
     for(name in flow.config.schema) {
-        console.log('schema', name);
         var detail = flow.config.schema[name];
         var schema = gate.createSchema(detail);
         var json = prepared.source[name] || {};
-        console.log(json);
-        // if(json) {
+        if(json) {
             try {
                 schema.validate(json);
             } catch(e) {
-                console.log(e);
+                flow.log(1,e);
             }
-
-            console.log(json);
-        // } else {
-            // flow.log(1, 'prepare - schema requested for %s, but no node in project', name);
-        // }
-    }
+        } else {
+            flow.log(1, 'prepare - schema requested for %s, but no node in project', name);
+        }
+    } //each schema
 
 } //prepare_schema
 

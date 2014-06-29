@@ -142,9 +142,7 @@ internal.resolve_single = function(flow, defines, define) {
 
 internal.resolve_multi = function(flow, defines_all, tokenized) {
 
-    //for each step in the condition, we have a final resulting value of true or false
-
-        //first we check if ALL of the defines in question
+    //first we check if ALL of the defines in question
         //are unknown, there is nothing we can do yet
     var is_unknown = true;
     for(index in tokenized) {
@@ -160,6 +158,7 @@ internal.resolve_multi = function(flow, defines_all, tokenized) {
         return -1;
     }
 
+        //for each step in the condition, we have a final resulting value of true or false
     var state;
 
     for(index in tokenized) {
@@ -186,9 +185,9 @@ internal.resolve_multi = function(flow, defines_all, tokenized) {
             var nextmet = next.inverse ? !nextdef.met : nextdef.met;
 
             if(tokened.as == '||') {
-                state = curmet || nextmet;
+                state = state || (curmet || nextmet);
             } else if(tokened.as == '&&') {
-                state = curmet && nextmet;
+                state = state && (curmet && nextmet);
             }
 
         } else {

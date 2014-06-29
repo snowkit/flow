@@ -1,12 +1,16 @@
 {
     "config" : "1.0.0-alpha-1",
     "build" : {
+
         "timing" : false,
         "boot" : "FlowApp",
         "command_line" : false,
+
+        "windows" : {
+            "binary_extension" : "exe"
+        },
         "mac" : {
-            "default_binary_path" : "MacOS",
-            "default_output" : "Resources"
+            "output" : "Contents/Resources"
         },
 
         "files_error_on_missing" : false,

@@ -182,8 +182,9 @@ exports.get_out_binary = function(flow, prepared) {
         outpath = path.join(outroot, app_name) + '.app/Contents/MacOS/';
     }
 
-    if(flow.target == 'windows') {
-        app_name += '.exe';
+    var plat = flow.config[flow.target];
+    if(plat && plat.binary_extension) {
+        app_name += '.'+plat.binary_extension;
     }
 
     return path.join(outpath, app_name);
@@ -196,7 +197,7 @@ exports.get_out_path = function get_out_path(flow, prepared) {
 
         //some targets have considerations for their destination
     if(flow.target == 'mac' && !flow.config.build.command_line) {
-        var postfix = prepared.source.project.app.name + '.app/Contents/' + flow.config.build.mac.default_output;
+        var postfix = prepared.source.project.app.name + '.app/' + flow.config.build.mac.output;
         dest_folder = path.join(dest_folder, postfix);
     }
 

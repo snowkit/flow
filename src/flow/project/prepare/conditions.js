@@ -106,7 +106,12 @@ internal.parse_condition = function(cond) {
                             //store the one we had
                         result.push(current);
                             //make a new one
-                        current = { condition:token, inverse:next_inverse };
+                        current = { condition:token };
+                            //if inverse set it
+                        if( next_inverse ) {
+                            current.inverse = next_inverse;
+                        }
+
                             //expect a token next
                         expect = internal.token_type;
                             //reset flag
