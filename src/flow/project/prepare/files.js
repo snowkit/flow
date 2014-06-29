@@ -18,26 +18,7 @@ exports.parse = function parse(flow, prepared, source, srcpath, build_config) {
     internal.parse_node_list(flow, prepared, source.project.build.files, build_file_list);
 
         //then parse the conditional files/build.files nodes if any
-    if(source.if) {
-        for(condition in source.if) {
-
-            var files = source.if[condition].files;
-            if(files) {
-                if(defines.satisfy(flow, prepared, condition)){
-                    internal.parse_node_list(flow, prepared, files, project_file_list);
-                }
-            }
-
-            if(source.if[condition].build) {
-                var build_files = source.if[condition].build.files;
-                if(build_files) {
-                    if(defines.satisfy(flow, prepared, condition)){
-                        internal.parse_node_list(flow, prepared, build_files, project_file_list);
-                    }
-                }
-            }
-        } //each condition
-    } //if
+    internal.parse_conditional_files(flow, prepared, source, project_file_list, build_file_list);
 
     var project_root = path.dirname(flow.project.parsed.__path);
     var project_out = flow.project.path_output;
@@ -61,9 +42,6 @@ exports.parse = function parse(flow, prepared, source, srcpath, build_config) {
         build_file_list = internal.filter_unsafe(flow, build_file_list, project_root, project_out, project_root);
 
     }
-
-    console.log(project_file_list);
-    console.log(build_file_list);
 
     return {
         project_files : project_file_list,
@@ -117,20 +95,43 @@ internal.filter_unsafe = function(flow, list, srcpath, dstpath, rootpath) {
 
 } //filter_unsafe
 
-internal.parse_node_list = function(flow, project, list, file_list) {
+internal.parse_conditional_files = function(flow, prepared, source, file_list, build_file_list) {
+
+    if(source.if) {
+        for(condition in source.if) {
+
+            var files = source.if[condition].files;
+            if(files) {
+                if(defines.satisfy(flow, prepared, condition)){
+                    internal.parse_node_list(flow, prepared, files, file_list);
+                }
+            } //files
+
+            if(source.if[condition].build) {
+                var build_files = source.if[condition].build.files;
+                if(build_files) {
+                    if(defines.satisfy(flow, prepared, condition)){
+                        internal.parse_node_list(flow, prepared, build_files, build_file_list);
+                    }
+                }
+            }
+        } //each condition
+    } //if
+
+} //parse_conditional_files
+
+internal.parse_node_list = function(flow, prepared, list, file_list) {
     for(name in list) {
-        if(name != 'if' && name != 'unless') {
-            internal.parse_file(flow, project, list[name], file_list);
-        }
+        internal.parse_file(flow, prepared, list[name], file_list);
     }
 } //parse_node_list
 
-internal.parse_file = function(flow, project, _node, file_list) {
+internal.parse_file = function(flow, prepared, _node, file_list) {
 
-    var _path = internal.parse_node(flow, project, _node );
+    var _path = internal.parse_node(flow, prepared, _node);
 
     if(_path === null) {
-        flow.log(1, 'files - parsing failed for %s in %s', name, project.source.__path);
+        flow.log(1, 'files - parsing failed for %s in %s', name, prepared.source.__path);
     }
 
     if(_path) {
@@ -142,8 +143,8 @@ internal.parse_file = function(flow, project, _node, file_list) {
 } //parse_file
 
 
-    //parse a path into { source : dest }
-internal.parse_node = function(flow, project, _node) {
+    //parse a path into { source :'', dest:'', template:'' }
+internal.parse_node = function(flow, prepared, _node) {
 
     var _file_path = _node;
 
@@ -172,6 +173,12 @@ internal.parse_node = function(flow, project, _node) {
         //clean up whitespaces
     parts = parts.map(function(part) { return part.trim(); });
 
-    return { source:parts[0], dest:parts[1] };
+    var result = { source:parts[0], dest:parts[1] };
+
+    if(_node.template) {
+        result.template = _node.template;
+    }
+
+    return result;
 
 } //parse_path

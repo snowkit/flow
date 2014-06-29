@@ -4,7 +4,6 @@ var   util = require('../../util/util')
 
 var internal = {};
     internal._unknown = -1;
-    internal.cache_conditions = {};
 
 
 exports.parse = function parse(flow, source, depends, build_config, existing) {
@@ -31,7 +30,8 @@ exports.parse = function parse(flow, source, depends, build_config, existing) {
             var node = source.if[flag].build;
             if(node && node.defines) {
                 for(index in node.defines) {
-                    list.push({ name:node.defines[index],
+                    list.push({
+                        name:node.defines[index],
                         condition:flag,
                         file:source.__path
                     });
@@ -93,16 +93,15 @@ exports.filter = function filter(flow, defines, build_config) {
 
     // just satisfy the single condition. this should be called only after
     // the initial conditionals have all been parsed
-exports.satisfy = function satisfy(flow, project, condition) {
+exports.satisfy = function satisfy(flow, prepared, condition) {
 
     flow.log(2, 'defines - satisfy check', condition);
 
     var cond = conditions.conditions[condition];
-
-    if(cond.length > 1) {
-        return internal.cache_conditions[condition];
+    if(cond && cond.length > 1) {
+        return internal.resolve_multi(flow, prepared.defines_all, cond)
     } else {
-        return project.defines[condition] ? true : false;
+        return prepared.defines[condition] ? true : false;
     }
 
 } //satisfy
@@ -216,7 +215,7 @@ internal.resolve_multi = function(flow, defines_all, tokenized) {
 
     } //each tokenized
 
-    flow.log(2, 'defines - satisfy multi condition state', state);
+    flow.log(5, 'defines - satisfy multi condition state', state);
 
     return state;
 
@@ -258,7 +257,6 @@ internal.resolve_defines = function(flow, defines) {
                 var condition = conditions.conditions[define.condition];
                 if(condition && condition.length > 1) {
                     define.met = internal.resolve_multi(flow, defines, condition);
-                    internal.cache_conditions[define.condition] = define.met;
                 } //condition.as
             }
         } //each define

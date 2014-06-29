@@ -1,6 +1,9 @@
 
 var   fs = require('graceful-fs')
     , path = require('path')
+    , wrench = require('wrench')
+    , fse = require('fs-extra')
+    , bars = require('handlebars')
     , util = require('../../util/util')
 
 var internal = {};
@@ -8,8 +11,17 @@ var internal = {};
 exports.run = function run(flow, files) {
 
         //copy local project + build files
-    internal.copy_project_files(flow, files.project_files);
-    internal.copy_build_files(flow, files.build_files);
+
+    flow.log(2, 'files - copying project assets to %s', flow.project.path_output);
+    flow.log(3,'');
+
+        internal.copy_files(flow, files.project_files, flow.project.path_output);
+
+    flow.log(3,'');
+    flow.log(2, 'files - copying build files to %s', flow.project.path_build);
+    flow.log(3,'');
+
+        internal.copy_files(flow, files.build_files, flow.project.path_build);
 
     flow.log(3,'');
     flow.log(3,'files - done');
@@ -72,23 +84,23 @@ exports.verify = function verify(flow, done) {
 
 } //verify
 
-internal.copy_project_files = function(flow, files) {
+internal.copy_files = function(flow, files, output) {
 
     if(files.length > 0) {
-
-        var output = flow.project.path_output;
-
-        flow.log(2, 'files - copying project assets to %s', output);
-        flow.log(3,'');
 
                 //first deal with the files in the project itself
             for(index in files) {
 
                 var node = files[index];
-                flow.log(3, '   copying %s to %s%s', node.source, output, node.dest);
-
                 var dest = path.normalize(path.join(output, node.dest));
-                util.copy_path(flow, node.source, dest);
+
+                if(node.template) {
+                    flow.log(3, '   copying with template %s from %s to %s%s', node.template, node.source, output, node.dest);
+                    internal.template_path(flow, node, dest);
+                } else {
+                    flow.log(3, '   copying %s to %s%s', node.source, output, node.dest);
+                    util.copy_path(flow, node.source, dest);
+                }
 
             } //each project file
 
@@ -96,29 +108,98 @@ internal.copy_project_files = function(flow, files) {
 
 } //copy_project_files
 
-internal.copy_build_files = function(flow, files) {
+internal.template_path = function(flow, node, dest) {
 
-    if(files.length > 0) {
+    if(fs.statSync(node.source).isDirectory()) {
+        internal.template_folder_recursively(flow, node, dest);
+    } else {
+        internal.template_file(flow, node.template, node.source, dest);
+    }
 
-        var output = flow.project.path_build;
+} //template_path
 
-        flow.log(3,'');
-        flow.log(2, 'files - copying project build files to %s\n', output);
+internal.template_folder_recursively = function(flow, node, _dest, _overwrite) {
 
-                //then we deal with the build files, to copy over to the build folder not the output folder
-            for(index in files) {
+    if(_overwrite == undefined) _overwrite = true;
 
-                var node = files[index];
-                flow.log(3,'   copying build file %s to %s%s', node.source, output, node.dest);
+        //make sure the destination exists
+        //before copying any files to the location
+    wrench.mkdirSyncRecursive(_dest, 0755);
 
-                var dest = path.normalize(path.join(output,node.dest));
-                util.copy_path(flow, node.source, dest);
+        //obtain a list of items from the source
+    var _source_path = node.source;
+        //if a relative path from our project, make it absolute
+    if(!node.source_name) {
+        _source_path = path.resolve(flow.run_path, node.source);
+    }
 
-            } //each project file
+    var _source_list = wrench.readdirSyncRecursive(_source_path);
 
-    } //files.length > 0
+        //for each source item, check if it's a directory
+    var _source_file_list = [];
 
-} //copy_build_files
+    for(var i = 0; i < _source_list.length; ++i) {
+        var _is_dir = fs.statSync( path.join(node.source, _source_list[i]) ).isDirectory();
+        if(!_is_dir) {
+            var allow = _source_list[i].charAt(0) != '.' || !flow.config.build.files_ignore_dotfiles;
+            if(allow) {
+              _source_file_list.push(_source_list[i]);
+            }
+        }
+    }
+
+        //for each file only, copy it across
+    for(var i = 0; i < _source_file_list.length; ++i) {
+
+        var _dest_file = path.join( _dest, _source_file_list[i] );
+        var source_path = path.join(node.source, _source_file_list[i]);
+
+        flow.log(3,'        - copying with template %s %s to %s', node.template, source_path, _dest_file );
+
+        // fse.copySync( source_path, _dest_file );
+        internal.template_file(flow, node.template, source_path, _dest_file);
+
+    } //each source file
+
+} //template_folder_recursively
+
+internal.template_file = function(flow, _template, _source, _dest) {
+
+    var templates = [];
+
+        //we allow multiple context nodes via ['one','two']
+    if(_template.constructor == Array) {
+        templates = _template;
+    } else if(_template.constructor == String) {
+        templates.push(_template);
+    } else {
+        flow.log(1, '    Warning - template value on `files` currently supports Array or String only', _source, _template );
+    }
+
+        //we wrap the context against a root for clarity in the template files
+        //as well as allowing multiple contexts side by side
+    var real_context = {};
+
+    for(index in templates) {
+        var templ = templates[index];
+        var context = flow.project.prepared.source[templ];
+        if(!context) {
+            flow.log(1, '    Warning - template value missing! %s was not found in the project root', templ);
+        } else {
+            real_context[templ] = context;
+        }
+    } //each templates
+
+    var raw_file = fs.readFileSync(_source, 'utf8');
+
+    flow.log(4, 'context for file node : ', _source, real_context);
+
+    var template = bars.compile(raw_file);
+    var templated = template( real_context );
+
+    fs.writeFileSync(_dest, templated, 'utf8');
+
+} //template_file
 
 internal._missing_warning = function(flow, msg, type) {
 

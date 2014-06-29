@@ -175,7 +175,7 @@ exports.get_out_binary = function(flow, prepared) {
     var outpath = exports.get_out_path(flow, prepared);
     var outroot = exports.get_out_root(flow, prepared);
 
-    if(flow.target == 'mac' && !flow.config.build.command_line_based) {
+    if(flow.target == 'mac' && !flow.config.build.command_line) {
         outpath = path.join(outroot, app_name) + '.app/Contents/MacOS/';
     }
 
@@ -192,7 +192,7 @@ exports.get_out_path = function get_out_path(flow, prepared) {
     var dest_folder = exports.get_out_root(flow, prepared);
 
         //some targets have considerations for their destination
-    if(flow.target == 'mac' && !flow.config.build.command_line_based) {
+    if(flow.target == 'mac' && !flow.config.build.command_line) {
         var postfix = prepared.source.project.app.name + '.app/Contents/' + flow.config.build.mac.default_output;
         dest_folder = path.join(dest_folder, postfix);
     }

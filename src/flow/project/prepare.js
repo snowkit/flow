@@ -41,7 +41,7 @@ exports.prepare = function prepare(flow, build_config) {
 
         //we then merge the project values against our own,
         //so that they cascade and override each other
-    internal.prepare_cascade_project(flow, prepared, build_config);
+    internal.cascade_project(flow, prepared, build_config);
 
         //once cascaded we can safely calculate the output path
     flow.project.path_build = flow.project.get_build_path(flow, prepared);
@@ -102,24 +102,14 @@ internal.prepare_dependencies = function(flow, parsed, build_config) {
 
 } //prepare_dependencies
 
-internal.prepare_cascade_project = function(flow, prepared, build_config) {
+internal.cascade_project = function(flow, prepared, build_config) {
 
-    //we go through all dependencies now and merge
+        //we go through all dependencies now and merge
         //them with only unique values persisting, i.e respecting last value
     for(name in prepared.depends) {
         var depend = prepared.depends[name];
         prepared.source = util.merge_unique(depend.project, prepared.source);
     }
-
-        //an exception to this rule is files : {} and build : { files : {} } because
-        //these are relative paths to the project they originate in, and should be left alone,
-        //used later by the files preparation to resolve their paths against the dependency correctly
-    if(flow.project.parsed.project.build.files) {
-        prepared.source.project.build.files = util.deep_copy(flow.project.parsed.project.build.files, {});
-    } else { delete prepared.source.project.build.files; }
-    if(flow.project.parsed.project.files) {
-        prepared.source.project.files = util.deep_copy(flow.project.parsed.project.files, {});
-    } else { delete prepared.source.project.files; }
 
         //and then bring in any flow configs
         //from the project and store them in flow.config,
@@ -147,6 +137,7 @@ internal.prepare_cascade_project = function(flow, prepared, build_config) {
     internal.log(flow, 3, '');
 
 } //prepare_cascade_project
+
 
 internal.fail = function(flow, prepared, section, msg) {
 
@@ -209,11 +200,14 @@ internal.prepare_defines = function(flow, prepared, build_config) {
     internal.log(flow, 3, 'prepare - defines ...');
 
     //store the list of targets as met or unmet defines based on the target
-        //we are attempting to prepare for
+    //we are attempting to prepare for
     for(index in build_config.known_targets) {
         var name = build_config.known_targets[index];
         prepared.defines_all[name] = { name:name, met:flow.target == name };
     }
+
+        //we also store a few config values as defines because they can be used to configure the build
+    prepared.defines_all['flow_build_command_line'] = { name:'flow_build_command_line', met:flow.config.build.command_line };
 
         //now we parse all project defines from the project
     prepared.defines_all = defines.parse(flow, prepared.source, prepared.depends, build_config, prepared.defines_all);
@@ -250,7 +244,7 @@ internal.prepare_defines = function(flow, prepared, build_config) {
 
 
     internal.log(flow, 5, prepared.defines_all);
-    internal.log(flow, 4, bake.defines(flow, prepared, build_config));
+    internal.log(flow, 3, bake.defines(flow, prepared, build_config));
     internal.log(flow, 5, prepared.defines);
 
     internal.log(flow, 3, 'prepare - defines - ok');
@@ -295,11 +289,14 @@ internal.prepare_flags = function(flow, prepared, build_config) {
 
 } //prepare_flags
 
+    //note that files are prepared from the parsed project instead of the prepared
+    //project because they are cascaded, leaving dependencies files incorrectly
+    //located in the local project file tree (which i will resolve later but is clean enough)
 internal.prepare_files = function(flow, prepared, build_config) {
 
     internal.log(flow, 3, 'prepare - files ...');
 
-        var result = files.parse(flow, prepared, prepared.source, null, build_config);
+        var result = files.parse(flow, prepared, flow.project.parsed, null, build_config);
 
             //now, check each dependency and get their files, making them
             //absolute to their path, such that they can be copied
