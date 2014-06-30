@@ -68,7 +68,7 @@ internal.build_hxcpp = function(flow, config, done) {
     var hxcpp_file = 'Build.xml';
     var args = [hxcpp_file];
 
-    if(flow.target_native && flow.target_arch == '64') {
+    if(flow.target_cpp && flow.target_arch == '64') {
         args.push('-DHXCPP_M64');
     }
 

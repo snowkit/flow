@@ -19,9 +19,9 @@ exports.run = function run(flow, data) {
     flow.log(2, 'running %s %s for %s\n',
         flow.project.parsed.project.name, flow.project.parsed.project.version, flow.target);
 
-    if(flow.target_native) {
+    if(flow.target_cpp) {
         native.run(flow);
-    } else if(flow.target_web) {
+    } else if(flow.target_js) {
         web.run(flow);
     }
 

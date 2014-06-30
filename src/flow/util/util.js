@@ -87,16 +87,19 @@ exports.copy_path = function(flow, source, dest) {
 
     if(fs.statSync(source).isDirectory()) {
         flow.log(5, '     util - copying folder from %s to %s', source, dest);
-        exports.copy_folder_recursively(flow, source, dest);
+        return exports.copy_folder_recursively(flow, source, dest);
     } else {
         flow.log(5, '     util - copying file from %s to %s', source, dest);
         wrench.mkdirSyncRecursive(path.dirname(dest), 0755);
         fse.copySync(source, dest);
+        return [ dest ];
     }
 }
 
 
 exports.copy_folder_recursively = function(flow, _source, _dest, _overwrite) {
+
+    var copied_list = [];
 
     if(_overwrite == undefined) _overwrite = true;
 
@@ -127,6 +130,9 @@ exports.copy_folder_recursively = function(flow, _source, _dest, _overwrite) {
         var source_path = path.join(_source, _source_file_list[i]);
         flow.log(3,'        - copying ' + source_path + ' to ' + _dest_file );
         fse.copySync( source_path, _dest_file );
+        copied_list.push( _dest_file );
     }
+
+    return copied_list;
 
 } //copy_folder_recursively

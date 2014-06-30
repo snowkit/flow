@@ -47,6 +47,13 @@ exports.run = function(flow, config, done) {
 
         if(flow.timing) console.timeEnd('build - write hxml');
 
+        //write out the asset list
+        if(flow.timing) console.time('build - write files list');
+
+    internal.write_files_list(flow, config);
+
+        if(flow.timing) console.timeEnd('build - write files list');
+
         //then run the haxe build stage, if it fails, early out
         //but since the console will be logging the output from haxe,
         // no need to log it again.
@@ -71,13 +78,13 @@ internal.post_haxe = function(flow, config, done) {
 
         //on native targets we run hxcpp against the now
         //generated build files in the build output
-    if(flow.target_native) {
+    if(flow.target_cpp) {
 
         buildcpp.post_haxe(flow, config, function(err){
             internal.post_build(flow, config, done);
         });
 
-    } else if(flow.target_web) {
+    } else if(flow.target_js) {
 
         buildweb.post_haxe(flow, config, function(err){
             internal.post_build(flow, config, done);
@@ -104,13 +111,13 @@ internal.complete = function(flow, config, done) {
 internal.post_build = function(flow, config, done) {
 
 
-    if(flow.target_native) {
+    if(flow.target_cpp) {
 
         buildcpp.post_build(flow, config, function(err){
             internal.complete(flow, config, done);
         });
 
-    } else if(flow.target_web) {
+    } else if(flow.target_js) {
 
         buildweb.post_build(flow, config, function(err){
             internal.complete(flow, config, done);
@@ -161,3 +168,22 @@ internal.write_hxml = function(flow, config, write_to) {
     fs.writeFileSync(write_to, flow.project.hxml, 'utf8');
 
 } //write_hxml
+
+
+internal.write_files_list = function(flow, config) {
+
+    if(flow.config.build.files_output_list) {
+
+        var output_path = path.join(flow.project.path_output, flow.config.build.files_output_list_name);
+            output_path = path.normalize(output_path);
+
+        flow.log(3, 'build - writing file list to ' + output_path);
+
+        var output = JSON.stringify(flow.project.prepared.files.project_files_output);
+
+        fs.writeFileSync(output_path, output, 'utf8');
+
+    } //if config
+
+} //write_files_list
+

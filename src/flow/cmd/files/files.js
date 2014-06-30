@@ -15,13 +15,28 @@ exports.run = function run(flow, files) {
     flow.log(2, 'files - copying project assets to %s', flow.project.path_output);
     flow.log(3,'');
 
-        internal.copy_files(flow, files.project_files, flow.project.path_output);
+        var projectfiles = internal.copy_files(flow, files.project_files, flow.project.path_output);
 
     flow.log(3,'');
     flow.log(2, 'files - copying build files to %s', flow.project.path_build);
     flow.log(3,'');
 
-        internal.copy_files(flow, files.build_files, flow.project.path_build);
+        var buildfiles = internal.copy_files(flow, files.build_files, flow.project.path_build);
+
+        //clean up the list of files by their destination
+    projectfiles.map(function(_path, i){
+        projectfiles[i] = _path.replace(flow.project.path_output,'');
+    });
+
+        //clean up the list of files by their destination
+    buildfiles.map(function(_path, i){
+        buildfiles[i] = _path.replace(flow.project.path_build,'');
+    });
+
+        //store the lists
+    flow.project.prepared.files.project_files_output = projectfiles;
+    flow.project.prepared.files.build_files_output = buildfiles;
+
 
     flow.log(3,'');
     flow.log(3,'files - done');
@@ -86,6 +101,8 @@ exports.verify = function verify(flow, done) {
 
 internal.copy_files = function(flow, files, output) {
 
+    var copied_list = [];
+
     if(files.length > 0) {
 
                 //first deal with the files in the project itself
@@ -96,29 +113,34 @@ internal.copy_files = function(flow, files, output) {
 
                 if(node.template) {
                     flow.log(3, '   copying with template %s from %s to %s%s', node.template, node.source, output, node.dest);
-                    internal.template_path(flow, node, dest);
+                    copied_list = copied_list.concat( internal.template_path(flow, node, dest) );
                 } else {
                     flow.log(3, '   copying %s to %s%s', node.source, output, node.dest);
-                    util.copy_path(flow, node.source, dest);
+                    copied_list = copied_list.concat( util.copy_path(flow, node.source, dest) );
                 }
 
             } //each project file
 
     } //files.length > 0
 
+    return copied_list;
+
 } //copy_project_files
 
 internal.template_path = function(flow, node, dest) {
 
     if(fs.statSync(node.source).isDirectory()) {
-        internal.template_folder_recursively(flow, node, dest);
+        return internal.template_folder_recursively(flow, node, dest);
     } else {
         internal.template_file(flow, node.template, node.source, dest);
+        return [ dest ];
     }
 
 } //template_path
 
 internal.template_folder_recursively = function(flow, node, _dest, _overwrite) {
+
+    var copied_list = [];
 
     if(_overwrite == undefined) _overwrite = true;
 
@@ -158,8 +180,11 @@ internal.template_folder_recursively = function(flow, node, _dest, _overwrite) {
 
         // fse.copySync( source_path, _dest_file );
         internal.template_file(flow, node.template, source_path, _dest_file);
+        copied_list.push(_dest_file);
 
     } //each source file
+
+    return copied_list;
 
 } //template_folder_recursively
 

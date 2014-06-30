@@ -27,12 +27,12 @@ exports.init = function init(flow) {
 
         case 'mac': case 'windows': case 'linux':
         case 'ios': case 'android': {
-            flow.target_native = true;
+            flow.target_cpp = true;
             break;
         }
 
         case 'web': {
-            flow.target_web = true;
+            flow.target_js = true;
             break;
         }
 
@@ -46,8 +46,8 @@ bars.registerHelper('toString', function( value ) {
 
 bars.registerHelper('if', function (v1, op_opt, v2, options) {
 
-    if(options === undefined) {
-        if(v2 === undefined) {
+    if(options === void 0) {
+        if(v2 === void 0) {
             return v1 ? op_opt.fn(this) : op_opt.inverse(this);
         }
     }

@@ -45,25 +45,20 @@ exports.target = function(flow, project, build_config, split) {
 
     var values = '-cp haxe/';
 
-    switch(flow.target) {
+    if(flow.target_cpp) {
 
-        case 'mac': case 'linux': case 'windows':
-        case 'android': case 'ios': {
-            values += split + '-cpp cpp/';
-            break;
-        } //native
+        values += split + '-cpp cpp/';
 
-        case 'web':{
-                //js the file can go straight out to the dest path
-            var out_file = path.join(flow.project.path_output, project.source.app.name+'.js');
-            var abs_out_path = path.join(flow.run_path, flow.project.path_build);
-            out_file = path.relative(abs_out_path, out_file);
+    } else if(flow.target_js) {
 
-            values += split + '-js ' + out_file;
-            break;
-        } //web
+            //js the file can go straight out to the dest path
+        var out_file = path.join(flow.project.path_output, project.source.app.name+'.js');
+        var abs_out_path = path.join(flow.run_path, flow.project.path_build);
+        out_file = path.relative(abs_out_path, out_file);
 
-    } //switch
+        values += split + '-js ' + out_file;
+
+    } //web
 
     return values;
 
