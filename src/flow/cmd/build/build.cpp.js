@@ -19,7 +19,7 @@ exports.post_build = function(flow, config, done) {
 
     var source_binary = flow.config.build.boot;
 
-    var plat = flow.config[flow.target];
+    var plat = flow.config.build[flow.target];
     if(plat && plat.binary_extension) {
         source_binary += '.'+plat.binary_extension;
     }

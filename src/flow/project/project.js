@@ -182,7 +182,7 @@ exports.get_out_binary = function(flow, prepared) {
         outpath = path.join(outroot, app_name) + '.app/Contents/MacOS/';
     }
 
-    var plat = flow.config[flow.target];
+    var plat = flow.config.build[flow.target];
     if(plat && plat.binary_extension) {
         app_name += '.'+plat.binary_extension;
     }
