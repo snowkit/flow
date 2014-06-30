@@ -10,7 +10,7 @@ var   fs = require('graceful-fs')
 
 
 var internal = {};
-exports.default = 'flow.json';
+exports.default = 'project.flow';
 
 exports.init = function init(flow) {
         //default to the system if no target specified,

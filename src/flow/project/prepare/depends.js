@@ -74,7 +74,7 @@ exports.parse = function parse(flow, parsed, result, depth) {
         if(lib.project == null) {
 
                 //if it's null, but not missing, it's a syntax issue
-                //in which case totally abort
+                //in which case totally abort, this is silly code, could be better
             if(state.reason.indexOf('cannot find') == -1) {
                 prepare.log(flow, 1, '\n', state.reason);
                 return result = null;

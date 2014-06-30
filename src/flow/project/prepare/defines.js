@@ -57,7 +57,7 @@ exports.parse = function parse(flow, source, depends, build_config, existing) {
         for(name in depends) {
             var depend = depends[name];
                 //possible for a null project,
-                //i.e no flow.json in dependency
+                //i.e no *.flow in dependency
             if(depend.project) {
                 existing = exports.parse(flow, depend.project, null, build_config, existing);
             }
