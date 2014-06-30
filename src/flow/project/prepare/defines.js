@@ -238,7 +238,7 @@ internal.resolve_defines = function(flow, defines) {
             var define = defines[name];
             if(define.condition) {
                 var condition = conditions.conditions[define.condition];
-                if(condition && condition.length) {
+                if(condition && condition.length == 1) {
                     define.met = internal.resolve_single(flow, defines, define);
                 } //if condition
             } else {

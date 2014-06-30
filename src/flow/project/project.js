@@ -7,6 +7,7 @@ var   fs = require('graceful-fs')
     , _prepare = require('./prepare')
     , _bake = require('./bake')
     , bars = require('handlebars')
+    , glob = require('glob')
 
 
 var internal = {};
@@ -68,18 +69,22 @@ bars.registerHelper('if', function (v1, op_opt, v2, options) {
 });
 
 
+exports.find_flow_files = function(flow, root) {
+
+    var list = [];
+
+    glob( "*.flow" , { sync:true, nonull:true, cwd:root || process.cwd() }, function(er, files) {
+        list = list.concat(files);
+    });
+
+    return list;
+
+} //find_flow_files
+
 exports.verify = function verify(flow, project_path, quiet) {
 
     var project_file = flow.flags.project || project_path;
-        project_file = project_file || exports.default;
-
-    var abs_path = path.resolve(project_file);
-
-    if(!flow.quiet.project && !quiet) {
-        flow.log(2, 'project - looking for project file %s', abs_path)
-    }
-
-    var result;
+    var abs_path = '';
 
     function fail_verify(reason) {
         return {
@@ -90,17 +95,33 @@ exports.verify = function verify(flow, project_path, quiet) {
         };
     }
 
-        //fail if not found
-    if(!fs.existsSync(abs_path)) {
-        return fail_verify('cannot find file ' + project_file);
+        //if no explicit project given, search for one
+    if(!project_file) {
+
+        var flow_files = exports.find_flow_files(flow);
+
+        if(flow_files.length > 1) {
+            return fail_verify('uh.. multiple *.flow files found, which one did you mean? use --project <your.flow> or keep a single project file in the root of your project');
+        } else if(flow_files.length == 0) {
+            return fail_verify('cannot find any *.flow project files in the current working directory. run flow from your project root alongside your.flow file');
+        } else {
+            project_file = flow_files[0];
+        }
+
+    } //!project_file
+
+    abs_path = path.resolve(project_file);
+
+    if(!flow.quiet.project && !quiet) {
+        flow.log(2, 'project - using project file %s', abs_path)
     }
 
+    var result;
     var parsed = null;
-
     var file_contents = fs.readFileSync( abs_path,'utf8' );
 
     if(!file_contents) {
-        return fail_verify('file content is invalid : ' + file_contents);
+        return fail_verify('file content is invalid for %s? content : ', abs_path, file_contents);
     }
 
     try {

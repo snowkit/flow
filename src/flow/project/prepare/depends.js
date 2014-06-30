@@ -62,7 +62,17 @@ exports.parse = function parse(flow, parsed, result, depth) {
     for(depend in found) {
 
         var lib = found[depend];
-        var project_file = path.join(lib.path, flow.project.default);
+        var project_file = flow.project.default;
+
+        var flow_files = flow.project.find_flow_files(flow, lib.path);
+
+        if(flow_files.length > 1) {
+            return fail_verify('dependency %s has multiple *.flow files in the root (%s), cannot guess which to use. projects should only keep one root *.flow file in the root', depend, lib.path);
+        } else if(flow_files.length == 1) {
+            project_file = flow_files[0];
+        }
+
+        project_file = path.join(lib.path, project_file);
         var state = projects.verify(flow, project_file, true);
 
             //store the project value for the dependency
