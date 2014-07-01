@@ -222,6 +222,7 @@ internal.template_file = function(flow, _template, _source, _dest) {
     var template = bars.compile(raw_file);
     var templated = template( real_context );
 
+    fse.ensureFileSync(_dest);
     fs.writeFileSync(_dest, templated, 'utf8');
 
 } //template_file
