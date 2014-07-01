@@ -25,11 +25,13 @@ exports.run = function run(flow, files) {
 
         //clean up the list of files by their destination
     projectfiles.map(function(_path, i){
+        _path = path.normalize(_path).replace(/\\/gi,'/');
         projectfiles[i] = _path.replace(flow.project.path_output,'');
     });
 
         //clean up the list of files by their destination
     buildfiles.map(function(_path, i){
+        _path = path.normalize(_path).replace(/\\/gi,'/');
         buildfiles[i] = _path.replace(flow.project.path_build,'');
     });
 
