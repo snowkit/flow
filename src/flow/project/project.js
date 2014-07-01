@@ -200,13 +200,21 @@ exports.get_out_binary = function(flow, prepared) {
     var outroot = exports.get_out_root(flow, prepared);
 
     if(flow.target == 'mac' && !flow.config.build.command_line) {
-        outpath = path.join(outroot, app_name) + '.app/Contents/MacOS/';
+        outpath = path.join(outroot, app_name) + '.app/';
     }
 
     var plat = flow.config.build[flow.target];
-    if(plat && plat.binary_extension) {
-        app_name += '.'+plat.binary_extension;
-    }
+    if(plat) {
+
+        if(plat.binary_extension) {
+            app_name += '.'+plat.binary_extension;
+        }
+
+        if(plat.binary_path) {
+            outpath = path.join(outpath, plat.binary_path);
+        }
+
+    } //plat
 
     return path.join(outpath, app_name);
 
@@ -253,7 +261,7 @@ exports.find_arch = function(flow) {
     if(flow.flags.arch) {
         var _arch = flow.flags.arch;
         if(_arch === true) {
-            flow.log(1, '\nError\n--arch specified but no arch given\n\n> use --arch 86, --arch 64, --arch armv6 etc.\n');
+            flow.log(1, '\nError\n--arch specified but no arch given\n\n> use --arch 32, --arch 64, --arch armv6 etc.\n');
             return null;
         } else {
             arch = _arch;
