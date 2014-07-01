@@ -86,7 +86,7 @@ exports.pad = function pad(width, string, padding) {
 exports.openurl = function(flow, url) {
 
     if(flow.system == 'windows') {
-      cmd.exec(flow, 'start', [ url ]);
+      cmd.exec(flow, 'explorer', [ url ]);
     } else if(flow.system == 'mac') {
       cmd.exec(flow, 'open', [ url ]);
     } else {
