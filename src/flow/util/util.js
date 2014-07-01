@@ -90,7 +90,7 @@ exports.openurl = function(flow, url) {
     } else if(flow.system == 'mac') {
       cmd.exec(flow, 'open', [ url ]);
     } else {
-      cmd.exec(flow, 'xdg-open', [ url, "&" ]);
+      cmd.exec(flow, 'xdg-open', [ url ]);
     }
 
 } //openurl
