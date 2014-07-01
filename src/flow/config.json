@@ -6,6 +6,10 @@
         "boot" : "FlowApp",
         "command_line" : false,
 
+        "web" : {
+            "port" : 40404,
+            "open_delay" : 300
+        },
         "windows" : {
             "binary_extension" : "exe"
         },

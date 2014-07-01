@@ -3,6 +3,7 @@ var   fs = require('graceful-fs')
     , path = require('path')
     , wrench = require('wrench')
     , fse = require('fs-extra')
+    , cmd = require('./process')
 
 
 exports.object_size = function(obj) {
@@ -80,6 +81,19 @@ exports.random_file = function random_file() {
 exports.pad = function pad(width, string, padding) {
   return (width <= string.length) ? string : exports.pad(width, padding + string, padding)
 }
+
+
+exports.openurl = function(flow, url) {
+
+    if(flow.system == 'windows') {
+      cmd.exec(flow, 'start', [ url ]);
+    } else if(flow.system == 'mac') {
+      cmd.exec(flow, 'open', [ url ]);
+    } else {
+      cmd.exec(flow, 'xdg-open', [ url, "&" ]);
+    }
+
+} //openurl
 
 //file stuff
 

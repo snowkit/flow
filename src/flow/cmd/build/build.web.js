@@ -12,17 +12,26 @@ exports.post_build = function(flow, config, done) {
         //minify step
     if(flow.flags.min) {
 
+        flow.log(2, 'build - uglifying js output');
+
         var result = UglifyJS.minify(min_code, {fromString:true});
         min_code = result.code;
+
+        flow.log(2, 'build - uglifying - ok');
 
     } //flags.min
 
         //crush step
     if(flow.flags.crush) {
-        min_code = jscrush(min_code);
+
+        flow.log(2, 'build - crushing js output');
+        min_code = jscrush( min_code );
+        flow.log(2, 'build - crushing - ok');
+
     }
 
     if(min_code) {
+        flow.log(2, 'build - writing js min output %s', out_file+'.min.js');
         fs.writeFileSync(out_file+'.min.js', min_code, 'utf8');
     }
 

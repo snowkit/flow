@@ -52,7 +52,7 @@ exports.target = function(flow, project, build_config, split) {
     } else if(flow.target_js) {
 
             //js the file can go straight out to the dest path
-        var out_file = path.join(flow.project.path_output, project.source.app.name+'.js');
+        var out_file = path.join(flow.project.path_output, project.source.project.app.name+'.js');
         var abs_out_path = path.join(flow.run_path, flow.project.path_build);
         out_file = path.relative(abs_out_path, out_file);
 
