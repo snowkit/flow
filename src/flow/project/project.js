@@ -26,6 +26,21 @@ exports.init = function init(flow) {
 
     flow.target_arch = flow.project.find_arch(flow);
 
+        //make sure these exist even if unset
+    flow.target_cpp = false;
+    flow.target_js = false;
+    flow.target_desktop = false;
+    flow.target_mobile = false;
+
+    switch(flow.target) {
+        case 'mac': case 'windows': case 'linux':
+            flow.target_desktop = true;
+        break;
+        case 'ios': case 'android':
+            flow.target_mobile = true;
+        break;
+    }
+
     switch(flow.target) {
 
         case 'mac': case 'windows': case 'linux':

@@ -22,8 +22,10 @@
         "android" : {
             "sdk" : "/Users/sven/dev/android-sdk/",
             "ant_path" : "/opt/apache-ant/bin/ant",
+            "logcat_include" : { "trace":"trace", "hxcpp":"HXCPP", "am" : "ActivityManager", "ar":"AndroidRuntime" },
 
             "project" : "project",
+            "activity_name" : "MainActivity",
             "binary_source_name" : "lib{{app.boot}}.so",
             "binary_dest_name" : "lib{{app.name}}.so",
             "binary_dest_path" : "{{paths.build}}/{{paths.android.project}}/libs/armeabi/",
@@ -52,6 +54,7 @@
                     "fullscreen" : true,
                     "orientation" : "landscape",
                     "android" : {
+                        "build_type" : "debug",
                         "install_location" : "preferExternal",
                         "sdk_min" : 10,
                         "sdk_target" : 13,

@@ -22,7 +22,7 @@ exports.post_build = function(flow, config, done) {
     util.copy_path(flow, source_path, flow.project.paths.binary.full);
         if(flow.timing) console.timeEnd('build - binary copy');
 
-    if(flow.target != 'android' && flow.target != 'ios') {
+    if(flow.target_desktop) {
         internal.post_build_desktop(flow, source_path, done);
     } else {
         internal.post_build_mobile(flow, source_path, done);
@@ -49,7 +49,7 @@ internal.post_build_mobile = function(flow, source_path, done) {
 internal.build_android = function(flow, done) {
 
     //handle ability to compile store build, vs debug test build
-    var build_type = 'debug';
+    var build_type = flow.project.prepared.source.project.app.mobile.android.build_type;
     //where to build from
     var project_root = path.join(flow.project.paths.build, flow.config.build.android.project);
     var build_meta_file = path.join(project_root,'bin/build.prop');
