@@ -44,11 +44,8 @@ exports.prepare = function prepare(flow, build_config) {
         //so that they cascade and override each other
     internal.cascade_project(flow, prepared, build_config);
 
-        //once cascaded we can safely calculate the output path
-    flow.project.path_build = flow.project.get_build_path(flow, prepared);
-    flow.project.path_output = flow.project.get_out_path(flow, prepared) + '/';
-    flow.project.path_output_root = flow.project.get_out_root(flow, prepared) + '/';
-    flow.project.path_binary = flow.project.get_out_binary(flow, prepared)
+        //once cascaded we can safely calculate the paths from it
+    internal.prepare_config_paths(flow, prepared, build_config);
 
         //this step simply pulls out any conditionals in any root node,
         //tokenizes it, verifies it and pushes it into a cache for later
@@ -71,6 +68,65 @@ internal.log = function(flow) {
 
     //expose for children code
 exports.log = internal.log;
+
+
+internal.template_config_path = function(flow, prepared, build_config, path_node, context) {
+    var template = bars.compile(path_node);
+    var result = template(context);
+    return path.normalize(result);
+}
+
+internal.prepare_config_paths = function(flow, prepared, build_config) {
+
+    flow.project.paths = {
+        android : { project : flow.config.build.android.project },
+        output : flow.project.get_path_output(flow, prepared),
+        build : flow.project.get_path_build(flow, prepared)
+    }
+
+        //go over the config path values and
+        //template them against this specific context
+    var path_context = {
+        app : {
+            boot : flow.config.build.boot,
+            name : prepared.source.project.app.name
+        },
+        paths : flow.project.paths
+    }
+
+    var list = ['binary_source_name','binary_dest_name', 'binary_dest_path', 'files_dest_path'];
+
+    for(name in flow.config.build) {
+        var node = flow.config.build[name];
+
+            //if this is platform specific
+        if(build_config.known_targets.indexOf(name) != -1) {
+            for(subname in node) {
+                var subnode = node[subname];
+                if(list.indexOf(subname) != -1) {
+                    flow.config.build[name][subname] = internal.template_config_path(flow, prepared, build_config, subnode, path_context);
+                }
+            }
+        } else {
+            if(list.indexOf(name) != -1) {
+                flow.config.build[name] = internal.template_config_path(flow, prepared, build_config, node, path_context);
+            }
+        }
+    }
+
+        //now, assign more specific paths like the binary path
+    flow.project.paths.binary = {
+        source : flow.project.get_path_binary_name_source(flow, prepared),
+        path : flow.project.get_path_binary_dest(flow, prepared),
+        name : flow.project.get_path_binary_name(flow, prepared)
+    }
+
+    flow.project.paths.binary.full = path.join(flow.project.paths.binary.path, flow.project.paths.binary.name);
+    flow.project.paths.files = flow.project.get_path_files(flow, prepared);
+
+    console.log(flow.project.paths);
+
+} //prepare_config_paths
 
 internal.prepare_dependencies = function(flow, parsed, build_config) {
 
@@ -288,7 +344,7 @@ internal.prepare_codepaths = function (flow, prepared, build_config) {
         //store the app code paths flag list
     if(prepared.source.project.app && prepared.source.project.app.codepaths) {
         var _paths = prepared.source.project.app.codepaths.map(function(a) {
-            var _path = path.relative(flow.project.path_build, path.join(flow.run_path, a));
+            var _path = path.relative(flow.project.paths.build, path.join(flow.run_path, a));
             return '-cp ' + _path;
         });
         prepared.flags = util.array_union(prepared.flags, _paths);

@@ -8,11 +8,13 @@ var   fs = require('graceful-fs')
     , _bake = require('./bake')
     , bars = require('handlebars')
     , glob = require('glob')
+    , gate = require('json-gate')
 
 
 var internal = {};
 exports.default = 'project.flow';
 
+exports.paths = {}
 exports.init = function init(flow) {
         //default to the system if no target specified,
         //but needs to watch for command lines calling target
@@ -43,6 +45,10 @@ exports.init = function init(flow) {
 
 bars.registerHelper('toString', function( value ) {
     return ( value === void 0 ) ? 'undefined' : value.toString();
+});
+
+bars.registerHelper('upperFirst', function( value ) {
+    return value.charAt(0).toUpperCase() + value.slice(1);
 });
 
 bars.registerHelper('if', function (v1, op_opt, v2, options) {
@@ -80,6 +86,22 @@ exports.find_flow_files = function(flow, root) {
     return list;
 
 } //find_flow_files
+
+exports.verify_schema = function(flow, parsed) {
+
+    var detail = require('./project.schema.json'); //schema
+    var schema = gate.createSchema(detail);
+
+    try {
+        schema.validate(parsed);
+    } catch(e) {
+        console.log(e);
+        throw e;
+    }
+
+    console.log(parsed.project);
+
+} //verify_schema
 
 exports.verify = function verify(flow, project_path, quiet) {
 
@@ -142,6 +164,8 @@ exports.verify = function verify(flow, project_path, quiet) {
         return fail_verify('flow projects are a json object, this appears to be : ' + parsed.constructor.name);
     }
 
+    // exports.verify_schema(flow, parsed);
+
         //now check that it has valid information
     if(!(parsed.project)) {
         return fail_verify('flow projects require a { project:{ name:"", version:"" } } minimum. missing "project"');
@@ -155,13 +179,8 @@ exports.verify = function verify(flow, project_path, quiet) {
         return fail_verify('flow projects require a { project:{ name:"", version:"" } } minimum. missing "name"');
     }
 
-
-        //safeguard against touching non existing build options
-    if(!parsed.project.build) {
-        parsed.project.build = {};
-    }
         //then merge any base options from flow defaults into it
-    parsed.build = util.merge_combine(flow.config.project.build, parsed.project.build);
+    parsed.project = util.merge_combine(flow.config.defaults.project, parsed.project);
 
     parsed.__path = abs_path;
     parsed.__file = project_file;
@@ -172,74 +191,92 @@ exports.verify = function verify(flow, project_path, quiet) {
         file : project_file
     };
 
-
     return result;
 
 } //verify
 
 
     //the final target path for the output
-exports.get_out_root = function(flow, prepared) {
+exports.get_path_root = function(flow, prepared) {
 
-    var dest_folder = path.normalize(prepared.source.project.app.output) + '/';
+    return path.normalize(prepared.source.project.app.output);
 
-    dest_folder += flow.target;
+} //get_path_root
+
+exports.get_path_output = function(flow, prepared) {
+
+    var dest_folder = exports.get_path_root(flow, prepared);
+
+    dest_folder = path.join(dest_folder, flow.target);
 
     if(flow.target_arch == '64') {
         dest_folder += flow.target_arch;
     }
 
-    return dest_folder;
+    return path.normalize(dest_folder);
 
-} //get_out_root
+} //get_path_output
 
-exports.get_out_binary = function(flow, prepared) {
+exports.get_path_build = function(flow, prepared) {
 
-    var app_name = prepared.source.project.app.name;
-    var outpath = exports.get_out_path(flow, prepared);
-    var outroot = exports.get_out_root(flow, prepared);
+    var dest_folder = exports.get_path_output(flow, prepared);
 
-    if(flow.target == 'mac' && !flow.config.build.command_line) {
-        outpath = path.join(outroot, app_name) + '.app/';
-    }
+    return path.normalize(dest_folder + '.build/');
+
+} //get_path_build
+
+exports.get_path_files = function(flow, prepared) {
+
+    var dest_path = flow.config.build.files_dest_path;
 
     var plat = flow.config.build[flow.target];
-    if(plat) {
-
-        if(plat.binary_extension) {
-            app_name += '.'+plat.binary_extension;
-        }
-
-        if(plat.binary_path) {
-            outpath = path.join(outpath, plat.binary_path);
-        }
-
-    } //plat
-
-    return path.join(outpath, app_name);
-
-} //get_out_binary
-
-exports.get_out_path = function get_out_path(flow, prepared) {
-
-    var dest_folder = exports.get_out_root(flow, prepared);
-
-        //some targets have considerations for their destination
-    if(flow.target == 'mac' && !flow.config.build.command_line) {
-        var postfix = prepared.source.project.app.name + '.app/' + flow.config.build.mac.output;
-        dest_folder = path.join(dest_folder, postfix);
+    if(plat && plat.files_dest_path) {
+        dest_path = plat.files_dest_path;
     }
 
-    return dest_folder;
+    return dest_path;
 
-} //out_path
+} //get_path_files
 
-    //the final build data path for the output
-exports.get_build_path = function get_build_path(flow, prepared) {
+exports.get_path_binary_dest = function(flow, prepared) {
 
-    return exports.get_out_root(flow, prepared) + '.build/';
+    var dest_path = flow.config.build.binary_dest_path;
 
-} //build_path
+    var plat = flow.config.build[flow.target];
+    if(plat && plat.binary_dest_path) {
+        dest_path = plat.binary_dest_path;
+    }
+
+    return path.normalize(dest_path);
+
+} //get_path_binary_dest
+
+exports.get_path_binary_name = function(flow, prepared) {
+
+    var dest_name = flow.config.build.binary_dest_name;
+
+    var plat = flow.config.build[flow.target];
+    if(plat && plat.binary_dest_name) {
+        dest_name = plat.binary_dest_name;
+    }
+
+    return dest_name;
+
+} //get_path_binary_name
+
+exports.get_path_binary_name_source = function(flow, prepared) {
+
+    var src_name = flow.config.build.binary_source_name;
+
+    var plat = flow.config.build[flow.target];
+    if(plat && plat.binary_source_name) {
+        src_name = plat.binary_source_name;
+    }
+
+    return src_name;
+
+} //get_path_binary_name_source
+
 
 exports.prepare = function prepare(flow, project, build_config) {
 

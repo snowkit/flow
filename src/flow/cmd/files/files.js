@@ -12,27 +12,27 @@ exports.run = function run(flow, files) {
 
         //copy local project + build files
 
-    flow.log(2, 'files - copying project assets to %s', flow.project.path_output);
+    flow.log(2, 'files - copying project assets to %s', flow.project.paths.files);
     flow.log(3,'');
 
-        var projectfiles = internal.copy_files(flow, files.project_files, flow.project.path_output);
+        var projectfiles = internal.copy_files(flow, files.project_files, flow.project.paths.files);
 
     flow.log(3,'');
-    flow.log(2, 'files - copying build files to %s', flow.project.path_build);
+    flow.log(2, 'files - copying build files to %s', flow.project.paths.build);
     flow.log(3,'');
 
-        var buildfiles = internal.copy_files(flow, files.build_files, flow.project.path_build);
+        var buildfiles = internal.copy_files(flow, files.build_files, flow.project.paths.build);
 
         //clean up the list of files by their destination
     projectfiles.map(function(_path, i){
         _path = path.normalize(_path).replace(/\\/gi,'/');
-        projectfiles[i] = _path.replace(flow.project.path_output,'');
+        projectfiles[i] = _path.replace(flow.project.paths.files+'/','');
     });
 
         //clean up the list of files by their destination
     buildfiles.map(function(_path, i){
         _path = path.normalize(_path).replace(/\\/gi,'/');
-        buildfiles[i] = _path.replace(flow.project.path_build,'');
+        buildfiles[i] = _path.replace(flow.project.paths.build+'/','');
     });
 
         //store the lists
@@ -117,7 +117,7 @@ internal.copy_files = function(flow, files, output) {
                     flow.log(3, '   copying with template %s from %s to %s%s', node.template, node.source, output, node.dest);
                     copied_list = copied_list.concat( internal.template_path(flow, node, dest) );
                 } else {
-                    flow.log(3, '   copying %s to %s%s', node.source, output, node.dest);
+                    flow.log(3, '   copying %s to %s/%s', node.source, output, node.dest);
                     copied_list = copied_list.concat( util.copy_path(flow, node.source, dest) );
                 }
 
@@ -205,7 +205,10 @@ internal.template_file = function(flow, _template, _source, _dest) {
 
         //we wrap the context against a root for clarity in the template files
         //as well as allowing multiple contexts side by side
-    var real_context = {};
+    var real_context = {
+        debug : flow.flags.debug || false,
+        flow : { config : flow.config }
+    };
 
     for(index in templates) {
         var templ = templates[index];

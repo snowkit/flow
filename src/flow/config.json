@@ -6,16 +6,32 @@
         "boot" : "FlowApp",
         "command_line" : false,
 
+        "binary_source_name" : "{{app.boot}}",
+        "binary_dest_name" : "{{app.name}}",
+        "binary_dest_path" : "{{paths.output}}",
+        "files_dest_path" : "{{paths.output}}",
+
         "web" : {
             "port" : 40404,
             "open_delay" : 300
         },
         "windows" : {
-            "binary_extension" : "exe"
+            "binary_source_name" : "{{app.boot}}.exe",
+            "binary_dest_name" : "{{app.name}}.exe"
+        },
+        "android" : {
+            "sdk" : "/Users/sven/dev/android-sdk/",
+            "ant_path" : "/opt/apache-ant/bin/ant",
+
+            "project" : "project",
+            "binary_source_name" : "lib{{app.boot}}.so",
+            "binary_dest_name" : "lib{{app.name}}.so",
+            "binary_dest_path" : "{{paths.build}}/{{paths.android.project}}/libs/armeabi/",
+            "files_dest_path" : "{{paths.build}}/{{paths.android.project}}/assets/"
         },
         "mac" : {
-            "binary_path" : "Contents/MacOS",
-            "output" : "Contents/Resources"
+            "binary_dest_path" : "{{paths.output}}/{{app.name}}.app/Contents/MacOS",
+            "files_dest_path" : "{{paths.output}}/{{app.name}}.app/Contents/Resources"
         },
 
         "files_output_list" : true,
@@ -24,11 +40,26 @@
         "files_ignore_dotfiles" : true
 
     },
-    "project" : {
-        "app" : {
-            "main" : "Main",
-            "output" : "bin",
-            "codepaths" : [ "src" ]
+    "defaults" : {
+        "project" : {
+            "build" : {},
+            "app" : {
+                "main" : "Main",
+                "output" : "bin",
+                "title" : "flow app",
+                "codepaths" : [ "src" ],
+                "mobile" : {
+                    "fullscreen" : true,
+                    "orientation" : "landscape",
+                    "android" : {
+                        "install_location" : "preferExternal",
+                        "sdk_min" : 10,
+                        "sdk_target" : 13,
+                        "permissions" : ["READ_EXTERNAL_STORAGE", "INTERNET"],
+                        "certificate" : ""
+                    }
+                }
+            }
         }
     }
 }

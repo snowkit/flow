@@ -34,11 +34,11 @@ exports.run = function(flow, config, done) {
     flow.execute(flow, cmds['files']);
 
         //then ensure the folder for the build data exists
-    wrench.mkdirSyncRecursive(flow.project.path_build, 0755);
+    wrench.mkdirSyncRecursive(flow.project.paths.build, 0755);
 
         //fetch the hxml location
     var hxml_file = internal.get_hxml_file(flow, config);
-    var hxml_path = path.join(flow.project.path_build, hxml_file);
+    var hxml_path = path.join(flow.project.paths.build, hxml_file);
 
         //write out the baked build hxml for the config
         if(flow.timing) console.time('build - write hxml');
@@ -139,7 +139,7 @@ internal.build_haxe = function(flow, config, hxml_file, done) {
 
     var opt = {
         // quiet : false,
-        cwd: path.resolve(flow.run_path, flow.project.path_build)
+        cwd: path.resolve(flow.run_path, flow.project.paths.build)
     }
 
     cmd.exec(flow, 'haxe', [hxml_file], opt, done);
@@ -174,7 +174,7 @@ internal.write_files_list = function(flow, config) {
 
     if(flow.config.build.files_output_list) {
 
-        var output_path = path.join(flow.project.path_output, flow.config.build.files_output_list_name);
+        var output_path = path.join(flow.project.paths.files, flow.config.build.files_output_list_name);
             output_path = path.normalize(output_path);
 
         flow.log(3, 'build - writing file list to ' + output_path);

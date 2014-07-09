@@ -13,10 +13,10 @@ exports.run = function run(flow, do_all) {
         flow.log(2, 'clean - cleaning %s ... \n', flow.project.parsed.project.app.output );
         wrench.rmdirSyncRecursive(path.resolve(flow.run_path, flow.project.parsed.project.app.output), true);
     } else {
-        flow.log(2, 'clean - cleaning %s ... ', flow.project.path_build );
-        wrench.rmdirSyncRecursive(path.resolve(flow.run_path, flow.project.path_build), true);
-        flow.log(2, 'clean - cleaning %s ... \n', flow.project.path_output );
-        wrench.rmdirSyncRecursive(path.resolve(flow.run_path, flow.project.path_output), true);
+        flow.log(2, 'clean - cleaning %s ... ', flow.project.paths.build );
+        wrench.rmdirSyncRecursive(path.resolve(flow.run_path, flow.project.paths.build), true);
+        flow.log(2, 'clean - cleaning %s ... \n', flow.project.paths.output );
+        wrench.rmdirSyncRecursive(path.resolve(flow.run_path, flow.project.paths.output), true);
     }
 
     if(flow.timing) console.timeEnd('clean');
@@ -28,7 +28,7 @@ exports.verify = function verify(flow, done) {
     var do_all = false;
 
         //if called from the command line, verify that build path and such exist!
-    if(flow.project.path_build === undefined) {
+    if(flow.project.paths.build === undefined) {
 
         flow.quiet.prepare = true;
         flow.quiet.project = true;
