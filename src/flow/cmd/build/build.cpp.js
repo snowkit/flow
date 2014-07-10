@@ -50,11 +50,13 @@ internal.build_android = function(flow, done) {
 
     //handle ability to compile store build, vs debug test build
     var build_type = flow.project.prepared.source.project.app.mobile.android.build_type;
-    //where to build from
+
+        //where to build from
     var project_root = path.join(flow.project.paths.build, flow.config.build.android.project);
+        //a build file to remove
     var build_meta_file = path.join(project_root,'bin/build.prop');
 
-    //remove build meta data to ensure build happens
+        //remove build meta data to ensure build happens
     if(fs.existsSync(build_meta_file)) {
         fs.unlinkSync(build_meta_file);
     }
@@ -70,6 +72,11 @@ internal.build_android = function(flow, done) {
     cmd.exec(flow, flow.config.build.android.ant_path, args, opt, function(code,out,err){
 
             if(flow.timing) console.timeEnd('build - android - ant');
+
+        if(code != 0) {
+            flow.log(1,'build - android - stopping because ant failed to build, exit code %d', code);
+            return flow.project.failed = true;
+        }
 
             //now move the apk out into the user bin folder
         var apk_name = flow.project.prepared.source.project.app.name + '-' + build_type + '.apk';
@@ -89,7 +96,7 @@ internal.build_android = function(flow, done) {
 
 } //build_android
 
-internal.post_build_desktop = function(flow, done) {
+internal.post_build_desktop = function(flow, source_path, done) {
 
     if(flow.system == 'mac' || flow.system == 'linux') {
 
@@ -117,6 +124,8 @@ internal.post_build_desktop = function(flow, done) {
 
 exports.post_haxe = function(flow, config, done) {
 
+    flow.log(2, 'android specifics', flow.project.prepared.source.project.app.mobile.android);
+
             if(flow.timing) console.time('build - hxcpp');
 
     internal.build_hxcpp(flow, config, function(err) {
@@ -141,8 +150,25 @@ internal.build_hxcpp = function(flow, config, done) {
     var hxcpp_file = 'Build.xml';
     var args = [hxcpp_file];
 
-    if(flow.target_cpp && flow.target_arch == '64') {
-        args.push('-DHXCPP_M64');
+    if(flow.flags.debug) {
+        args.push("-Ddebug");
+    }
+
+    if(flow.target_cpp){
+        switch(flow.target_arch) {
+            case '64':
+                args.push('-DHXCPP_M64');
+                break;
+            case 'armv6':
+                args.push('-DHXCPP_ARMV6');
+                break;
+            case 'armv7':
+                args.push('-DHXCPP_ARMV7');
+                break;
+            case 'x86':
+                args.push('-DHXCPP_X86');
+                break;
+        }
     }
 
     if(flow.target == 'android') {
