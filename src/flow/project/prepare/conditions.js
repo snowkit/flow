@@ -132,7 +132,7 @@ internal.parse_condition = function(cond) {
     } else {
             //a single token on it's own must be a name, it cannot be a tokentype
         if( internal.token_types.indexOf(tokens[0]) != -1) {
-            return { err:'at "'+tokens[0]+'" - a define by itself cannot be a token type, such as ' + internal.token_types.join(', ') };
+            return { err:'at "'+tokens[0]+'" - a condition by itself cannot be a token type, such as ' + internal.token_types.join(', ') };
         } else {
             return [{ condition:tokens[0] }];
         }
