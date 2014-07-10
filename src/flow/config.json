@@ -20,16 +20,19 @@
             "binary_dest_name" : "{{app.name}}.exe"
         },
         "android" : {
-            "sdk" : "/Users/sven/dev/android-sdk/",
+            "sdk" : "/Users/sven/dev/android-sdk",
             "ant_path" : "/opt/apache-ant/bin/ant",
-            "logcat_include" : { "trace":"trace", "hxcpp":"HXCPP", "am" : "ActivityManager", "ar":"AndroidRuntime" },
+            "logcat_include" : {
+                "trace":"trace", "hxcpp":"HXCPP", "debug":"DEBUG",
+                "am":"ActivityManager", "ar":"AndroidRuntime",
+                "exception":"Exception", "loader":"loader", "libc":"libc" },
 
             "project" : "project",
             "activity_name" : "MainActivity",
-            "binary_source_name" : "lib{{app.boot}}.so",
+            "binary_source_name" : "lib{{app.boot}}{{app.debugtag}}{{app.archtag}}.so",
             "binary_dest_name" : "lib{{app.name}}.so",
-            "binary_dest_path" : "{{paths.build}}/{{paths.android.project}}/libs/armeabi/",
-            "files_dest_path" : "{{paths.build}}/{{paths.android.project}}/assets/"
+            "binary_dest_path" : "{{paths.build}}/{{paths.android.project}}/libs/armeabi",
+            "files_dest_path" : "{{paths.build}}/{{paths.android.project}}/assets"
         },
         "mac" : {
             "binary_dest_path" : "{{paths.output}}/{{app.name}}.app/Contents/MacOS",
@@ -41,28 +44,5 @@
         "files_error_on_missing" : false,
         "files_ignore_dotfiles" : true
 
-    },
-    "defaults" : {
-        "project" : {
-            "build" : {},
-            "app" : {
-                "main" : "Main",
-                "output" : "bin",
-                "title" : "flow app",
-                "codepaths" : [ "src" ],
-                "mobile" : {
-                    "fullscreen" : true,
-                    "orientation" : "landscape",
-                    "android" : {
-                        "build_type" : "debug",
-                        "install_location" : "preferExternal",
-                        "sdk_min" : 10,
-                        "sdk_target" : 13,
-                        "permissions" : ["READ_EXTERNAL_STORAGE", "INTERNET"],
-                        "certificate" : ""
-                    }
-                }
-            }
-        }
     }
 }
