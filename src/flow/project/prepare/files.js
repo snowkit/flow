@@ -20,7 +20,7 @@ exports.parse = function parse(flow, prepared, source, srcpath, build_config) {
         //then parse the conditional files/build.files nodes if any
     internal.parse_conditional_files(flow, prepared, source, project_file_list, build_file_list);
 
-    var project_root = path.dirname(flow.project.parsed.__path);
+    var project_root = flow.project.parsed.__root;
     var project_out = flow.project.paths.output;
 
         //make sure this file is within the bounds of the project + dependency scope

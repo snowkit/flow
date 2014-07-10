@@ -12,7 +12,7 @@ var   fs = require('graceful-fs')
 
 
 var internal = {};
-exports.default = 'project.flow';
+exports.default_name = 'project.flow';
 
 exports.paths = {}
 exports.init = function init(flow) {
@@ -102,23 +102,8 @@ exports.find_flow_files = function(flow, root) {
 
 } //find_flow_files
 
-exports.verify_schema = function(flow, parsed) {
 
-    var detail = require('./project.schema.json'); //schema
-    var schema = gate.createSchema(detail);
-
-    try {
-        schema.validate(parsed);
-    } catch(e) {
-        console.log(e);
-        throw e;
-    }
-
-    console.log(parsed.project);
-
-} //verify_schema
-
-exports.verify = function verify(flow, project_path, quiet) {
+exports.verify = function verify(flow, project_path, project_root, quiet) {
 
     var project_file = flow.flags.project || project_path;
     var abs_path = '';
@@ -128,7 +113,8 @@ exports.verify = function verify(flow, project_path, quiet) {
             parsed : null,
             reason : reason,
             file : project_file,
-            path : abs_path
+            path : abs_path,
+            root : project_root,
         };
     }
 
@@ -148,6 +134,9 @@ exports.verify = function verify(flow, project_path, quiet) {
     } //!project_file
 
     abs_path = path.resolve(project_file);
+
+    project_root = project_root || path.dirname(abs_path);
+    project_root = util.normalize(project_root, true);
 
     if(!flow.quiet.project && !quiet) {
         flow.log(2, 'project - using project file %s', abs_path)
@@ -179,8 +168,6 @@ exports.verify = function verify(flow, project_path, quiet) {
         return fail_verify('flow projects are a json object, this appears to be : ' + parsed.constructor.name);
     }
 
-    // exports.verify_schema(flow, parsed);
-
         //now check that it has valid information
     if(!(parsed.project)) {
         return fail_verify('flow projects require a { project:{ name:"", version:"" } } minimum. missing "project"');
@@ -195,13 +182,15 @@ exports.verify = function verify(flow, project_path, quiet) {
     }
 
         //then merge any base options from flow defaults into it
-    parsed.project = util.merge_combine(flow.config.defaults.project, parsed.project);
+    parsed.project = util.merge_combine(flow.project.defaults.project, parsed.project);
 
+    parsed.__root = project_root;
     parsed.__path = abs_path;
     parsed.__file = project_file;
 
     result = {
         parsed : parsed,
+        root : project_root,
         path : abs_path,
         file : project_file
     };
@@ -214,7 +203,7 @@ exports.verify = function verify(flow, project_path, quiet) {
     //the final target path for the output
 exports.get_path_root = function(flow, prepared) {
 
-    return path.normalize(prepared.source.project.app.output);
+    return util.normalize(prepared.source.project.app.output, true);
 
 } //get_path_root
 
@@ -228,7 +217,7 @@ exports.get_path_output = function(flow, prepared) {
         dest_folder += flow.target_arch;
     }
 
-    return path.normalize(dest_folder);
+    return util.normalize(dest_folder, true);
 
 } //get_path_output
 
@@ -236,7 +225,10 @@ exports.get_path_build = function(flow, prepared) {
 
     var dest_folder = exports.get_path_output(flow, prepared);
 
-    return path.normalize(dest_folder + '.build/');
+        //remove trailing slash
+    dest_folder = dest_folder.slice(0, -1);
+
+    return util.normalize(dest_folder + '.build', true);
 
 } //get_path_build
 
@@ -262,7 +254,7 @@ exports.get_path_binary_dest = function(flow, prepared) {
         dest_path = plat.binary_dest_path;
     }
 
-    return path.normalize(dest_path);
+    return util.normalize(dest_path, true);
 
 } //get_path_binary_dest
 
