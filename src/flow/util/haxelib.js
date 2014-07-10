@@ -1,6 +1,7 @@
 
 var   cmd = require('./process')
     , path = require('path')
+    , util = require('./util')
 
 //caches a list of installed haxelibs for the remaining execution,
 var libs = {};
@@ -28,7 +29,7 @@ var internal = {};
                 throw new HaxelibError(reason);
             }
 
-            exports.haxelib_path = out.trim();
+            exports.haxelib_path = util.normalize(out.trim());
 
             flow.log(3, 'haxelib path %s', exports.haxelib_path);
 
@@ -139,13 +140,13 @@ internal.parse_versions = function() {
                 v = 'dev';
             } else if(v == 'git') {
                     //git folder is in the root like so
-                lib_path = exports.haxelib_path + '/' + lib + '/git';
+                lib_path = path.join( exports.haxelib_path, lib, 'git' );
             } else {
                     //the other types becomes /v,e,r/
-                lib_path = exports.haxelib_path + '/' + v.replace(/\./gi,',');
+                lib_path = path.join( exports.haxelib_path, lib, v.replace(/\./gi,',') );
             }
 
-            lib_path = path.normalize(lib_path) + '/';
+            lib_path = util.normalize(lib_path, true);
             _lib.versions[v] = { version:v, path:lib_path };
 
             if(current) {

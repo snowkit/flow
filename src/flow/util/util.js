@@ -28,6 +28,20 @@ exports.deep_copy = function deep_copy(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
 
+exports.normalize = function(_path, _folder) {
+    //normalize removes .. . // \\ and such
+  var n = path.normalize(_path);
+    //swap \ for /
+  n = n.replace(/\\/gi,'/')
+
+  if(_folder) {
+      //then ensure trailing slash
+    n = n.replace(/\/?$/, '/');
+  }
+
+  return n;
+}
+
   //copy all of obj_src onto obj_dest overriding existing values
 exports.merge_combine = function merge_combine(obj_src, obj_dest) {
   if(!obj_src) return obj_dest;
