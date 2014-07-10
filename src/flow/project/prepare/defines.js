@@ -153,7 +153,7 @@ internal.resolve_multi = function(flow, defines_all, tokenized) {
                 is_unknown = false;
             }
         } else {
-            defines_all[tokened.condition] = { name:tokened.condition, met:false };;
+            defines_all[tokened.condition] = { name:tokened.condition, met:false, nonexistant:true };
             is_unknown = false;
         }
     }
