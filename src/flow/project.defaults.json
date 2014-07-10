@@ -1,0 +1,26 @@
+{
+    "project" : {
+        "build" : {},
+        "app" : {
+            "main" : "Main",
+            "output" : "bin",
+            "title" : "flow app",
+            "codepaths" : [ "src" ],
+            "mobile" : {
+                "fullscreen" : true,
+                "orientation" : "landscape",
+                "android" : {
+                    "build_type" : "debug",
+                    "install_location" : "preferExternal",
+                    "libs":{
+                        "native":{}
+                    },
+                    "sdk_min" : 10,
+                    "sdk_target" : 13,
+                    "permissions" : ["READ_EXTERNAL_STORAGE", "INTERNET"],
+                    "certificate" : ""
+                }
+            }
+        }
+    }
+}

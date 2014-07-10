@@ -7,6 +7,8 @@
 
 //initial setup
 
+    project.defaults = require('./project.defaults');
+
 var internal = {};
 var flow = {
     bin_path : process.argv[0],
