@@ -25,14 +25,14 @@ exports.run = function run(flow, files) {
 
         //clean up the list of files by their destination
     projectfiles.map(function(_path, i){
-        _path = path.normalize(_path).replace(/\\/gi,'/');
-        projectfiles[i] = _path.replace(flow.project.paths.files+'/','');
+        _path = util.normalize(_path);
+        projectfiles[i] = _path.replace(flow.project.paths.files,'');
     });
 
         //clean up the list of files by their destination
     buildfiles.map(function(_path, i){
-        _path = path.normalize(_path).replace(/\\/gi,'/');
-        buildfiles[i] = _path.replace(flow.project.paths.build+'/','');
+        _path = util.normalize(_path);
+        buildfiles[i] = _path.replace(flow.project.paths.build,'');
     });
 
         //store the lists
@@ -89,8 +89,11 @@ exports.verify = function verify(flow, done) {
 
     } //index in prepared build files
 
-    if(flow.config.build.error_on_missing_files) {
-        err = warning;
+    if(flow.config.build.files_error_on_missing) {
+        if(warning) {
+            err = warning;
+            flow.project.failed = true;
+        }
     } else {
         if(warning) {
             internal._missing_warning(flow, warning, 'Warning');
@@ -111,7 +114,7 @@ internal.copy_files = function(flow, files, output) {
             for(index in files) {
 
                 var node = files[index];
-                var dest = path.normalize(path.join(output, node.dest));
+                var dest = util.normalize(path.join(output, node.dest));
 
                 if(node.template) {
                     flow.log(3, '   copying with template %s from %s to %s%s', node.template, node.source, output, node.dest);
@@ -222,7 +225,7 @@ internal.template_file = function(flow, _template, _source, _dest) {
 
     var raw_file = fs.readFileSync(_source, 'utf8');
 
-    flow.log(4, 'context for file node : ', _source, real_context);
+    flow.log(6, 'context for file node : ', _source, real_context);
 
     var template = bars.compile(raw_file);
     var templated = template( real_context );
