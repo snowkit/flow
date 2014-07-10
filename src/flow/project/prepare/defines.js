@@ -95,7 +95,7 @@ exports.filter = function filter(flow, defines, build_config) {
     // the initial conditionals have all been parsed
 exports.satisfy = function satisfy(flow, prepared, condition) {
 
-    flow.log(2, 'defines - satisfy check', condition);
+    flow.log(4, 'defines - satisfy check', condition);
 
     var cond = conditions.conditions[condition];
     if(cond && cond.length > 1) {
@@ -147,7 +147,13 @@ internal.resolve_multi = function(flow, defines_all, tokenized) {
     var is_unknown = true;
     for(index in tokenized) {
         var tokened = tokenized[index];
-        if(defines_all[tokened.condition].met != -1) {
+        var define = defines_all[tokened.condition];
+        if(define) {
+            if(define.met != -1) {
+                is_unknown = false;
+            }
+        } else {
+            defines_all[tokened.condition] = { name:tokened.condition, met:false };;
             is_unknown = false;
         }
     }
@@ -159,7 +165,7 @@ internal.resolve_multi = function(flow, defines_all, tokenized) {
     }
 
         //for each step in the condition, we have a final resulting value of true or false
-    var state;
+    var state = false;
 
     for(index in tokenized) {
 
@@ -187,7 +193,7 @@ internal.resolve_multi = function(flow, defines_all, tokenized) {
             if(tokened.as == '||') {
                 state = state || (curmet || nextmet);
             } else if(tokened.as == '&&') {
-                state = state && (curmet && nextmet);
+                state = state || (curmet && nextmet);
             }
 
         } else {
