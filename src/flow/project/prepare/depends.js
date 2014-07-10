@@ -2,11 +2,11 @@ var   path = require('path')
     , fs = require('graceful-fs')
     , util = require('../../util/util')
     , haxelib = require('../../util/haxelib')
-    , projects = require('../project')
     , prepare = require('../prepare')
 
-
     //return all dependencies, as {found:{}, failed:{}}
+
+
 exports.parse = function parse(flow, parsed, result, depth) {
 
         //recursive, so use the one passed in otherwise
@@ -21,17 +21,35 @@ exports.parse = function parse(flow, parsed, result, depth) {
 
     if(depends) {
 
-        for(depend in depends) {
+        for(name in depends) {
 
-            var depend_version = depends[depend];
-            var has = haxelib.version(flow, depend, depend_version);
+            var depend = depends[name];
+            var is_internal = false;
+            var depend_version = '*';
 
-            if(!has) {
-                failed[depend] = { name:depend, version:depend_version };
-                prepare.log(flow, 3, '        - %s - missing dependency %s %s', util.pad(depth*2, '', ' '), depend, depend_version);
+                //if this is dependency with a custom flow file
+                //or other options it will be a { } instead of a string
+            if(depend.constructor == Object) {
+                depend_version = depend.version;
+                is_internal = depend.internal;
             } else {
-                found[depend] = { name:depend, version:depend_version, path:has.path };
-                prepare.log(flow, 3, '        - %s - found dependency %s %s', util.pad(depth*2, '', ' '), depend, depend_version);
+                depend_version = depend;
+            }
+
+            if(is_internal) {
+
+                found[name] = flow.project.internal_depends[name];
+
+            } else {
+                var has = haxelib.version(flow, name, depend_version);
+
+                if(!has) {
+                    failed[name] = { name:name, version:depend_version };
+                    prepare.log(flow, 3, '        - %s - missing dependency %s %s', util.pad(depth*2, '', ' '), name, depend_version);
+                } else {
+                    found[name] = { name:name, version:depend_version, path:has.path };
+                    prepare.log(flow, 3, '        - %s - found dependency %s %s', util.pad(depth*2, '', ' '), name, depend_version);
+                }
             }
 
         } //each depends
@@ -62,18 +80,30 @@ exports.parse = function parse(flow, parsed, result, depth) {
     for(depend in found) {
 
         var lib = found[depend];
-        var project_file = flow.project.default;
+        var project_file = flow.project.default_name;
 
-        var flow_files = flow.project.find_flow_files(flow, lib.path);
+        //if the project has no explicit path given (from internal only atm)
+        //we check the folder for any .flow files
 
-        if(flow_files.length > 1) {
-            return fail_verify('dependency %s has multiple *.flow files in the root (%s), cannot guess which to use. projects should only keep one root *.flow file in the root', depend, lib.path);
-        } else if(flow_files.length == 1) {
-            project_file = flow_files[0];
+        if(!lib.flow_file) {
+
+            var flow_files = flow.project.find_flow_files(flow, lib.path);
+
+            if(flow_files.length > 1) {
+                return fail_verify('dependency %s has multiple *.flow files in the root (%s), cannot guess which to use. projects should only keep one root *.flow file in the root', depend, lib.path);
+            } else if(flow_files.length == 1) {
+                project_file = flow_files[0];
+            }
+
+            project_file = path.join(lib.path, project_file);
+
+        } else {
+                //but if it does...
+                //it must be absolute already
+            project_file = lib.flow_file;
         }
 
-        project_file = path.join(lib.path, project_file);
-        var state = projects.verify(flow, project_file, true);
+        var state = flow.project.verify(flow, project_file, lib.path, true);
 
             //store the project value for the dependency
         lib.project = state.parsed;

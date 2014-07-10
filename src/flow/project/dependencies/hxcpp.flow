@@ -1,0 +1,52 @@
+{
+    project:{
+        name:'hxcpp',
+        version:'3.1.39',
+        author:'haxe foundation',
+    },
+
+    if:{
+
+        "android && arch-armv7 && !static_link" : {
+          build : {
+            files : {
+              libregexp : { path:"bin/Android/libregexp-v7.so => project/libs/armeabi/libregexp.so" },
+              libstd : { path:"bin/Android/libstd-v7.so => project/libs/armeabi/libstd.so" },
+              libzlib : { path:"bin/Android/libzlib-v7.so => project/libs/armeabi/libzlib.so" }
+            }
+          }
+        },
+
+        "android && arch-armv5 && !static_link" : {
+          build : {
+            files : {
+              libregexp : { path:"bin/Android/libregexp.so => project/libs/armeabi/libregexp.so" },
+              libstd : { path:"bin/Android/libstd.so => project/libs/armeabi/libstd.so" },
+              libzlib : { path:"bin/Android/libzlib.so => project/libs/armeabi/libzlib.so" }
+            }
+          }
+        },
+
+        "android && arch-x86 && !static_link" : {
+          build : {
+            files : {
+              libregexp : { path:"bin/Android/libregexp-x86.so => project/libs/armeabi/libregexp.so" },
+              libstd : { path:"bin/Android/libstd-x86.so => project/libs/armeabi/libstd.so" },
+              libzlib : { path:"bin/Android/libzlib-x86.so => project/libs/armeabi/libzlib.so" }
+            }
+          }
+        },
+
+        "android && !static_link": {
+            app : {
+              mobile : {
+                android : {
+                  libs : {
+                    native : { regexp:'regexp', std:'std', zlib:'zlib' }
+                  }
+                }
+              }
+            }
+        }
+    }
+}

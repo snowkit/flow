@@ -4,6 +4,8 @@ var   path = require('path')
     , bake = require('./bake')
     , bars = require('handlebars')
     , gate = require('json-gate')
+    , jsonic = require('jsonic')
+    , fs = require('graceful-fs')
 
     , depends = require('./prepare/depends')
     , conditions = require('./prepare/conditions')
@@ -73,7 +75,7 @@ exports.log = internal.log;
 internal.template_config_path = function(flow, prepared, build_config, path_node, context) {
     var template = bars.compile(path_node);
     var result = template(context);
-    return path.normalize(result);
+    return util.normalize(result);
 }
 
 internal.prepare_config_paths = function(flow, prepared, build_config) {
@@ -88,10 +90,20 @@ internal.prepare_config_paths = function(flow, prepared, build_config) {
         //template them against this specific context
     var path_context = {
         app : {
+            archtag : '',
+            debugtag : '',
             boot : flow.config.build.boot,
             name : prepared.source.project.app.name
         },
         paths : flow.project.paths
+    }
+
+    if(flow.flags.debug) {
+        path_context.app.debugtag = '-debug';
+    }
+
+    if(flow.target_arch == 'armv7') {
+        path_context.app.archtag = '-v7';
     }
 
     var list = ['binary_source_name','binary_dest_name', 'binary_dest_path', 'files_dest_path'];
@@ -123,14 +135,41 @@ internal.prepare_config_paths = function(flow, prepared, build_config) {
 
     flow.project.paths.binary.full = path.join(flow.project.paths.binary.path, flow.project.paths.binary.name);
     flow.project.paths.files = flow.project.get_path_files(flow, prepared);
+    flow.project.paths.files = util.normalize(flow.project.paths.files, true);
 
-    console.log(flow.project.paths);
+    flow.log(3, 'paths for project', flow.project.paths);
 
 } //prepare_config_paths
 
 internal.prepare_dependencies = function(flow, parsed, build_config) {
 
     internal.log(flow, 3, 'prepare - dependency tree ...');
+
+
+    var internal_deps = ['hxcpp'];
+    var flow_path = path.dirname(flow.flow_path);
+    var dep_path = path.resolve(flow_path, 'project/dependencies/');
+
+    var internal_depends = {};
+    for(index in internal_deps) {
+        var dep = internal_deps[index];
+        var lib = haxelib.version(flow, dep, '*');
+        internal_depends[dep] = {
+            name : dep,
+            path : lib.path,
+            flow_file:path.join(dep_path, dep+'.flow'),
+            version:'*'
+        };
+    }
+
+    flow.project.internal_depends = internal_depends;
+
+        //now we add internal deps as required
+    if(flow.target_cpp) {
+        flow.log(2, 'prepare - dependency tree - adding dependency hxcpp *');
+        parsed.project.build.dependencies = parsed.project.build.dependencies || {};
+        parsed.project.build.dependencies['hxcpp'] = { version:'*', internal:true };
+    }
 
     var _depends = depends.parse(flow, parsed);
 
@@ -163,8 +202,10 @@ internal.cascade_project = function(flow, prepared, build_config) {
 
         //we go through all dependencies now and merge
         //them with only unique values persisting, i.e respecting last value
+        //we also make a deep copy because the function operates on the one, causing
+        //changes to be reflected into the depends tree, which is a fail
     for(name in prepared.depends) {
-        var depend = prepared.depends[name];
+        var depend = util.deep_copy(prepared.depends[name]);
         prepared.source = util.merge_unique(depend.project, prepared.source);
     }
 
@@ -189,9 +230,9 @@ internal.cascade_project = function(flow, prepared, build_config) {
         } //for each node in prepared.source project
     } //if config has alias
 
-    internal.log(flow, 3,'\nproject is \n');
-    internal.log(flow, 3, prepared.source);
-    internal.log(flow, 3, '');
+    internal.log(flow, 4,'\nproject is \n');
+    internal.log(flow, 4, prepared.source);
+    internal.log(flow, 4, '');
 
 } //prepare_cascade_project
 
@@ -211,7 +252,6 @@ internal.fail = function(flow, prepared, section, msg) {
 internal.prepare_project = function(flow, prepared, build_config) {
 
     internal.log(flow, 2, 'prepare - project ...');
-
 
     //conditions
 
@@ -253,7 +293,7 @@ internal.prepare_project = function(flow, prepared, build_config) {
 
     internal.log(flow, 2, 'prepare - project - ok');
 
-} //prepare_conditionals
+} //prepare_project
 
 
 internal.prepare_schema = function(flow, prepared, build_config) {
@@ -284,6 +324,14 @@ internal.prepare_defines = function(flow, prepared, build_config) {
     for(index in build_config.known_targets) {
         var name = build_config.known_targets[index];
         prepared.defines_all[name] = { name:name, met:flow.target == name };
+    }
+
+        //also store the current target arch as a define
+    var arch = 'arch-' + flow.target_arch;
+    prepared.defines_all[arch] = { name:arch, met:true };
+        //and we store "mobile" for convenience
+    if(flow.target_mobile) {
+        prepared.defines_all['mobile'] = { name:'mobile', met:true };
     }
 
         //we also store a few config values as defines because they can be used to configure the build
@@ -383,7 +431,8 @@ internal.prepare_files = function(flow, prepared, build_config) {
         for(index in prepared.depends) {
 
             var depend = prepared.depends[index];
-            var sourcepath = path.dirname(depend.project.__path);
+
+            var sourcepath = depend.project.__root;
             var depfiles = files.parse(flow, prepared, depend.project, sourcepath, build_config);
 
                 //merge them into the final list
