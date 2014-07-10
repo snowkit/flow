@@ -33,6 +33,11 @@ exports.run = function(flow, config, done) {
         //first copy over all the files in the project
     flow.execute(flow, cmds['files']);
 
+        //check for failure already
+    if(flow.project.failed) {
+        return;
+    }
+
         //then ensure the folder for the build data exists
     wrench.mkdirSyncRecursive(flow.project.paths.build, 0755);
 
@@ -175,7 +180,7 @@ internal.write_files_list = function(flow, config) {
     if(flow.config.build.files_output_list) {
 
         var output_path = path.join(flow.project.paths.files, flow.config.build.files_output_list_name);
-            output_path = path.normalize(output_path);
+            output_path = util.normalize(output_path);
 
         flow.log(3, 'build - writing file list to ' + output_path);
 
