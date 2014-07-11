@@ -179,6 +179,10 @@ internal.parse_node = function(flow, prepared, _node) {
         result.template = _node.template;
     }
 
+    if(_node.not_listed) {
+        result.not_listed = _node.not_listed;
+    }
+
     return result;
 
 } //parse_path

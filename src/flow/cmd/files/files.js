@@ -118,10 +118,14 @@ internal.copy_files = function(flow, files, output) {
 
                 if(node.template) {
                     flow.log(3, '   copying with template %s from %s to %s%s', node.template, node.source, output, node.dest);
-                    copied_list = copied_list.concat( internal.template_path(flow, node, dest) );
+                    if(!node.not_listed) {
+                        copied_list = copied_list.concat( internal.template_path(flow, node, dest) );
+                    }
                 } else {
                     flow.log(3, '   copying %s to %s%s', node.source, output, node.dest);
-                    copied_list = copied_list.concat( util.copy_path(flow, node.source, dest) );
+                    if(!node.not_listed) {
+                        copied_list = copied_list.concat( util.copy_path(flow, node.source, dest) );
+                    }
                 }
 
             } //each project file
