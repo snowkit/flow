@@ -103,6 +103,8 @@ exports.parse = function parse(flow, parsed, result, depth) {
             project_file = lib.flow_file;
         }
 
+        flow.log(5, '       looking for dependency project file (maybe) at %s', project_file);
+
         var state = flow.project.verify(flow, project_file, lib.path, true);
 
             //store the project value for the dependency
@@ -113,22 +115,28 @@ exports.parse = function parse(flow, parsed, result, depth) {
             //so we only use valid ones
         if(lib.project == null) {
 
+            flow.log(3, 'prepare - %s - %s has no flow file, this is not an error state', util.pad(depth*2, '', ' '), depend);
+
                 //if it's null, but not missing, it's a syntax issue
                 //in which case totally abort, this is silly code, could be better
             if(state.reason.indexOf('cannot find') == -1) {
                 prepare.log(flow, 1, '\n', state.reason);
                 return result = null;
             }
+
                 //but if not, at least try and parse the version
                 //information from the haxelib.json because it will be defined
                 //in the flags later on before baking
             var haxelib_json = path.join(lib.path, 'haxelib.json');
+
             if(fs.existsSync(haxelib_json)) {
                 var json = JSON.parse( fs.readFileSync(haxelib_json, 'utf8') );
-                lib.project = { name:lib.name, version:json.version, build:{} };
+                lib.project = { project: { name:lib.name, version:json.version, build:{} } };
+                prepare.log(flow, 3, 'prepare - %s - found a haxelib json, it says %s ', util.pad(depth*2, '', ' '), json.version);
             } else {
+                prepare.log(flow,3,'prepare - %s - unable to find any information about this dependency from the haxelib json, so it will have blank information and just the path will be add to -cp and the define be generated... nothing else can happen with this dependency');
                 //nothing we can do to define this, so ...
-                lib.project = { name:lib.name, version:'', build:{} };
+                lib.project = { project : { name:lib.name, version:'', build:{} } };
             }
 
         } else {

@@ -94,7 +94,7 @@ exports.find_flow_files = function(flow, root) {
 
     var list = [];
 
-    glob( "*.flow" , { sync:true, nonull:true, cwd:root || process.cwd() }, function(er, files) {
+    glob( "*.flow" , { sync:true, cwd:root || process.cwd() }, function(er, files) {
         list = list.concat(files);
     });
 
@@ -140,6 +140,10 @@ exports.verify = function verify(flow, project_path, project_root, quiet) {
 
     if(!flow.quiet.project && !quiet) {
         flow.log(2, 'project - using project file %s', abs_path)
+    }
+
+    if(!fs.existsSync(abs_path)) {
+        return fail_verify('cannot find project file at ' + abs_path);
     }
 
     var result;
