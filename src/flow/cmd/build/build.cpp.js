@@ -14,7 +14,7 @@ exports.post_build = function(flow, config, done) {
 
     //the post build is so that we can move the binary file
     //from the output path if needed etc, run extra scripts and so on
-    var source_path = path.join(flow.project.paths.build, 'cpp/' + flow.project.paths.binary.source);
+    var source_path = util.normalize(path.join(flow.project.paths.build, 'cpp/' + flow.project.paths.binary.source));
 
     flow.log(3,'build - moving binary from %s to %s', source_path, flow.project.paths.binary.full);
 
@@ -151,6 +151,10 @@ exports.build_hxcpp = function(flow, config, run_path, done) {
 
     var hxcpp_file = 'Build.xml';
     var args = [hxcpp_file];
+
+    if(run_path) {
+        run_path = util.normalize(run_path, true);
+    }
 
     if(flow.flags.debug) {
         args.push("-Ddebug");

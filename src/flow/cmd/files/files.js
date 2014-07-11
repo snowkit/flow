@@ -120,7 +120,7 @@ internal.copy_files = function(flow, files, output) {
                     flow.log(3, '   copying with template %s from %s to %s%s', node.template, node.source, output, node.dest);
                     copied_list = copied_list.concat( internal.template_path(flow, node, dest) );
                 } else {
-                    flow.log(3, '   copying %s to %s/%s', node.source, output, node.dest);
+                    flow.log(3, '   copying %s to %s%s', node.source, output, node.dest);
                     copied_list = copied_list.concat( util.copy_path(flow, node.source, dest) );
                 }
 
@@ -157,7 +157,7 @@ internal.template_folder_recursively = function(flow, node, _dest, _overwrite) {
     var _source_path = node.source;
         //if a relative path from our project, make it absolute
     if(!node.source_name) {
-        _source_path = path.resolve(flow.run_path, node.source);
+        _source_path = util.normalize(path.resolve(flow.run_path, node.source), true);
     }
 
     var _source_list = wrench.readdirSyncRecursive(_source_path);

@@ -135,6 +135,8 @@ internal.prepare_config_paths = function(flow, prepared, build_config) {
 
     flow.project.paths.binary.full = path.join(flow.project.paths.binary.path, flow.project.paths.binary.name);
     flow.project.paths.files = flow.project.get_path_files(flow, prepared);
+
+    flow.project.paths.binary.full = util.normalize(flow.project.paths.binary.full);
     flow.project.paths.files = util.normalize(flow.project.paths.files, true);
 
     flow.log(3, 'paths for project', flow.project.paths);
@@ -393,7 +395,7 @@ internal.prepare_codepaths = function (flow, prepared, build_config) {
     if(prepared.source.project.app && prepared.source.project.app.codepaths) {
         var _paths = prepared.source.project.app.codepaths.map(function(a) {
             var _path = path.relative(flow.project.paths.build, path.join(flow.run_path, a));
-            return '-cp ' + _path;
+            return '-cp ' + util.normalize(_path, true);
         });
         prepared.flags = util.array_union(prepared.flags, _paths);
     }//each depends

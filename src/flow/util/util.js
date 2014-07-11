@@ -131,6 +131,8 @@ exports.copy_folder_recursively = function(flow, _source, _dest, _overwrite) {
 
     if(_overwrite == undefined) _overwrite = true;
 
+    _dest = util.normalize(_dest, true);
+
         //make sure the destination exists
         //before copying any files to the location
     wrench.mkdirSyncRecursive(_dest, 0755);
@@ -153,9 +155,9 @@ exports.copy_folder_recursively = function(flow, _source, _dest, _overwrite) {
 
         //for each file only, copy it across
     for(var i = 0; i < _source_file_list.length; ++i) {
-        var _dest_file = path.join(_dest,_source_file_list[i]);
+        var _dest_file = util.normalize(path.join(_dest,_source_file_list[i]));
         fse.ensureFileSync(_dest_file);
-        var source_path = path.join(_source, _source_file_list[i]);
+        var source_path = util.normalize(path.join(_source, _source_file_list[i]));
         flow.log(3,'        - copying ' + source_path + ' to ' + _dest_file );
         fse.copySync( source_path, _dest_file );
         copied_list.push( _dest_file );

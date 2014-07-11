@@ -3,6 +3,7 @@
         , flagger = require('./util/flagger')
         , project = require('./project/project')
         , haxelib = require('./util/haxelib')
+        , util = require('./util/util')
 
 
 //initial setup
@@ -11,10 +12,10 @@
 
 var internal = {};
 var flow = {
-    bin_path : process.argv[0],
-    flow_path : process.argv[1],
-    run_path : process.argv[2],
-    system : process.argv[3],
+    bin_path : util.normalize(process.argv[0]),
+    flow_path : util.normalize(process.argv[1]),
+    run_path : util.normalize(process.argv[2]),
+    system : util.normalize(process.argv[3]),
     quiet : {},
     log_level : 2,
     project : project,

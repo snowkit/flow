@@ -43,7 +43,7 @@ exports.run = function(flow, config, done) {
 
         //fetch the hxml location
     var hxml_file = internal.get_hxml_file(flow, config);
-    var hxml_path = path.join(flow.project.paths.build, hxml_file);
+    var hxml_path = util.normalize(path.join(flow.project.paths.build, hxml_file));
 
         //write out the baked build hxml for the config
         if(flow.timing) console.time('build - write hxml');

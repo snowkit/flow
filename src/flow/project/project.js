@@ -133,7 +133,7 @@ exports.verify = function verify(flow, project_path, project_root, quiet) {
 
     } //!project_file
 
-    abs_path = path.resolve(project_file);
+    abs_path = util.normalize(path.resolve(project_file));
 
     project_root = project_root || path.dirname(abs_path);
     project_root = util.normalize(project_root, true);

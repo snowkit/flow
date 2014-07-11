@@ -56,7 +56,7 @@ internal.append_source = function(flow, list, srcpath) {
     return list.map(function(file){
 
         file.source_name = file.source;
-        file.source = path.join(srcpath, file.source);
+        file.source = util.normalize(path.join(srcpath, file.source));
 
         return file;
 
@@ -135,7 +135,7 @@ internal.parse_file = function(flow, prepared, _node, file_list) {
     }
 
     if(_path) {
-        file_list.push(_path);
+        file_list.push( _path );
     }
 
     return file_list;
@@ -173,7 +173,7 @@ internal.parse_node = function(flow, prepared, _node) {
         //clean up whitespaces
     parts = parts.map(function(part) { return part.trim(); });
 
-    var result = { source:parts[0], dest:parts[1] };
+    var result = { source:util.normalize(parts[0]), dest:util.normalize(parts[1]) };
 
     if(_node.template) {
         result.template = _node.template;
