@@ -38,7 +38,7 @@ var internal = {};
             cmd.exec(flow, 'haxelib', ['list'], {quiet:true}, function(lcode, lout, lerr) {
 
                 var list = lout.trim();
-                var name_ver = /^([a-zA-Z-_]*)(:{1})\s(.*)$/igm;
+                var name_ver = /^([0-9a-zA-Z-_]*)(:{1})\s(.*)$/igm;
 
                 var match = name_ver.exec(list);
                 while (match != null) {
@@ -71,7 +71,6 @@ var internal = {};
 
 
         if(libs[name]) {
-            flow.log(3, libs[name].versions);
             return libs[name].versions[ver];
         } else {
             return null;
