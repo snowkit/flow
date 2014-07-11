@@ -53,6 +53,8 @@ exports.verify = function verify(flow, done) {
 
     flow.log(3, 'files - verifying ... ');
 
+    flow.project.do_prepare(flow);
+
     var final_project_files = [];
     var final_build_files = [];
 
@@ -117,14 +119,23 @@ internal.copy_files = function(flow, files, output) {
                 var dest = util.normalize(path.join(output, node.dest));
 
                 if(node.template) {
+
                     flow.log(3, '   copying with template %s from %s to %s%s', node.template, node.source, output, node.dest);
+
+                    var res = internal.template_path(flow, node, dest);
+
                     if(!node.not_listed) {
-                        copied_list = copied_list.concat( internal.template_path(flow, node, dest) );
+                        copied_list = copied_list.concat( res );
                     }
+
                 } else {
+
                     flow.log(3, '   copying %s to %s%s', node.source, output, node.dest);
+
+                    var res = util.copy_path(flow, node.source, dest);
+
                     if(!node.not_listed) {
-                        copied_list = copied_list.concat( util.copy_path(flow, node.source, dest) );
+                        copied_list = copied_list.concat( res );
                     }
                 }
 
