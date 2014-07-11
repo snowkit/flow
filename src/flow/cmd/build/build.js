@@ -16,6 +16,7 @@ var internal = {};
 
             //set the project values
         flow.project.parsed = opt.project.parsed;
+        flow.project.root = path.dirname(opt.project.path);
         flow.project.path = opt.project.path;
         flow.project.file = opt.project.file;
 

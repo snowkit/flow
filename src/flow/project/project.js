@@ -24,6 +24,8 @@ exports.init = function init(flow) {
     flow.target =
         flow.flags._next('build') ||
         flow.flags._next('try') ||
+        flow.flags._next('run') ||
+        flow.flags._next('package') ||
         flow.flags._next('clean') ||
         flow.system;
 
@@ -325,6 +327,7 @@ exports.do_prepare = function(flow) {
     }
 
     flow.project.parsed = project.parsed;
+    flow.project.root = path.dirname(project.path);
     flow.project.path = project.path;
     flow.project.file = project.file;
 
