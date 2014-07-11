@@ -1,6 +1,7 @@
 ###flow
 
-state : 
+state :
+    libs : yes
     windows : yes
     mac : yes
     linux : yes

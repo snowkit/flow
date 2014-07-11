@@ -11,6 +11,7 @@ var internal = {};
     exports.run = function run(flow, opt) {
 
         if(flow.target_arch === null) {
+            flow.log(1, 'unknown target arch, invalid state! can\'t build. stopping.');
             return flow.project.failed = true;
         }
 
@@ -19,23 +20,23 @@ var internal = {};
         flow.project.path = opt.project.path;
         flow.project.file = opt.project.file;
 
+        flow.log(2,'build - %s %s for %s',
+            flow.project.parsed.project.name, flow.project.parsed.project.version, flow.target);
+
+            //to build a project we need to prepare it first
+        flow.project.prepare(flow, config);
+
+        if(!flow.project.prepared) {
+            flow.log(1, 'build - failed at `prepare`\n');
+            return flow.project.failed = true;
+        }
+
             //if building a library we defer this to it's own commmand
-        if(flow.flags.lib) {
+        if(flow.project.parsed.project.lib) {
 
             flow.execute(flow, cmds['_build_lib']);
 
         } else {
-
-            flow.log(2,'build - %s %s for %s',
-                flow.project.parsed.project.name, flow.project.parsed.project.version, flow.target);
-
-                //to build a project we need to prepare it first
-            flow.project.prepare(flow, config);
-
-            if(!flow.project.prepared) {
-                flow.log(1, 'build - failed at `prepare`\n');
-                return flow.project.failed = true;
-            }
 
                 //the we bake it into a buildable form
             flow.project.bake(flow, config);
@@ -44,6 +45,7 @@ var internal = {};
                 flow.log(1, 'build - failed at `bake`\n');
                 return flow.project.failed = true;
             }
+
 
                 //finally, if all is ok,
                 //run an actual build

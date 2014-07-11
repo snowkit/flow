@@ -128,7 +128,10 @@ exports.post_haxe = function(flow, config, done) {
 
             if(flow.timing) console.time('build - hxcpp');
 
-    internal.build_hxcpp(flow, config, function(err) {
+    var cpp_path = path.join(flow.project.paths.build, 'cpp/');
+        cpp_path = path.resolve(flow.run_path, cpp_path);
+
+    exports.build_hxcpp(flow, config, cpp_path, function(err) {
 
             if(flow.timing) console.timeEnd('build - hxcpp');
 
@@ -144,15 +147,20 @@ exports.post_haxe = function(flow, config, done) {
 } //exports
 
 
-internal.build_hxcpp = function(flow, config, done) {
+exports.build_hxcpp = function(flow, config, run_path, done) {
 
-    var cpp_path = path.join(flow.project.paths.build, 'cpp/');
     var hxcpp_file = 'Build.xml';
     var args = [hxcpp_file];
 
     if(flow.flags.debug) {
         args.push("-Ddebug");
     }
+
+    if(flow.flags.log > 2) {
+        args.push('-verbose');
+    }
+
+    args.push('-D' + flow.target);
 
     if(flow.target_cpp){
         switch(flow.target_arch) {
@@ -172,19 +180,18 @@ internal.build_hxcpp = function(flow, config, done) {
     }
 
     if(flow.target == 'android') {
-        args.push('-Dandroid');
         args.push('-Dandroid-' + flow.project.parsed.project.app.mobile.android.sdk_target);
     }
 
     flow.log(2, 'build - running hxcpp ...');
     flow.log(3, 'haxelib run hxcpp %s', args.join(' ') );
+    flow.log(3, 'running hxcpp from %s', run_path );
 
     var opt = {
         quiet : false,
-        cwd: path.resolve(flow.run_path, cpp_path)
+        cwd: run_path
     }
 
     cmd.exec(flow, 'haxelib', ['run','hxcpp'].concat(args), opt, done);
-
 
 } //build_hxcpp
