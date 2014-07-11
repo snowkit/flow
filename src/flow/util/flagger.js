@@ -7,7 +7,7 @@ module.exports = {
         var flags = minimist(args, {
         });
 
-        flags._aliases = { 'try':'try_' };
+        flags._aliases = { };
 
         flags._has = function _has(flag) {
             return this._.indexOf(flag) != -1;

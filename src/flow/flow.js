@@ -13,7 +13,7 @@
 var internal = {};
 var flow = {
     bin_path : util.normalize(process.argv[0]),
-    flow_path : util.normalize(process.argv[1]),
+    flow_path : util.normalize(path.dirname(process.argv[1])),
     run_path : util.normalize(process.argv[2]),
     system : util.normalize(process.argv[3]),
     quiet : {},
@@ -88,15 +88,15 @@ internal.run = function() {
     }
 
     //first check critical flags
-    if(!args.length) {
+    if(!args.length || flow.flags._has('usage')) {
 
         cmds.usage.run(flow, '');
 
-    } else if(flow.flags._has('version')) {
+    } else if(flow.flags._has('version') && args.length == 1) {
 
         console.log(flow.version);
 
-    } else if(flow.flags._has('er')) {
+    } else if(flow.flags._has('er') && args.length == 1) {
 
         require('./util/er').er();
 

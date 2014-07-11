@@ -2,7 +2,7 @@
 //public facing
 
 exports.run = require('./run/run');
-exports.try_ = require('./try/try');
+exports.launch = require('./launch/launch');
 exports.build = require('./build/build');
 exports.clean = require('./clean/clean');
 exports.package = require('./package/package');

@@ -1,47 +1,25 @@
 
-var  cmd = require('../../util/process')
-   , path = require('path')
-   , native = require('./run.native')
-   , web = require('./run.web')
+    var   cmds = require('../')
 
-// > flow run target -options
+// > flow run target --options
+//   is the same as
+// > flow build target --options
+// > flow run target --options
 
 exports.run = function run(flow, data) {
 
-    if(!flow.project.parsed) {
-        return;
-    }
+        //this is so build can use this to check if
+        //it should execute run as well
+    flow.action = 'run';
 
-    if(flow.project.failed) {
-        return;
-    }
-
-    flow.log(2, 'running %s %s for %s\n',
-        flow.project.parsed.project.name, flow.project.parsed.project.version, flow.target);
-
-    if(flow.target_cpp) {
-        native.run(flow);
-    } else if(flow.target_js) {
-        web.run(flow);
-    }
+    flow.execute(flow, cmds['build']);
 
 } //run
 
 exports.verify = function verify(flow, done) {
-
-    if(flow.target) {
-        flow.project.do_prepare(flow);
-        done(null,null);
-    } else {
-        done(true,null);
-    }
-
-} //verify
+    done(null,null);
+}
 
 exports.error = function(flow, err) {
-
-    if(err && err.length > 0) {
-        flow.log(1, 'run / error %s', err);
-    }
-
-} //error
+    flow.log(1, 'run / error %s', err);
+}

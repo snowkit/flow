@@ -55,8 +55,8 @@ var internal = {};
 
                 if(!err) {
                         //if build + run was asked
-                    if(flow.action == 'try') {
-                        flow.execute(flow, cmds['run']);
+                    if(flow.action == 'run') {
+                        flow.execute(flow, cmds['launch']);
                     }
                 }
             });

@@ -13,3 +13,7 @@ exports.verify = function verify(flow, done) {
 exports.error = function(flow, err) {
 
 } //error
+
+exports.usage = function(flow) {
+    return 'usage pending';
+}

@@ -149,8 +149,7 @@ internal.prepare_dependencies = function(flow, parsed) {
 
 
     var internal_deps = ['hxcpp'];
-    var flow_path = path.dirname(flow.flow_path);
-    var dep_path = path.resolve(flow_path, 'project/dependencies/');
+    var dep_path = path.resolve(flow.flow_path, 'project/dependencies/');
 
     var internal_depends = {};
     for(index in internal_deps) {
