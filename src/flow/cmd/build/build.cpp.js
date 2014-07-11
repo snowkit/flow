@@ -48,6 +48,9 @@ internal.post_build_mobile = function(flow, source_path, done) {
     //runs ant, and such
 internal.build_android = function(flow, done) {
 
+
+    flow.log(2, 'android specifics', flow.project.prepared.source.project.app.mobile.android);
+
     //handle ability to compile store build, vs debug test build
     var build_type = flow.project.prepared.source.project.app.mobile.android.build_type;
 
@@ -123,8 +126,6 @@ internal.post_build_desktop = function(flow, source_path, done) {
 } //post_build_desktop
 
 exports.post_haxe = function(flow, config, done) {
-
-    flow.log(2, 'android specifics', flow.project.prepared.source.project.app.mobile.android);
 
             if(flow.timing) console.time('build - hxcpp');
 
