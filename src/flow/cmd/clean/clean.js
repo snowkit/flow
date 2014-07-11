@@ -1,7 +1,6 @@
 
     var   wrench = require('wrench')
         , path = require('path')
-        , build_config = require('../build/config')
 
 var internal = {};
 
@@ -27,29 +26,11 @@ exports.verify = function verify(flow, done) {
 
     var do_all = false;
 
-        //if called from the command line, verify that build path and such exist!
-    if(flow.project.paths.build === undefined) {
+        //if called from the command line, make sure its prepared
+    flow.project.do_prepare(flow);
 
-        flow.quiet.prepare = true;
-        flow.quiet.project = true;
-
-        var project = flow.project.verify(flow);
-
-            //if no valid project was found
-        if(!project.parsed) {
-            return done( internal._error_project(flow, project.reason), null );
-        }
-
-        flow.project.parsed = project.parsed;
-        flow.project.path = project.path;
-        flow.project.file = project.file;
-
-        flow.project.prepare(flow, build_config);
-
-        if(flow.flags.all) {
-            do_all = true;
-        }
-
+    if(flow.flags.all) {
+        do_all = true;
     }
 
     done(null,do_all);
@@ -59,14 +40,3 @@ exports.verify = function verify(flow, done) {
 exports.error = function(flow, err) {
 
 } //error
-
-
-internal._error_project = function(flow, reason){
-
-    if(reason && reason.length > 0) {
-        return 'project file error \n\n > ' + reason;
-    } else {
-        return 'unknown project error';
-    }
-
-} //_error_project

@@ -1,13 +1,13 @@
 
 var   path = require('path')
 
-exports.bake = function bake(flow, build_config) {
+exports.bake = function bake(flow) {
 
     var project = flow.project.prepared;
 
     flow.log(2, 'bake - project %s\n', flow.project.parsed.project.name);
 
-    flow.project.hxml = exports.hxml(flow, project, build_config );
+    flow.project.hxml = exports.hxml(flow, project );
 
     flow.log(3, flow.project.hxml);
     flow.log(3, '');
@@ -17,7 +17,7 @@ exports.bake = function bake(flow, build_config) {
 } //project
 
     //bakes defines into a usable form
-exports.defines = function defines(flow, project, build_config, split) {
+exports.defines = function defines(flow, project, split) {
 
     split = split || '\n';
 
@@ -30,7 +30,7 @@ exports.defines = function defines(flow, project, build_config, split) {
 } //defines
 
     //bakes flags into a usable form
-exports.flags = function flags(flow, project, build_config, split) {
+exports.flags = function flags(flow, project, split) {
 
     split = split || '\n';
 
@@ -39,7 +39,7 @@ exports.flags = function flags(flow, project, build_config, split) {
 } //flags
 
 
-exports.target = function(flow, project, build_config, split) {
+exports.target = function(flow, project, split) {
 
     split = split || '\n';
 
@@ -65,15 +65,15 @@ exports.target = function(flow, project, build_config, split) {
 } //target
 
     //bakes the whole project into a usable complete hxml
-exports.hxml = function(flow, project, build_config, with_compile, split) {
+exports.hxml = function(flow, project, with_compile, split) {
 
     split = split || '\n';
 
     var hxml_ = '-main ' + flow.config.build.boot + split;
 
-    hxml_ += exports.defines(flow, project, build_config, split);
-    hxml_ += exports.flags(flow, project, build_config, split);
-    hxml_ += exports.target(flow, project, build_config, split);
+    hxml_ += exports.defines(flow, project, split);
+    hxml_ += exports.flags(flow, project, split);
+    hxml_ += exports.target(flow, project, split);
 
         //since we want to manually invoke the builds
         //with custom configs we tell haxe only to generate

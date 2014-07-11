@@ -4,7 +4,7 @@
         , UglifyJS = require('uglify-js')
 
 
-exports.post_build = function(flow, config, done) {
+exports.post_build = function(flow, done) {
 
     var out_file = path.join(flow.project.paths.output, flow.project.prepared.source.project.app.name);
     var minified = false;
@@ -41,6 +41,6 @@ exports.post_build = function(flow, config, done) {
     done();
 }
 
-exports.post_haxe = function(flow, config, done) {
+exports.post_haxe = function(flow, done) {
     done();
 }

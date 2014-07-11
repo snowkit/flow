@@ -6,7 +6,7 @@ var   defines = require('./defines')
 var internal = {};
 
     //returns an array of { source:dest } for the files in project
-exports.parse = function parse(flow, prepared, source, srcpath, build_config) {
+exports.parse = function parse(flow, prepared, source, srcpath) {
 
     flow.log(3, 'prepare - files');
 

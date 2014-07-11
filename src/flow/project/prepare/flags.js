@@ -2,7 +2,7 @@
     var   defines = require('./defines')
         , util = require('../../util/util')
 
-exports.parse = function parse(flow, project, build_config) {
+exports.parse = function parse(flow, project) {
 
     var flags = project.flags || [];
 

@@ -37,7 +37,7 @@ var flow = {
         var args = Array.prototype.slice.call(arguments,1);
         if(level <= this.log_level && this.log_level != 0) {
             if(args[0] && args[0].constructor != Object) {
-                args[0] = level+'.flow / ' + args[0];
+                args[0] = 'flow / ' + args[0];
             }
             console.log.apply(console, args);
         }
@@ -103,7 +103,9 @@ internal.run = function() {
     } else {
 
             //start with initing the project state values
-        flow.project.init(flow);
+        if(!flow.project.init(flow)) {
+            return;
+        }
 
             //useful immediate information
         flow.log(2, '%s', flow.version);

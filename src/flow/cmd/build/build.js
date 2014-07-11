@@ -1,6 +1,5 @@
 
-    var   config = require('./config')
-        , cmds = require('../')
+    var   cmds = require('../')
         , builder = require('./builder')
 
 var internal = {};
@@ -24,7 +23,7 @@ var internal = {};
             flow.project.parsed.project.name, flow.project.parsed.project.version, flow.target);
 
             //to build a project we need to prepare it first
-        flow.project.prepare(flow, config);
+        flow.project.prepare(flow);
 
         if(!flow.project.prepared) {
             flow.log(1, 'build - failed at `prepare`\n');
@@ -39,7 +38,7 @@ var internal = {};
         } else {
 
                 //the we bake it into a buildable form
-            flow.project.bake(flow, config);
+            flow.project.bake(flow);
 
             if(!flow.project.baked) {
                 flow.log(1, 'build - failed at `bake`\n');
@@ -49,7 +48,10 @@ var internal = {};
 
                 //finally, if all is ok,
                 //run an actual build
-            builder.run(flow, config, function(err){
+            builder.run(flow, function(err){
+
+                flow.log(2,'build - done');
+
                 if(!err) {
                         //if build + run was asked
                     if(flow.action == 'try') {
@@ -85,10 +87,10 @@ var internal = {};
 
                 //look up the list of known targets
                 //if found, it is a valid build command
-            if(config.known_targets.indexOf(target) != -1) {
+            if(flow.config.build.known_targets.indexOf(target) != -1) {
 
                     //check that this is a valid target for our system
-                var invalid = config.invalid_targets[flow.system];
+                var invalid = flow.config.build.invalid_targets[flow.system];
 
                     //if not, invalidate
                 if(invalid.indexOf(target) != -1) {
@@ -139,7 +141,7 @@ var internal = {};
     internal._error_unknown = function(flow, target){
 
         var err = 'unknown target `' + target + '`\n\n';
-            err += '> known targets : ' + config.known_targets.join(', ');
+            err += '> known targets : ' + flow.config.build.known_targets.join(', ');
 
         return err;
 
@@ -149,8 +151,8 @@ var internal = {};
 
         var err = 'invalid target `'+target+'` for system `'+flow.system+'` \n\n';
 
-        var valid = [].concat(config.known_targets);
-        var invalid = config.invalid_targets[flow.system];
+        var valid = [].concat(flow.config.build.known_targets);
+        var invalid = flow.config.build.invalid_targets[flow.system];
 
             //remove invalid from valid list
         for(index in invalid) {

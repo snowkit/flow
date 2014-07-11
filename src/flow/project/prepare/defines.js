@@ -6,7 +6,7 @@ var internal = {};
     internal._unknown = -1;
 
 
-exports.parse = function parse(flow, source, depends, build_config, existing) {
+exports.parse = function parse(flow, source, depends, existing) {
 
         //start with given value if any
     existing = existing || {};
@@ -59,7 +59,7 @@ exports.parse = function parse(flow, source, depends, build_config, existing) {
                 //possible for a null project,
                 //i.e no *.flow in dependency
             if(depend.project) {
-                existing = exports.parse(flow, depend.project, null, build_config, existing);
+                existing = exports.parse(flow, depend.project, null, existing);
             }
         }
     } //depends
@@ -70,7 +70,7 @@ exports.parse = function parse(flow, source, depends, build_config, existing) {
 
 
     //post parsing strip based on existing defines + known targets
-exports.filter = function filter(flow, defines, build_config) {
+exports.filter = function filter(flow, defines) {
 
     var results = {};
 

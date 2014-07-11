@@ -8,7 +8,7 @@
 
 var internal = {};
 
-exports.post_build = function(flow, config, done) {
+exports.post_build = function(flow, done) {
 
     flow.log(3,'build - running cpp post process');
 
@@ -125,14 +125,14 @@ internal.post_build_desktop = function(flow, source_path, done) {
 
 } //post_build_desktop
 
-exports.post_haxe = function(flow, config, done) {
+exports.post_haxe = function(flow, done) {
 
             if(flow.timing) console.time('build - hxcpp');
 
     var cpp_path = path.join(flow.project.paths.build, 'cpp/');
         cpp_path = path.resolve(flow.run_path, cpp_path);
 
-    exports.build_hxcpp(flow, config, cpp_path, function(err) {
+    exports.build_hxcpp(flow, cpp_path, function(err) {
 
             if(flow.timing) console.timeEnd('build - hxcpp');
 
@@ -148,7 +148,7 @@ exports.post_haxe = function(flow, config, done) {
 } //exports
 
 
-exports.build_hxcpp = function(flow, config, run_path, done) {
+exports.build_hxcpp = function(flow, run_path, done) {
 
     var hxcpp_file = 'Build.xml';
     var args = [hxcpp_file];

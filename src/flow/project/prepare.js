@@ -17,7 +17,7 @@ var internal = {};
 
     //convert a parsed project into a fully parsed project,
     //complete with per target flags, values and so on
-exports.prepare = function prepare(flow, build_config) {
+exports.prepare = function prepare(flow) {
 
     flow.project.depends = flow.project.depends || {};
 
@@ -28,7 +28,7 @@ exports.prepare = function prepare(flow, build_config) {
 
         //dependencies are a special case as they affect everything, they
         //come first and are required to be complete before anything else
-    var _depends = internal.prepare_dependencies(flow, parsed, build_config);
+    var _depends = internal.prepare_dependencies(flow, parsed);
 
         //get out early if missing any dependency
     if(_depends == null) {
@@ -44,15 +44,15 @@ exports.prepare = function prepare(flow, build_config) {
 
         //we then merge the project values against our own,
         //so that they cascade and override each other
-    internal.cascade_project(flow, prepared, build_config);
+    internal.cascade_project(flow, prepared);
 
         //once cascaded we can safely calculate the paths from it
-    internal.prepare_config_paths(flow, prepared, build_config);
+    internal.prepare_config_paths(flow, prepared);
 
         //this step simply pulls out any conditionals in any root node,
         //tokenizes it, verifies it and pushes it into a cache for later
         //checks against a condition being met
-    internal.prepare_project(flow, prepared, build_config);
+    internal.prepare_project(flow, prepared);
 
         //finally, store it in the project as valid and return
     flow.project.prepared = prepared;
@@ -72,13 +72,13 @@ internal.log = function(flow) {
 exports.log = internal.log;
 
 
-internal.template_config_path = function(flow, prepared, build_config, path_node, context) {
+internal.template_config_path = function(flow, prepared, path_node, context) {
     var template = bars.compile(path_node);
     var result = template(context);
     return util.normalize(result);
 }
 
-internal.prepare_config_paths = function(flow, prepared, build_config) {
+internal.prepare_config_paths = function(flow, prepared) {
 
     flow.project.paths = {
         android : { project : flow.config.build.android.project },
@@ -112,16 +112,16 @@ internal.prepare_config_paths = function(flow, prepared, build_config) {
         var node = flow.config.build[name];
 
             //if this is platform specific
-        if(build_config.known_targets.indexOf(name) != -1) {
+        if(flow.config.build.known_targets.indexOf(name) != -1) {
             for(subname in node) {
                 var subnode = node[subname];
                 if(list.indexOf(subname) != -1) {
-                    flow.config.build[name][subname] = internal.template_config_path(flow, prepared, build_config, subnode, path_context);
+                    flow.config.build[name][subname] = internal.template_config_path(flow, prepared, subnode, path_context);
                 }
             }
         } else {
             if(list.indexOf(name) != -1) {
-                flow.config.build[name] = internal.template_config_path(flow, prepared, build_config, node, path_context);
+                flow.config.build[name] = internal.template_config_path(flow, prepared, node, path_context);
             }
         }
     }
@@ -143,7 +143,7 @@ internal.prepare_config_paths = function(flow, prepared, build_config) {
 
 } //prepare_config_paths
 
-internal.prepare_dependencies = function(flow, parsed, build_config) {
+internal.prepare_dependencies = function(flow, parsed) {
 
     internal.log(flow, 3, 'prepare - dependency tree ...');
 
@@ -200,7 +200,7 @@ internal.prepare_dependencies = function(flow, parsed, build_config) {
 
 } //prepare_dependencies
 
-internal.cascade_project = function(flow, prepared, build_config) {
+internal.cascade_project = function(flow, prepared) {
 
         //we go through all dependencies now and merge
         //them with only unique values persisting, i.e respecting last value
@@ -251,7 +251,7 @@ internal.fail = function(flow, prepared, section, msg) {
 
 }
 
-internal.prepare_project = function(flow, prepared, build_config) {
+internal.prepare_project = function(flow, prepared) {
 
     internal.log(flow, 2, 'prepare - project ...');
 
@@ -262,7 +262,7 @@ internal.prepare_project = function(flow, prepared, build_config) {
             //preparing the defines themselves, so we go first
         internal.log(flow, 3, 'prepare - project - conditions ...');
 
-            var state = conditions.parse(flow, prepared, build_config);
+            var state = conditions.parse(flow, prepared);
 
             if(state.err) {
                 return internal.fail(flow, prepared, 'conditions', state.err);
@@ -274,7 +274,7 @@ internal.prepare_project = function(flow, prepared, build_config) {
 
                 //process the defines as the rest will depend on them
                 //and error out if there are any parsing or other errors in there.
-            state = internal.prepare_defines(flow, prepared, build_config);
+            state = internal.prepare_defines(flow, prepared);
 
             if(state.err) {
                 return internal.fail(flow, prepared, 'defines', state.err);
@@ -282,15 +282,15 @@ internal.prepare_project = function(flow, prepared, build_config) {
 
     //flags
 
-            internal.prepare_flags(flow, prepared, build_config);
+            internal.prepare_flags(flow, prepared);
 
     //files
 
-            internal.prepare_files(flow, prepared, build_config);
+            internal.prepare_files(flow, prepared);
 
     //user object schema
 
-            internal.prepare_schema(flow, prepared, build_config);
+            internal.prepare_schema(flow, prepared);
 
 
     internal.log(flow, 2, 'prepare - project - ok');
@@ -298,7 +298,7 @@ internal.prepare_project = function(flow, prepared, build_config) {
 } //prepare_project
 
 
-internal.prepare_schema = function(flow, prepared, build_config) {
+internal.prepare_schema = function(flow, prepared) {
 
     for(name in flow.config.schema) {
         var detail = flow.config.schema[name];
@@ -317,14 +317,14 @@ internal.prepare_schema = function(flow, prepared, build_config) {
 
 } //prepare_schema
 
-internal.prepare_defines = function(flow, prepared, build_config) {
+internal.prepare_defines = function(flow, prepared) {
 
     internal.log(flow, 3, 'prepare - defines ...');
 
     //store the list of targets as met or unmet defines based on the target
     //we are attempting to prepare for
-    for(index in build_config.known_targets) {
-        var name = build_config.known_targets[index];
+    for(index in flow.config.build.known_targets) {
+        var name = flow.config.build.known_targets[index];
         prepared.defines_all[name] = { name:name, met:flow.target == name };
     }
 
@@ -340,9 +340,9 @@ internal.prepare_defines = function(flow, prepared, build_config) {
     prepared.defines_all['flow_build_command_line'] = { name:'flow_build_command_line', met:flow.config.build.command_line };
 
         //now we parse all project defines from the project
-    prepared.defines_all = defines.parse(flow, prepared.source, prepared.depends, build_config, prepared.defines_all);
+    prepared.defines_all = defines.parse(flow, prepared.source, prepared.depends, prepared.defines_all);
         //and the final list is filtered against the defines themselves, and the known targets
-    prepared.defines = defines.filter(flow, prepared.defines_all, build_config);
+    prepared.defines = defines.filter(flow, prepared.defines_all);
 
         //if any errors, return out early
     if(prepared.defines.err) {
@@ -374,7 +374,7 @@ internal.prepare_defines = function(flow, prepared, build_config) {
 
 
     internal.log(flow, 5, prepared.defines_all);
-    internal.log(flow, 3, bake.defines(flow, prepared, build_config));
+    internal.log(flow, 3, bake.defines(flow, prepared));
     internal.log(flow, 5, prepared.defines);
 
     internal.log(flow, 3, 'prepare - defines - ok');
@@ -383,7 +383,7 @@ internal.prepare_defines = function(flow, prepared, build_config) {
 
 } //prepare_defines
 
-internal.prepare_codepaths = function (flow, prepared, build_config) {
+internal.prepare_codepaths = function (flow, prepared) {
 
     //store the code paths of each of the dependencies in the flag list
     for(name in prepared.depends) {
@@ -402,18 +402,18 @@ internal.prepare_codepaths = function (flow, prepared, build_config) {
 
 } //prepare_codepaths
 
-internal.prepare_flags = function(flow, prepared, build_config) {
+internal.prepare_flags = function(flow, prepared) {
 
     internal.log(flow, 3, 'prepare - project - flags ...');
 
         prepared.flags = [];
-        internal.prepare_codepaths(flow, prepared, build_config);
-        prepared.flags = flags.parse(flow, prepared, build_config);
+        internal.prepare_codepaths(flow, prepared);
+        prepared.flags = flags.parse(flow, prepared);
 
             //append the debug flag if requested
         if(flow.flags.debug) { prepared.flags.push('-debug'); }
 
-        internal.log(flow, 4, bake.flags(flow, prepared, build_config));
+        internal.log(flow, 4, bake.flags(flow, prepared));
 
     internal.log(flow, 3, 'prepare - project - flags - ok');
 
@@ -422,11 +422,11 @@ internal.prepare_flags = function(flow, prepared, build_config) {
     //note that files are prepared from the parsed project instead of the prepared
     //project because they are cascaded, leaving dependencies files incorrectly
     //located in the local project file tree (which i will resolve later but is clean enough)
-internal.prepare_files = function(flow, prepared, build_config) {
+internal.prepare_files = function(flow, prepared) {
 
     internal.log(flow, 3, 'prepare - files ...');
 
-        var result = files.parse(flow, prepared, flow.project.parsed, null, build_config);
+        var result = files.parse(flow, prepared, flow.project.parsed, null);
 
             //now, check each dependency and get their files, making them
             //absolute to their path, such that they can be copied
@@ -435,7 +435,7 @@ internal.prepare_files = function(flow, prepared, build_config) {
             var depend = prepared.depends[index];
 
             var sourcepath = depend.project.__root;
-            var depfiles = files.parse(flow, prepared, depend.project, sourcepath, build_config);
+            var depfiles = files.parse(flow, prepared, depend.project, sourcepath);
 
                 //merge them into the final list
             result.build_files = util.array_union(result.build_files, depfiles.build_files);

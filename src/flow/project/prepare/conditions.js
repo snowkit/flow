@@ -5,7 +5,7 @@ var internal = {};
     //a cached list of conditionals and their tokenized values
 exports.conditions = {}
 
-exports.parse = function(flow, prepared, build_config) {
+exports.parse = function(flow, prepared) {
 
     if(prepared.source.if) {
 

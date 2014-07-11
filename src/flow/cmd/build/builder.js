@@ -21,7 +21,7 @@ function HaxeCompileError(message) {
 HaxeCompileError.prototype = Error.prototype;
 
 
-exports.run = function(flow, config, done) {
+exports.run = function(flow, done) {
 
     if(flow.timing) console.time('build - total');
 
@@ -42,20 +42,20 @@ exports.run = function(flow, config, done) {
     wrench.mkdirSyncRecursive(flow.project.paths.build, 0755);
 
         //fetch the hxml location
-    var hxml_file = internal.get_hxml_file(flow, config);
+    var hxml_file = internal.get_hxml_file(flow);
     var hxml_path = util.normalize(path.join(flow.project.paths.build, hxml_file));
 
-        //write out the baked build hxml for the config
+        //write out the baked build hxml for the build
         if(flow.timing) console.time('build - write hxml');
 
-    internal.write_hxml(flow, config, hxml_path);
+    internal.write_hxml(flow, hxml_path);
 
         if(flow.timing) console.timeEnd('build - write hxml');
 
         //write out the asset list
         if(flow.timing) console.time('build - write files list');
 
-    internal.write_files_list(flow, config);
+    internal.write_files_list(flow);
 
         if(flow.timing) console.timeEnd('build - write files list');
 
@@ -64,7 +64,7 @@ exports.run = function(flow, config, done) {
         // no need to log it again.
     if(flow.timing) console.time('build - haxe');
 
-    internal.build_haxe(flow, config, hxml_file, function(err, out) {
+    internal.build_haxe(flow, hxml_file, function(err, out) {
 
         if(flow.timing) console.timeEnd('build - haxe');
 
@@ -73,37 +73,37 @@ exports.run = function(flow, config, done) {
             return flow.project.failed = true;
         }
 
-        internal.post_haxe(flow, config, done);
+        internal.post_haxe(flow, done);
 
     }); //run haxe
 
 } //run
 
-internal.post_haxe = function(flow, config, done) {
+internal.post_haxe = function(flow, done) {
 
         //on native targets we run hxcpp against the now
         //generated build files in the build output
     if(flow.target_cpp) {
 
-        buildcpp.post_haxe(flow, config, function(err){
-            internal.post_build(flow, config, done);
+        buildcpp.post_haxe(flow, function(err){
+            internal.post_build(flow, done);
         });
 
     } else if(flow.target_js) {
 
-        buildweb.post_haxe(flow, config, function(err){
-            internal.post_build(flow, config, done);
+        buildweb.post_haxe(flow, function(err){
+            internal.post_build(flow, done);
         });
 
     } else { //native targets
 
-        internal.post_build(flow, config, done);
+        internal.post_build(flow, done);
 
     } //!native
 
 } //post_haxe
 
-internal.complete = function(flow, config, done) {
+internal.complete = function(flow, done) {
 
     if(flow.timing) console.timeEnd('build - total');
 
@@ -113,31 +113,31 @@ internal.complete = function(flow, config, done) {
 
 } //complete
 
-internal.post_build = function(flow, config, done) {
+internal.post_build = function(flow, done) {
 
 
     if(flow.target_cpp) {
 
-        buildcpp.post_build(flow, config, function(err){
-            internal.complete(flow, config, done);
+        buildcpp.post_build(flow, function(err){
+            internal.complete(flow, done);
         });
 
     } else if(flow.target_js) {
 
-        buildweb.post_build(flow, config, function(err){
-            internal.complete(flow, config, done);
+        buildweb.post_build(flow, function(err){
+            internal.complete(flow, done);
         });
 
     } else { //native targets
 
-        internal.complete(flow, config, done);
+        internal.complete(flow, done);
 
     } //!native
 
 } //post_build
 
 
-internal.build_haxe = function(flow, config, hxml_file, done) {
+internal.build_haxe = function(flow, hxml_file, done) {
 
     flow.log(2, 'build - running haxe ...');
     flow.log(3, 'haxe %s', hxml_file );
@@ -153,7 +153,7 @@ internal.build_haxe = function(flow, config, hxml_file, done) {
 
 } //build_haxe
 
-internal.get_hxml_file = function(flow, config) {
+internal.get_hxml_file = function(flow) {
 
     var hxml_file = 'build';
 
@@ -166,7 +166,7 @@ internal.get_hxml_file = function(flow, config) {
 
 } //get_hxml_file
 
-internal.write_hxml = function(flow, config, write_to) {
+internal.write_hxml = function(flow, write_to) {
 
     flow.log(3, 'build - writing hxml to ' + write_to);
 
@@ -175,7 +175,7 @@ internal.write_hxml = function(flow, config, write_to) {
 } //write_hxml
 
 
-internal.write_files_list = function(flow, config) {
+internal.write_files_list = function(flow) {
 
     if(flow.config.build.files_output_list) {
 

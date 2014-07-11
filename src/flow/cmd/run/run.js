@@ -30,6 +30,7 @@ exports.run = function run(flow, data) {
 exports.verify = function verify(flow, done) {
 
     if(flow.target) {
+        flow.project.do_prepare(flow);
         done(null,null);
     } else {
         done(true,null);

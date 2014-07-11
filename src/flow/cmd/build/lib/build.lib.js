@@ -1,6 +1,5 @@
 
-var   config = require('../config')
-    , buildcpp = require('../build.cpp')
+var   buildcpp = require('../build.cpp')
     , path = require('path')
     , util = require('../../../util/util')
 
@@ -10,7 +9,7 @@ exports.run = function run(flow, data) {
 
     var run_path = util.normalize( path.dirname(flow.project.path) );
 
-    buildcpp.build_hxcpp(flow, config, run_path, function(code,out,err){
+    buildcpp.build_hxcpp(flow, run_path, function(code,out,err){
 
         flow.log(2, 'build - done');
     });

@@ -2,6 +2,14 @@
     "config" : "1.0.0-alpha-1",
     "build" : {
 
+        "known_targets" : ["mac","windows","linux","ios","android","web"],
+
+        "invalid_targets" : {
+            "windows"   : ["linux","mac","ios"],
+            "mac"       : ["linux","windows"],
+            "linux"     : ["windows","mac","ios"]
+        },
+
         "timing" : false,
         "boot" : "FlowApp",
         "command_line" : false,

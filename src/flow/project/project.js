@@ -16,6 +16,9 @@ exports.default_name = 'project.flow';
 
 exports.paths = {}
 exports.init = function init(flow) {
+
+    var success = true;
+
         //default to the system if no target specified,
         //but needs to watch for command lines calling target
     flow.target =
@@ -55,6 +58,15 @@ exports.init = function init(flow) {
         }
 
     }
+
+        //target not found in known targets?
+    if(flow.config.build.known_targets.indexOf(flow.target) == -1) {
+        success = false;
+        flow.log(1, '\n\nError');
+        flow.log(1, '- unknown target `%s`, known targets include %s\n', flow.target, flow.config.build.known_targets.join(', '));
+    }
+
+    return success;
 
 } //init
 
@@ -289,15 +301,51 @@ exports.get_path_binary_name_source = function(flow, prepared) {
 } //get_path_binary_name_source
 
 
-exports.prepare = function prepare(flow, project, build_config) {
+exports.prepare = function prepare(flow) {
 
-    return _prepare.prepare(flow, project, build_config);
+    return _prepare.prepare(flow);
 
 } //exports.prepare
 
-exports.bake = function bake(flow, project, build_config) {
 
-    return _bake.bake(flow, project, build_config);
+exports.do_prepare = function(flow) {
+
+    if(flow.project.prepared) {
+        return;
+    }
+
+    flow.quiet.prepare = true;
+    flow.quiet.project = true;
+
+    var project = flow.project.verify(flow);
+
+        //if no valid project was found
+    if(!project.parsed) {
+        return internal._error_project(flow, project.reason);
+    }
+
+    flow.project.parsed = project.parsed;
+    flow.project.path = project.path;
+    flow.project.file = project.file;
+
+    flow.project.prepare(flow);
+
+} //do_prepare
+
+internal._error_project = function(flow, reason){
+
+    if(reason && reason.length > 0) {
+        return 'project file error \n\n > ' + reason;
+    } else {
+        return 'unknown project error';
+    }
+
+} //_error_project
+
+
+exports.bake = function bake(flow, project) {
+
+    return _bake.bake(flow, project);
 
 } //exports.bake
 
