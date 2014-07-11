@@ -87,7 +87,11 @@ internal.run = function() {
     }
 
     //first check critical flags
-    if(flow.flags._has('version')) {
+    if(!args.length) {
+
+        cmds.usage.run(flow, '');
+
+    } else if(flow.flags._has('version')) {
 
         console.log(flow.version);
 
