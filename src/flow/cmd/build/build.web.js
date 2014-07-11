@@ -7,6 +7,7 @@
 exports.post_build = function(flow, config, done) {
 
     var out_file = path.join(flow.project.paths.output, flow.project.prepared.source.project.app.name);
+    var minified = false;
     var min_code = fs.readFileSync(out_file + '.js', 'utf8');
 
         //minify step
@@ -16,6 +17,7 @@ exports.post_build = function(flow, config, done) {
 
         var result = UglifyJS.minify(min_code, {fromString:true});
         min_code = result.code;
+        minified = true;
 
         flow.log(2, 'build - uglifying - ok');
 
@@ -27,10 +29,11 @@ exports.post_build = function(flow, config, done) {
         flow.log(2, 'build - crushing js output');
         min_code = jscrush( min_code );
         flow.log(2, 'build - crushing - ok');
+        minified = true;
 
     }
 
-    if(min_code) {
+    if(minified) {
         flow.log(2, 'build - writing js min output %s', out_file+'.min.js');
         fs.writeFileSync(out_file+'.min.js', min_code, 'utf8');
     }
