@@ -49,7 +49,9 @@ var internal = {};
 
                 internal.parse_versions();
 
-                if(done) done();
+                if(done) {
+                    done();
+                }
 
             });
 
@@ -67,7 +69,9 @@ var internal = {};
 
     exports.version = function version(flow, name, ver) {
 
+
         if(libs[name]) {
+            flow.log(3, libs[name].versions);
             return libs[name].versions[ver];
         } else {
             return null;
@@ -99,7 +103,7 @@ var internal = {};
     exports.path = function path(flow, name, version) {
 
             //current if none specified
-        version = version = "*";
+        version = version || "*";
 
         flow.log(3, 'haxelib get path for %s(%s)', name, version );
 
