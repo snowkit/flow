@@ -6,6 +6,10 @@
             "output" : "bin",
             "title" : "flow app",
             "codepaths" : [ "src" ],
+            "web" : {
+                "libs" : {
+                }
+            },
             "mobile" : {
                 "fullscreen" : true,
                 "orientation" : "landscape",
