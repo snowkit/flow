@@ -24,8 +24,8 @@
             "open_delay" : 300
         },
         "windows" : {
-            "binary_source_name" : "{{app.boot}}.exe",
-            "binary_dest_name" : "{{app.name}}.exe"
+            "binary_source_name" : "{{app.boot}}{{app.debugtag}}.exe",
+            "binary_dest_name" : "{{app.name}}{{app.debugtag}}.exe"
         },
         "android" : {
             "sdk" : "/Users/sven/dev/android-sdk",
