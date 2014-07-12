@@ -14,8 +14,8 @@
 
   options :
     --all
-      removes ALL folders inside of the app output path.
-      for example, by default, this would delete (project)/bin entirely.
+        removes ALL folders inside of the app output path.
+        for example, by default, this would delete (project)/bin entirely.
 
 
   examples :

@@ -10,8 +10,8 @@
   options :
 
     --launch-wait <time in seconds>   
-      a time in seconds to wait before actually launching the build. on desktop and mobile this is 0, ignored,
-      and on web it is set to 0.3s in order to allow the internal web server to start up first.
+        a time in seconds to wait before actually launching the build. on desktop and mobile this is 0, ignored,   
+        and on web it is set to 0.3s in order to allow the internal web server to start up first.
 
     target specific options:
 
@@ -21,16 +21,16 @@
           at http://localhost:port, and automatically open your browser to that url for testing.
 
           --port <12345>   
-            override the port on which to host the launched application
+              override the port on which to host the launched application
 
           --no-launch   
-            suppress the default of opening the web page once the server starts
+              suppress the default of opening the web page once the server starts
 
           --no-server   
-            suppress the default of launching a web server to run the app. see --url below
+              suppress the default of launching a web server to run the app. see --url below
 
           --url   
-            specify a url to launch instead of the default http://localhost:<port>
+              specify a url to launch instead of the default http://localhost:<port>
 
         mobile :
 
@@ -42,7 +42,7 @@
 
           android :
 
-            *todo*   
+                *todo*   
             --logcat-include 'some, VALUES:I, hide:S'
                 there are plenty of good defaults, and this is configurable from the flow file,
                 but this allows appending additional filters, for example when temporarily testing.
