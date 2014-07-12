@@ -10,6 +10,6 @@
     `flow usage files`   
     `flow usage launch`   
 
-  examples :
-    `flow run`
+  examples :   
+    `flow run`   
     `flow run web --port 6000`
