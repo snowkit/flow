@@ -64,11 +64,14 @@ exports.run = function(flow, done) {
         // no need to log it again.
     if(flow.timing) console.time('build - haxe');
 
-    internal.build_haxe(flow, hxml_file, function(err, out) {
+    internal.build_haxe(flow, hxml_file, function(code, out, err) {
 
         if(flow.timing) console.timeEnd('build - haxe');
 
-        if(err || out.indexOf('Aborted') != -1) {
+        var outerr = out.indexOf('Aborted') != -1;
+        var errerr = err.indexOf('Aborted') != -1;
+
+        if(code || outerr || errerr) {
             flow.log(1,'\n build - stopping because of errors in haxe compile \n');
             return flow.project.failed = true;
         }
