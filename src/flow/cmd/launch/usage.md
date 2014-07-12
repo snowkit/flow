@@ -7,7 +7,7 @@
 
   `launch` will install the application as well, where applicable (like mobile). See the options to suppress this.
 
-  options :
+  options
 
     --launch-wait <time in seconds>   
         a time in seconds to wait before actually launching the build. on desktop and mobile this is 0, ignored,   
@@ -15,7 +15,7 @@
 
     target specific options:
 
-        web :
+        web
 
           on web, the launch command will host your application for you, running against a no-cache enabled node.js web server,
           at http://localhost:port, and automatically open your browser to that url for testing.
@@ -32,7 +32,7 @@
           --url   
               specify a url to launch instead of the default http://localhost:<port>
 
-        mobile :
+        mobile
 
           --no-launch   
               only install on the device, will not try to launch it
@@ -40,7 +40,7 @@
           --no-install   
               will only launch any existing app on the device. useful for quicker iteration
 
-          android :
+          android
 
                 *todo*   
             --logcat-include 'some, VALUES:I, hide:S'

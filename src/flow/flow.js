@@ -92,9 +92,14 @@ internal.run = function() {
 
         cmds.usage.run(flow, '');
 
-    } else if(flow.flags._has('version') && args.length == 1) {
+    } else if((flow.flags._has('version') && args.length < 3) || flow.flags.version && args.length < 3) {
 
-        console.log(flow.version);
+        if(!flow.flags.json) {
+            console.log(flow.version);
+        } else {
+                //this may be redundant but might change in future
+            console.log(JSON.stringify(flow.version));
+        }
 
     } else if(flow.flags._has('er') && args.length == 1) {
 

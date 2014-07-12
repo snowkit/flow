@@ -10,7 +10,7 @@
     `flow usage files`   
     `flow usage launch`   
 
-  examples :   
+  examples   
 
     `flow run`   
         build, and run the current system as the target

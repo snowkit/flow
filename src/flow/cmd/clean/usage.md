@@ -12,13 +12,14 @@
 
   PLEASE TAKE NOTE of the fact this will remove the folders, not store them in trash/recycle bin.
 
-  options :
+  options
     --all
         removes ALL folders inside of the app output path.
         for example, by default, this would delete (project)/bin entirely.
 
 
-  examples :
+  examples
+
     `flow clean`
     `flow clean --all`
     `flow clean web`
