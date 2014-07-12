@@ -215,6 +215,19 @@ internal.cascade_project = function(flow, prepared) {
         //overriding what's already in there on a value basis (not object bases)
     flow.config = util.merge_combine(prepared.source.flow, flow.config);
 
+        //process some specific platform flags that would be easier as accessed from the config root
+        //like, flow.config.build.launch_time instead of if(plat == web etc)
+    var multi_list = ['launch_wait'];
+    for(name in flow.config.build) {
+        if(multi_list.indexOf(name) != -1) {
+            var plat = flow.config.build[flow.target];
+            if(plat && plat[name]) {
+                flow.log(4, 'prepare - moving value of %s to root of flow.config.build. was %s now %s', name, flow.config.build[name], plat[name]);
+                flow.config.build[name] = plat[name];
+            }
+        }
+    }
+
         //plus, we want to handle any aliases that the projects have asked for,
         //so that their final baked project values are what they expect/asked
     if(flow.config.alias) {

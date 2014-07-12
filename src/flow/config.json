@@ -19,9 +19,11 @@
         "binary_dest_path" : "{{paths.output}}",
         "files_dest_path" : "{{paths.output}}",
 
+        "launch_wait" : 0,
+
         "web" : {
             "port" : 40404,
-            "open_delay" : 300
+            "launch_wait" : 0.3
         },
         "windows" : {
             "binary_source_name" : "{{app.boot}}{{app.debugtag}}.exe",
