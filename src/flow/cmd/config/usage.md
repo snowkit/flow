@@ -4,11 +4,15 @@ Configures the flow defaults on a system wide scale.
 When [value] is not given, the leaf value will be printed.
 When [value] is set, it will be stored in a user config file.
 
+If leaf is an object (not a leaf value), without --list, an error is generated.
+For example, `flow config build.web` would be { port:40404 }, and `flow config build.web.port` is 40404.
+The first is an error, as this is a leaf, not a leaf value.
+
 options
 
   --list (see examples below)
-    when used against a single leaf node, print all values in the leaf
-    when used against no leaf node, print the entire config that would be used
+      when used against a leaf node, print all values in the leaf
+      when used against no leaf node, print the entire config that would be used
 
 notes
 
@@ -36,13 +40,13 @@ notes
 
   There are quite a few system level values that are required to be set, which `flow setup` will process and handle for you (like the flow config build.android.[sdk, ant] paths).
 
-  Important ; The value you are trying to set must be a value, not a leaf node of the config itself.
-    In other words, flow config build { some:json, value:here } is invalid.
+  Important ; The value you are trying to set must be a value node, not a leaf node of the config.
+    In other words, `flow config build { some:json, value:here }` is invalid.
 
 examples
 
-    `flow config build --list`
-      print the list of options in the build leaf
+    `flow config build.web --list`
+      print the list of options in the `build.web` leaf
 
     `flow config --list`
       print the entire flow config as it would be used

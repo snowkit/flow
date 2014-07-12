@@ -20,13 +20,79 @@ exports.array_union = function(a,b) {
     return r;
 }
 
+exports.find_home_path = function(flow) {
+
+    return process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
+
+} //find_home_path
+
 exports.array_diff = function(a,b) {
+
     return a.filter(function(i) {return b.indexOf(i) < 0;});
-}
+
+} //array_diff
+
+  //takes a 'object' and 'object.property.sub.value' and returns the value or undefined
+exports.find_property = function(flow, obj, property) {
+
+  var parts = property.split('.');
+  var current = obj;
+
+  for(index in parts) {
+
+    var part = parts[index];
+
+    if(!current) {
+        break;
+    }
+
+    current = current[part];
+
+  } //index in parts
+
+  return current;
+
+} //find_property
+
+
+    //takes a 'object' and 'object.property.sub.value' and 'value', and sets the value returning the object
+exports.set_property = function(flow, obj, property, value) {
+
+    var parts = property.split('.');
+    var parent = obj;
+    var current = obj;
+    var is_last = false;
+
+    for(index in parts) {
+
+        is_last = (index == String(parts.length-1));
+
+        var part = parts[index];
+        current = current[part];
+
+        if(!current && !is_last) {
+            current = {}
+            parent[part] = current;
+        } else {
+            if(is_last) {
+                current = value;
+                parent[part] = current;
+            }
+        }
+
+        parent = current;
+
+    } //index in parts
+
+  return obj;
+
+} //set_property
 
 exports.deep_copy = function deep_copy(obj) {
+
   return JSON.parse(JSON.stringify(obj));
-}
+
+} //deep_copy
 
 exports.normalize = function(_path, _folder) {
     //normalize removes .. . // \\ and such

@@ -4,6 +4,9 @@
         , project = require('./project/project')
         , haxelib = require('./util/haxelib')
         , util = require('./util/util')
+        , path = require('path')
+        , fs = require('graceful-fs')
+        , fse = require('fs-extra')
 
 
 //initial setup
@@ -41,7 +44,11 @@ var flow = {
             }
             console.log.apply(console, args);
         }
+    },
+    save_user_config : function() {
+        internal.save_user_config(this);
     }
+
 };
 
 //main command processing, called after haxelib
@@ -75,6 +82,41 @@ internal.run = function() {
 
 } //run
 
+internal.user_config_path = function(flow) {
+
+    var home = util.normalize(util.find_home_path(flow), true);
+    var config_file = '.flow.config.json';
+    var abs_config = util.normalize( path.join(home, config_file) );
+
+    return abs_config;
+
+} //user_config_path
+
+internal.get_user_config = function(flow) {
+
+    var conf;
+
+    if(fs.existsSync(flow.user_config_path)) {
+        flow.log(2, 'found custom config at %s', flow.user_config_path);
+        var content = fs.readFileSync(flow.user_config_path, 'utf8');
+        try {
+            conf = JSON.parse(content);
+        } catch(e) {
+            console.log('error in user config file :');
+            throw e;
+        }
+    }
+
+    return conf;
+
+} //get_user_config
+
+internal.save_user_config = function(flow) {
+
+    fse.ensureFileSync(flow.user_config_path);
+    fs.writeFileSync(flow.user_config_path, JSON.stringify(flow.user_config,null,'    '), 'utf8');
+
+} //save_user_config
 
 //entry point
 
@@ -106,6 +148,12 @@ internal.run = function() {
         require('./util/er').er();
 
     } else {
+
+            //read any potential user config on top of the
+            //existing config values, as these override defaults
+        flow.user_config_path = internal.user_config_path(flow);
+        flow.user_config = internal.get_user_config(flow);
+        flow.config = util.merge_combine( flow.user_config, flow.config );
 
             //start with initing the project state values
         if(!flow.project.init(flow)) {
