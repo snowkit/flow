@@ -8,6 +8,7 @@ exports.clean = require('./clean/clean');
 exports.package = require('./package/package');
 exports.setup = require('./setup/setup');
 exports.files = require('./files/files');
+exports.config = require('./config/config');
 
 //special
 
