@@ -25,6 +25,7 @@ exports.init = function init(flow) {
         flow.flags._next('build') ||
         flow.flags._next('launch') ||
         flow.flags._next('run') ||
+        flow.flags._next('files') ||
         flow.flags._next('package') ||
         flow.flags._next('clean') ||
         flow.system;

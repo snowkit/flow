@@ -12,16 +12,24 @@ exports.run = function run(flow, files) {
 
         //copy local project + build files
 
-    flow.log(2, 'files - copying project assets to %s', flow.project.paths.files);
-    flow.log(3,'');
+        var ignore_files = (flow.flags.files === false);
 
-        var projectfiles = internal.copy_files(flow, files.project_files, flow.project.paths.files);
+        if(!ignore_files) {
+            flow.log(2, 'files - copying project assets to %s', flow.project.paths.files);
+            flow.log(3,'');
+        }
 
-    flow.log(3,'');
-    flow.log(2, 'files - copying build files to %s', flow.project.paths.build);
-    flow.log(3,'');
+        var projectfiles = internal.copy_files(flow, files.project_files, flow.project.paths.files, ignore_files);
 
-        var buildfiles = internal.copy_files(flow, files.build_files, flow.project.paths.build);
+        var ignore_build_files = (flow.flags['build-files'] === false);
+
+        if(!ignore_build_files) {
+            flow.log(3,'');
+            flow.log(2, 'files - copying build files to %s', flow.project.paths.build);
+            flow.log(3,'');
+        }
+
+        var buildfiles = internal.copy_files(flow, files.build_files, flow.project.paths.build, ignore_build_files);
 
         //clean up the list of files by their destination
     projectfiles.map(function(_path, i){
@@ -106,7 +114,7 @@ exports.verify = function verify(flow, done) {
 
 } //verify
 
-internal.copy_files = function(flow, files, output) {
+internal.copy_files = function(flow, files, output, no_copy) {
 
     var copied_list = [];
 
@@ -118,25 +126,33 @@ internal.copy_files = function(flow, files, output) {
                 var node = files[index];
                 var dest = util.normalize(path.join(output, node.dest));
 
-                if(node.template) {
+                if(!no_copy) {
 
-                    flow.log(3, '   copying with template %s from %s to %s%s', node.template, node.source, output, node.dest);
+                    if(node.template) {
 
-                    var res = internal.template_path(flow, node, dest);
+                        flow.log(3, '   copying with template %s from %s to %s%s', node.template, node.source, output, node.dest);
 
-                    if(!node.not_listed) {
-                        copied_list = copied_list.concat( res );
+                        var res = internal.template_path(flow, node, dest);
+
+                        if(!node.not_listed) {
+                            copied_list = copied_list.concat( res );
+                        }
+
+                    } else {
+
+                        flow.log(3, '   copying %s to %s%s', node.source, output, node.dest);
+
+                        var res = util.copy_path(flow, node.source, dest);
+
+                        if(!node.not_listed) {
+                            copied_list = copied_list.concat( res );
+                        }
                     }
 
-                } else {
+                } else {//no_copy
 
-                    flow.log(3, '   copying %s to %s%s', node.source, output, node.dest);
+                    copied_list.push( dest );
 
-                    var res = util.copy_path(flow, node.source, dest);
-
-                    if(!node.not_listed) {
-                        copied_list = copied_list.concat( res );
-                    }
                 }
 
             } //each project file
