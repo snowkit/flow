@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <link rel="shortcut icon" href="images/favicon.png" />
+
+        <link rel="stylesheet" type="text/css" href="../css/style.css" media="all">
+        <link rel="stylesheet" type="text/css" href="../css/font.css" media="all">
+
+        <script src="../js/jquery-2.0.3.min.js"> </script>
+
+    </head>
+
+    <body>
+        <div class="content">
+            <h2>flow - setup helper - requirements</h2>
+            <hr/>
+
+            <a href="../">home</a>
+
+            <br/>
+            <br/>
+            <span class="text">Some platforms have post requirements, which are listed on the index page as step two.</span> <br/>
+            <span class="text-small">If you already have any of the requirements installed, you can skip to the next step.</span>
+
+    <!-- Mac -->
+
+            <br/><br/><br/>
+            <h3><a name="mac">mac</a> and <a name="ios">ios</a> target requirements</h3>
+
+            <hr/>
+            <br/>
+
+            <div class="icon"><img src="./images/xcode.png"/></div>
+            <a target="_blank" class="item" href="https://developer.apple.com/xcode/">Xcode</a> <br/><br/>
+                <span class="desc"> Xcode is a free development environment provided by Apple for Mac. <br/> </span>
+                <span class="desc"> You need version 4 or 5 installed as well as the <a target="_blank" href="https://developer.apple.com/xcode/downloads/">command line tools</a>. </span>
+
+            <br/>
+            <br/>
+
+    <!-- Linux -->
+
+            <br/><a name="linux"></a>
+            <h3>linux target requirements</h3>
+
+            <hr/>
+            <br/>
+
+            <a class="item" href="">GCC / G++</a> <br/><br/>
+                <span class="desc"> To build native applications on linux you need a gcc/g++ install using the method that best suites your distro.<br/></span>
+                <br/>
+
+            <br/>
+            <h4>distro specific suggestions</h4>
+            <hr/>
+
+            <div class="icon"><img src="./images/ubuntu.png"/></div>
+            <a class="item_small" href="">Ubuntu</a> <br/><br/>
+                <span class="desc"> <code>apt-get</code> can be used to install the requirements using the following commands in the terminal <br/> <br/> 
+
+                    <strong>Ubuntu 12~14</strong> <br/>
+                    <code>sudo apt-get install gcc-multilib g++-multilib libxext-dev</code>
+
+                </span>
+
+            <br/>
+            <br/>
+            <hr/>
+
+            <br/>
+
+    <!-- Windows -->
+
+            <br/><a name="windows"></a>
+            <h3>windows target requirements</h3>
+            <hr/>
+            <br/>
+
+            <div class="icon"><img src="./images/visual_cpp.png"/></div>
+            <a target="_blank" class="item" href="http://download.microsoft.com/download/1/D/9/1D9A6C0E-FC89-43EE-9658-B9F0E3A76983/vc_web.exe">Visual C++</a> <br/><br/>
+                <span class="desc"> Visual C++ is a development environment provided by Microsoft for Windows. <br/> </span>
+                <span class="desc"> You need 2010 C++ or higher, the link above is for Visual C++ Express 2010. </span>
+
+            <br/>
+            <br/>
+            <hr/>
+
+    <!-- Android -->
+
+            <br/><a name="android"></a>
+            <h3>android target requirements</h3>
+            <hr/>
+            <br/>
+
+            <div class="icon"><img src="./images/android.png"/></div>
+            <a target="_blank" class="item" href="http://developer.android.com/sdk/index.html">Android SDK</a> <br/><br/>
+                <span class="desc"> You only need the SDK Tools, as long as you know the path to the SDK. <br/>
+                You need to manually install target platforms you want to target, <br/>documented in the Android SDK, available by running the android sdk manager.</span>
+                <br/><br/>
+            <a target="_blank" class="item" href="https://developer.android.com/tools/sdk/ndk/index.html">Android NDK</a> <br/><br/>
+                <span class="desc"> Since android applications are often built as native applications, the NDK install is a good idea. <br/></span>
+
+            <br/>
+            <br/>
+            <hr/>
+
+    <!-- Web -->
+
+            <br/><a name="web"></a>
+            <h3>web target requirements</h3>
+            <hr/>
+
+            <span class="text">When building against the web target, there is no setup required.</span>
+
+            <br/>
+            <br/>
+
+            <span class="text-small">You can skip to the next step.</span>
+
+            <br/>
+            <hr/>
+
+        </div>
+    </body>
+
+</html>
