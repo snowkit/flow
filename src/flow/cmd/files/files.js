@@ -48,6 +48,14 @@ exports.run = function run(flow, files) {
     flow.project.prepared.files.build_files_output = buildfiles;
 
 
+        //write out the asset list
+        if(flow.timing) console.time('files - write files list');
+
+    internal.write_files_list(flow);
+
+        if(flow.timing) console.timeEnd('files - write files list');
+
+
     flow.log(3,'');
     flow.log(3,'files - done');
     flow.log(3,'');
@@ -99,7 +107,9 @@ exports.verify = function verify(flow, done) {
 
     } //index in prepared build files
 
-    if(flow.config.build.files_error_on_missing) {
+    var err_on_missing = flow.flags['error-on-missing'] || flow.config.build.files_error_on_missing;
+
+    if(err_on_missing) {
         if(warning) {
             err = warning;
             flow.project.failed = true;
@@ -113,6 +123,31 @@ exports.verify = function verify(flow, done) {
     done(err, { project_files:final_project_files, build_files:final_build_files });
 
 } //verify
+
+
+internal.write_files_list = function(flow) {
+
+    if(flow.flags.list !== false) {
+
+        var out_name = flow.flags['list-name'] || flow.config.build.files_output_list_name;
+
+        if(flow.config.build.files_output_list) {
+
+            var output_path = path.join(flow.project.paths.files, out_name);
+                output_path = util.normalize(output_path);
+
+            flow.log(2, 'files - writing file list to ' + output_path);
+
+            var output = JSON.stringify(flow.project.prepared.files.project_files_output);
+
+            fs.writeFileSync(output_path, output, 'utf8');
+
+        } //if config
+
+    } //no list
+
+} //write_files_list
+
 
 internal.copy_files = function(flow, files, output, no_copy) {
 
@@ -274,8 +309,9 @@ internal._missing_warning = function(flow, msg, type) {
         level = 1;
     }
 
-    flow.log(level, '\n    %s', type);
-    flow.log(level, '      failed to find some files list in project tree!\n');
+    console.log('');
+    flow.log(level, '%s', type);
+    flow.log(level, 'failed to find some files list in project tree!\n');
     flow.log(level, '%s', msg);
 
 } //_missing_warning

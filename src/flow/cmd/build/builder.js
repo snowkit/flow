@@ -52,13 +52,6 @@ exports.run = function(flow, done) {
 
         if(flow.timing) console.timeEnd('build - write hxml');
 
-        //write out the asset list
-        if(flow.timing) console.time('build - write files list');
-
-    internal.write_files_list(flow);
-
-        if(flow.timing) console.timeEnd('build - write files list');
-
         //then run the haxe build stage, if it fails, early out
         //but since the console will be logging the output from haxe,
         // no need to log it again.
@@ -177,21 +170,4 @@ internal.write_hxml = function(flow, write_to) {
 
 } //write_hxml
 
-
-internal.write_files_list = function(flow) {
-
-    if(flow.config.build.files_output_list) {
-
-        var output_path = path.join(flow.project.paths.files, flow.config.build.files_output_list_name);
-            output_path = util.normalize(output_path);
-
-        flow.log(3, 'build - writing file list to ' + output_path);
-
-        var output = JSON.stringify(flow.project.prepared.files.project_files_output);
-
-        fs.writeFileSync(output_path, output, 'utf8');
-
-    } //if config
-
-} //write_files_list
 
