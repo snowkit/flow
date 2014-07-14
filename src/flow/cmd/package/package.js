@@ -2,11 +2,16 @@ var   fs = require('graceful-fs')
     , path = require('path')
     , archiver = require('archiver')
     , prettysize = require('prettysize')
+    , moment = require('moment')
  
 var internal = {
     valid_formats : ['zip', 'tar'],
     extensions : { zip:'zip', tar:'tar.gz' }
 };
+
+internal.date_string = function() {
+    return moment().format('DD.MMMM.YYYY-HH.mm.ss').toLowerCase();
+}
 
 exports.run = function run(flow, data) {
 
@@ -21,7 +26,7 @@ exports.run = function run(flow, data) {
 
     var extension = internal.extensions[internal.format];
 
-    var outfile = path.join(flow.project.parsed.project.app.output, flow.target + '.package');
+    var outfile = path.join(flow.project.parsed.project.app.output, flow.target + '.' + internal.date_string());
         outfile = flow.flags['archive-name'] || outfile;
 
     var out_file = outfile + '.' + extension;

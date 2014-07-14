@@ -13,7 +13,8 @@
     --archive-name <target/path/packagename>   
         Specify where to, and what to call the package file. Extension is automatically appended based on `--archive`.  
         Relative to your project root, or an absolute path.   
-        defaults to `(project output)/(target).package(.extension)
+        defaults to `(project output)/(target).(date-time).ext
+        an example of the default formatting - web.01.july.2014-23.12.04.zip
 
     --archive-root <subfolder>   
         specify the sub folder within the archive in which to store the contents.   

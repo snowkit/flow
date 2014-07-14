@@ -23,6 +23,7 @@
     "jscrush" : "latest",
     "json-gate" : "~0.8.2",
     "prettysize" : "~0.0.3",
+    "moment" : "~2.7.0",
     "archiver" : "~0.10.1"
   }
 }
