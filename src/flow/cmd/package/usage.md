@@ -6,18 +6,15 @@
 
   options
 
-      *todo* currently only zip   
     --archive <tar, zip>   
         specify the format of the archive. default is zip.
         usage shows zip extension, but extension will vary by chosen format
 
-      *todo* currently put it in project output/   
-    --output <target/path/>   
-        specify where to put the package. Relative to your project root, or an absolute path.   
-        defaults to `(project output)/`   
-        currently the package is named `(target).bin.zip` which will be configurable soon   
+    --archive-name <target/path/packagename>   
+        Specify where to, and what to call the package file. Extension is automatically appended based on `--archive`.  
+        Relative to your project root, or an absolute path.   
+        defaults to `(project output)/(target).package(.extension)
 
-      *todo* not implemented   
     --archive-root <subfolder>   
         specify the sub folder within the archive in which to store the contents.   
         for example, on windows, a bin/windows/*.* would be stored inside `(archive)/flowapp.exe` etc   
@@ -25,4 +22,4 @@
 
   examples   
 
-    `flow package web --archive-root 'myapp' --output '/builds/`
+    `flow package web --archive-root 'myapp' --output 'builds/package`
