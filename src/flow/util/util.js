@@ -175,6 +175,13 @@ exports.openurl = function(flow, url) {
 
 } //openurl
 
+exports.launch_server = function(flow, port, serve_path) {
+
+    var node = flow.bin_path;
+    cmd.exec(flow, node, [ flow.server_path, "-c-1", "-p", port], { cwd: serve_path });
+
+} //launch_server
+
 //file stuff
 
 exports.copy_path = function(flow, source, dest) {

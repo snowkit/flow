@@ -22,8 +22,6 @@ exports.launch = function(flow) {
             url = flag_url;
         }
 
-    var server_path = path.join( flow.flow_path, 'tools/http-server/http-server');
-
     if(flow.flags.launch !== false) {
 
             flow.log(2, 'launch at %s, after %ds', url, launch_wait);
@@ -39,9 +37,13 @@ exports.launch = function(flow) {
     }
 
     if(flow.flags.server !== false) {
-        cmd.exec(flow, node, [server_path, "-c-1", "-p", port], { cwd: abs_outpath });
+
+        util.launch_server(flow, port, abs_outpath);
+
     } else {
+
         flow.log(2, 'launch - web - not running node-http because of --no-server');
+
     }
 
 } //launch

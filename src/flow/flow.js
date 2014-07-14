@@ -151,6 +151,7 @@ internal.save_user_config = function(flow) {
 
             //read any potential user config on top of the
             //existing config values, as these override defaults
+        flow.server_path = path.join( flow.flow_path, 'tools/http-server/http-server');
         flow.user_config_path = internal.user_config_path(flow);
         flow.user_config = internal.get_user_config(flow);
         flow.config = util.merge_combine( flow.user_config, flow.config );

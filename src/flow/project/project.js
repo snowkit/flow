@@ -28,6 +28,7 @@ exports.init = function init(flow) {
         flow.flags._next('files') ||
         flow.flags._next('package') ||
         flow.flags._next('clean') ||
+        flow.flags._next('setup') ||
         flow.system;
 
     flow.target_arch = flow.project.find_arch(flow);

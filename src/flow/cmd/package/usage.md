@@ -7,13 +7,13 @@
   options
 
     --archive <tar, zip>   
-        specify the format of the archive. default is zip.
+        specify the format of the archive. default is zip.   
         usage shows zip extension, but extension will vary by chosen format
 
     --archive-name <target/path/packagename>   
         Specify where to, and what to call the package file. Extension is automatically appended based on `--archive`.  
         Relative to your project root, or an absolute path.   
-        defaults to `(project output)/(target).(date-time).ext
+        defaults to `(project output)/(target).(date-time).ext   
         an example of the default formatting - web.01.july.2014-23.12.04.zip
 
     --archive-root <subfolder>   
