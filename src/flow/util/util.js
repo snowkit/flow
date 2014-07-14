@@ -175,10 +175,21 @@ exports.openurl = function(flow, url) {
 
 } //openurl
 
-exports.launch_server = function(flow, port, serve_path) {
+exports.launch_server = function(flow, port, serve_path, silent, directories) {
 
     var node = flow.bin_path;
-    cmd.exec(flow, node, [ flow.server_path, "-c-1", "-p", port], { cwd: serve_path });
+    var args = [ flow.server_path, "-c-1", "-p", port ];
+
+    if(silent) {
+        args.push('-s');
+    }
+
+    if(directories) {
+        args.push('-d');
+        args.push('true');
+    }
+
+    cmd.exec(flow, node, args, { cwd: serve_path });
 
 } //launch_server
 
