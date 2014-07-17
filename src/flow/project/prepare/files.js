@@ -1,7 +1,7 @@
 
 var   defines = require('./defines')
     , path = require('path')
-
+    , bars = require('handlebars')
 
 var internal = {};
 
@@ -22,6 +22,10 @@ exports.parse = function parse(flow, prepared, source, srcpath) {
 
     var project_root = flow.project.parsed.__root;
     var project_out = flow.project.paths.output;
+
+        //now, we template the paths context into the list so that things like {{app.name}} resolve out into a path
+    project_file_list = internal.template_nodes(flow, project_file_list);
+    build_file_list = internal.template_nodes(flow, build_file_list);
 
         //make sure this file is within the bounds of the project + dependency scope
         //as well as append the given source path (i.e dependency abs file)
@@ -50,6 +54,28 @@ exports.parse = function parse(flow, prepared, source, srcpath) {
 
 } //parse
 
+
+internal.template_path = function(flow, path_node, context) {
+    var template = bars.compile(path_node);
+    var result = template(context);
+    return util.normalize(result);
+}
+
+internal.template_nodes = function(flow, list) {
+
+    return list.map(function(file){
+
+        file.dest_value = file.dest;
+        file.source_value = file.source;
+
+        file.source = internal.template_path(flow, file.source, flow.project.path_context );
+        file.dest = internal.template_path(flow, file.dest, flow.project.path_context );
+
+        return file;
+
+    });
+
+} //template_path
 
 internal.append_source = function(flow, list, srcpath) {
 

@@ -108,6 +108,9 @@ internal.prepare_config_paths = function(flow, prepared) {
         path_context.app.archtag = '-v7';
     }
 
+        //store for use later against files etc
+    flow.project.path_context = path_context;
+
     var list = ['binary_source_name','binary_dest_name', 'binary_dest_path', 'files_dest_path'];
 
     for(name in flow.config.build) {

@@ -276,8 +276,19 @@ internal.template_file = function(flow, _template, _source, _dest) {
         //as well as allowing multiple contexts side by side
     var real_context = {
         debug : flow.flags.debug || false,
+        arch : flow.target_arch,
+        archtag : '',
+        debugtag : '',
         flow : { config : flow.config }
     };
+
+    if(flow.flags.debug) {
+        real_context.debugtag = '-debug';
+    }
+
+    if(flow.target_arch == 'armv7') {
+        real_context.archtag = '-v7';
+    }
 
     for(index in templates) {
         var templ = templates[index];
