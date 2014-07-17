@@ -7,6 +7,36 @@
 
     if:{
 
+        "ios && arch-armv7 && !static_link" : {
+          build : {
+            files : {
+              libregexp : { path:"bin/IPhone/libregexp.iphoneos-v7.a => project/{{app.name}}/libs/armv7/libregexp.a" },
+              libstd : { path:"bin/IPhone/libstd.iphoneos-v7.a => project/{{app.name}}/libs/armv7/libstd.a" },
+              libzlib : { path:"bin/IPhone/libzlib.iphoneos-v7.a => project/{{app.name}}/libs/armv7/libzlib.a" }
+            }
+          }
+        },
+
+        "ios && arch-armv6 && !static_link" : {
+          build : {
+            files : {
+              libregexp : { path:"bin/IPhone/libregexp.iphoneos.a => project/{{app.name}}/libs/armv7/libregexp.a" },
+              libstd : { path:"bin/IPhone/libstd.iphoneos.a => project/{{app.name}}/libs/armv7/libstd.a" },
+              libzlib : { path:"bin/IPhone/libzlib.iphoneos.a => project/{{app.name}}/libs/armv7/libzlib.a" }
+            }
+          }
+        },
+
+        "ios && iossim && !static_link" : {
+          build : {
+            files : {
+              libregexp : { path:"bin/IPhone/libregexp.iphonesim.a => project/{{app.name}}/libs/armv7/libregexp.a" },
+              libstd : { path:"bin/IPhone/libstd.iphonesim.a => project/{{app.name}}/libs/armv7/libstd.a" },
+              libzlib : { path:"bin/IPhone/libzlib.iphonesim.a => project/{{app.name}}/libs/armv7/libzlib.a" }
+            }
+          }
+        },
+
         "android && arch-armv7 && !static_link" : {
           build : {
             files : {

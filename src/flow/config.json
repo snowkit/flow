@@ -37,8 +37,8 @@
             "project" : "project",
             "binary_source_name" : "{{app.boot}}{{app.debugtag}}.iphoneos{{app.archtag}}.a",
             "binary_dest_name" : "lib{{app.name}}{{app.debugtag}}.a",
-            "binary_dest_path" : "{{paths.build}}/{{paths.ios.project}}/libs/{{app.arch}}{{app.debugtag}}",
-            "files_dest_path" : "{{paths.build}}/{{paths.ios.project}}/assets"
+            "binary_dest_path" : "{{paths.build}}/{{paths.ios.project}}/{{app.name}}/libs/{{app.arch}}{{app.debugtag}}",
+            "files_dest_path" : "{{paths.build}}/{{paths.ios.project}}/{{app.name}}/assets"
         },
         "android" : {
             "sdk" : "/Users/sven/dev/android-sdk",
