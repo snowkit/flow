@@ -9,10 +9,11 @@ exports.run = function run(flow, data) {
     flow.log(2, 'press ctrl-c to end this process');
 
         //setup will launch a local web server to run the setup
+    var port = 40444;
     var setup_content = path.join( __dirname, 'setup/');
-    var url = 'http://localhost:40404';
+    var url = 'http://localhost:' + port;
 
-    util.launch_server(flow, 40404, setup_content, true);
+    util.launch_server(flow, port, setup_content, true);
 
     setTimeout(function() {
 
