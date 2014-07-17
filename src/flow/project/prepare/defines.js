@@ -165,7 +165,7 @@ internal.resolve_multi = function(flow, defines_all, tokenized) {
     }
 
         //for each step in the condition, we have a final resulting value of true or false
-    var state = false;
+    var state = true;
 
     for(index in tokenized) {
 
@@ -191,9 +191,9 @@ internal.resolve_multi = function(flow, defines_all, tokenized) {
             var nextmet = next.inverse ? !nextdef.met : nextdef.met;
 
             if(tokened.as == '||') {
-                state = state || (curmet || nextmet);
+                state = state && (curmet || nextmet);
             } else if(tokened.as == '&&') {
-                state = state || (curmet && nextmet);
+                state = state && (curmet && nextmet);
             }
 
         } else {
