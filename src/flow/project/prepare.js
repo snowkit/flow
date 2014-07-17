@@ -82,6 +82,7 @@ internal.prepare_config_paths = function(flow, prepared) {
 
     flow.project.paths = {
         android : { project : flow.config.build.android.project },
+        ios : { project : flow.config.build.ios.project },
         output : flow.project.get_path_output(flow, prepared),
         build : flow.project.get_path_build(flow, prepared)
     }
@@ -90,6 +91,7 @@ internal.prepare_config_paths = function(flow, prepared) {
         //template them against this specific context
     var path_context = {
         app : {
+            arch : flow.target_arch,
             archtag : '',
             debugtag : '',
             boot : flow.config.build.boot,
