@@ -23,16 +23,6 @@ exports.parse = function parse(flow, project) {
             }
         }
 
-        if(project.source.project.build.unless) {
-            for(conditional in project.source.project.build.unless) {
-                var current = project.source.project.build.unless[conditional].flags;
-                if(current) {
-                    if(defines.satisfy(flow, project, 'unless', conditional)){
-                        flags = util.array_union(flags, current);
-                    }
-                }
-            }
-        }
 
     return flags;
 
