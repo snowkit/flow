@@ -94,6 +94,7 @@ internal.prepare_config_paths = function(flow, prepared) {
             arch : flow.target_arch,
             archtag : '',
             debugtag : '',
+            iostag : 'os',
             boot : flow.config.build.boot,
             name : prepared.source.project.app.name
         },
@@ -102,6 +103,10 @@ internal.prepare_config_paths = function(flow, prepared) {
 
     if(flow.flags.debug) {
         path_context.app.debugtag = '-debug';
+    }
+
+    if(flow.flags.sim) {
+        path_context.app.iostag = 'sim';
     }
 
     if(flow.target_arch == 'armv7') {
@@ -443,6 +448,11 @@ internal.prepare_defines = function(flow, prepared) {
         //also store the current target arch as a define
     var arch = 'arch-' + flow.target_arch;
     prepared.defines_all[arch] = { name:arch, met:true };
+
+    if(flow.target == 'ios' && flow.flags.sim) {
+        prepared.defines_all['ios-sim'] = { name:'ios-sim', met:true };
+    }
+
         //and we store "mobile" for convenience
     if(flow.target_mobile) {
         prepared.defines_all['mobile'] = { name:'mobile', met:true };

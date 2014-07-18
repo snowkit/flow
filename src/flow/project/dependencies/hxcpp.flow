@@ -20,19 +20,19 @@
         "ios && arch-armv6 && !static_link" : {
           build : {
             files : {
-              libregexp : { path:"bin/IPhone/libregexp.iphoneos.a => project/{{app.name}}/libs/armv7/libregexp.a" },
-              libstd : { path:"bin/IPhone/libstd.iphoneos.a => project/{{app.name}}/libs/armv7/libstd.a" },
-              libzlib : { path:"bin/IPhone/libzlib.iphoneos.a => project/{{app.name}}/libs/armv7/libzlib.a" }
+              libregexp : { path:"bin/IPhone/libregexp.iphoneos.a => project/{{app.name}}/libs/armv6/libregexp.a" },
+              libstd : { path:"bin/IPhone/libstd.iphoneos.a => project/{{app.name}}/libs/armv6/libstd.a" },
+              libzlib : { path:"bin/IPhone/libzlib.iphoneos.a => project/{{app.name}}/libs/armv6/libzlib.a" }
             }
           }
         },
 
-        "ios && iossim && !static_link" : {
+        "ios && ios-sim && !static_link" : {
           build : {
             files : {
-              libregexp : { path:"bin/IPhone/libregexp.iphonesim.a => project/{{app.name}}/libs/armv7/libregexp.a" },
-              libstd : { path:"bin/IPhone/libstd.iphonesim.a => project/{{app.name}}/libs/armv7/libstd.a" },
-              libzlib : { path:"bin/IPhone/libzlib.iphonesim.a => project/{{app.name}}/libs/armv7/libzlib.a" }
+              libregexp : { path:"bin/IPhone/libregexp.iphonesim.a => project/{{app.name}}/libs/i386/libregexp.a" },
+              libstd : { path:"bin/IPhone/libstd.iphonesim.a => project/{{app.name}}/libs/i386/libstd.a" },
+              libzlib : { path:"bin/IPhone/libzlib.iphonesim.a => project/{{app.name}}/libs/i386/libzlib.a" }
             }
           }
         },

@@ -372,7 +372,9 @@ exports.find_arch = function(flow) {
         //99.9% (guess) of used macs are x64 now,
         //so default to x64. use --arch 32 if you want to force it
     if(flow.target == 'mac') {
-        if(!arch) arch = '64';
+        if(!arch) {
+            arch = '64';
+        }
     }
 
         //default to the host operating system arch on linux
@@ -388,18 +390,27 @@ exports.find_arch = function(flow) {
 
         //default to armv7 on mobile, use --arch armv6 etc to override
     if(flow.target == 'ios' || flow.target == 'android') {
+
+        if(flow.flags.sim) {
+                //force sim arch
+            arch = 'i386';
+        }
+
         if(!arch) {
             arch = 'armv7';
         }
+
     }
 
         //until hxcpp gets x64 support, force 32 bit on windows
     if(flow.target == 'windows') {
+
         if(arch == '64') {
             flow.log(1, 'hxcpp does not support 64 bit on windows at the moment. Please ask at http://github.com/haxefoundation/hxcpp/issues if you would like this to happen.');
         }
             //force 32
         arch = '32';
+
     } //windows
 
     return arch;

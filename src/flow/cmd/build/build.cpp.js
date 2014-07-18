@@ -167,24 +167,27 @@ exports.build_hxcpp = function(flow, run_path, done) {
 
     args.push('-D' + flow.target);
 
-    if(flow.target_cpp){
-        switch(flow.target_arch) {
-            case '64':
-                args.push('-DHXCPP_M64');
-                break;
-            case 'armv6':
-                args.push('-DHXCPP_ARMV6');
-                break;
-            case 'armv7':
-                args.push('-DHXCPP_ARMV7');
-                break;
-            case 'x86':
-                args.push('-DHXCPP_X86');
-                break;
-        }
+    switch(flow.target_arch) {
+        case '64':
+            args.push('-DHXCPP_M64');
+            break;
+        case 'armv6':
+            args.push('-DHXCPP_ARMV6');
+            break;
+        case 'armv7':
+            args.push('-DHXCPP_ARMV7');
+            break;
+        case 'x86':
+            args.push('-DHXCPP_X86');
+            break;
     }
 
     if(flow.target == 'ios') {
+
+        if(flow.flags.sim) {
+            args.push('-Dsimulator');
+        }
+
         args.push('-Diphone');
         args.push('-DHXCPP_CPP11');
         args.push('-DHXCPP_CLANG');
