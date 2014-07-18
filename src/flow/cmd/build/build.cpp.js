@@ -184,6 +184,13 @@ exports.build_hxcpp = function(flow, run_path, done) {
         }
     }
 
+    if(flow.target == 'ios') {
+        args.push('-Diphone');
+        args.push('-DHXCPP_CPP11');
+        args.push('-DHXCPP_CLANG');
+        args.push('-DOBJC_ARC');
+    }
+
     if(flow.target == 'android') {
         args.push('-Dandroid-' + flow.project.parsed.project.app.mobile.android.sdk_target);
     }
