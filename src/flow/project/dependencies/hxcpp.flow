@@ -67,6 +67,18 @@
           }
         },
 
+        "ios": {
+            app : {
+              mobile : {
+                ios : {
+                  libs : {
+                    native : { regexp:'regexp', std:'std', zlib:'zlib' }
+                  }
+                }
+              }
+            }
+        },
+
         "android && !static_link": {
             app : {
               mobile : {
