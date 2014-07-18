@@ -14,6 +14,26 @@ exports.object_size = function(obj) {
     return size;
 };
 
+exports.random_int = function(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
+
+exports.to_hex = function(value) {
+   return (value+0x10000).toString(16).substr(-4).toUpperCase();
+}
+
+exports.ios_uniqueid = function(flow) {
+
+    return ''+
+      exports.to_hex( exports.random_int(0, 32767) ) +
+      exports.to_hex( exports.random_int(0, 32767) ) +
+      exports.to_hex( exports.random_int(0, 32767) ) +
+      exports.to_hex( exports.random_int(0, 32767) ) +
+      exports.to_hex( exports.random_int(0, 32767) ) +
+      exports.to_hex( exports.random_int(0, 32767) );
+
+}
+
 exports.array_union = function(a,b) {
     var r = a.slice(0);
     b.forEach(function(i) { if (r.indexOf(i) < 0) r.push(i); });
