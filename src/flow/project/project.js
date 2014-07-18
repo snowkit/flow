@@ -202,7 +202,7 @@ exports.verify = function verify(flow, project_path, project_root, quiet) {
     }
 
         //then merge any base options from flow defaults into it
-    parsed.project = util.merge_combine(flow.project.defaults.project, parsed.project);
+    parsed.project = util.merge_unique(flow.project.defaults.project, parsed.project);
 
     parsed.__root = project_root;
     parsed.__path = abs_path;
