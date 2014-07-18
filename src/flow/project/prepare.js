@@ -220,6 +220,7 @@ internal.cascade_project = function(flow, prepared) {
         //overriding what's already in there on a value basis (not object bases)
     flow.config = util.merge_combine(prepared.source.flow, flow.config);
 
+
         //process some specific platform flags that would be easier as accessed from the config root
         //like, flow.config.build.launch_time instead of if(plat == web etc)
     var multi_list = ['launch_wait'];
@@ -305,6 +306,14 @@ internal.prepare_project = function(flow, prepared) {
 
             internal.prepare_files(flow, prepared);
 
+    //conditional nodes
+
+            internal.prepare_conditional_nodes(flow, prepared);
+
+    //mobile
+
+            internal.prepare_mobile(flow, prepared);
+
     //user object schema
 
             internal.prepare_schema(flow, prepared);
@@ -314,6 +323,68 @@ internal.prepare_project = function(flow, prepared) {
 
 } //prepare_project
 
+
+internal.prepare_conditional_nodes = function(flow, prepared) {
+
+        //backmerge known conditional nodes against the project itself
+    if(prepared.source.if) {
+        for(condition in prepared.source.if) {
+            if(defines.satisfy(flow, prepared, condition)) {
+
+                var node = prepared.source.if[condition];
+                if(node.app && node.app.mobile) {
+                    if(node.app.mobile.ios) {
+                        prepared.source.project.app.mobile.ios.libs = util.merge_unique(node.app.mobile.ios.libs, prepared.source.project.app.mobile.ios.libs);
+                    }
+                    if(node.app.mobile.android) {
+                        prepared.source.project.app.mobile.android.libs = util.merge_unique(node.app.mobile.android.libs, prepared.source.project.app.mobile.android.libs);
+                    }
+                }
+
+            }
+        }
+    } //each condition
+
+} //prepare_conditional_nodes
+
+internal.prepare_mobile = function(flow, prepared) {
+
+        //now we also handle any platform specifics that might need to be resolved to different values
+        //like orientations or device targets etc
+
+    if(flow.target == 'ios') {
+
+            //handle native libs as these will be registered unless requested not to
+        var libs = prepared.source.project.app.mobile.ios.libs;
+        if(libs) {
+            if(libs.native) {
+                libs._native = {};
+                for(name in libs.native) {
+                    //generate a unique ID for this file reference
+                    libs._native[name] = {
+                        fileRef : util.ios_uniqueid(flow),
+                        nodeRef : util.ios_uniqueid(flow),
+                        name : name
+                    }
+                }
+            }
+        }
+
+            //handle conversion from named device target to enum for project file
+        switch(prepared.source.project.app.mobile.ios.devices) {
+            case 'Universal':
+                prepared.source.project.app.mobile.ios._devices = "1,2";
+            break;
+            case 'iPhone':
+                prepared.source.project.app.mobile.ios._devices = 1;
+            break;
+            case 'iPad':
+                prepared.source.project.app.mobile.ios._devices = 2;
+            break;
+        }
+    }
+
+} //prepare_mobile
 
 internal.prepare_schema = function(flow, prepared) {
 
