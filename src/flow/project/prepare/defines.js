@@ -191,7 +191,7 @@ internal.resolve_multi = function(flow, defines_all, tokenized) {
             var nextmet = next.inverse ? !nextdef.met : nextdef.met;
 
             if(tokened.as == '||') {
-                state = state && (curmet || nextmet);
+                state = state || (curmet || nextmet);
             } else if(tokened.as == '&&') {
                 state = state && (curmet && nextmet);
             }
@@ -261,6 +261,7 @@ internal.resolve_defines = function(flow, defines) {
             if(define.condition) {
                 var condition = conditions.conditions[define.condition];
                 if(condition && condition.length > 1) {
+                    flow.log(4, 'defines - satisfy check', define.condition);
                     define.met = internal.resolve_multi(flow, defines, condition);
                 } //condition.as
             }
