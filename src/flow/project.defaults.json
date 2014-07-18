@@ -1,6 +1,8 @@
 {
     "project" : {
-        "build" : {},
+        "build" : {
+            "number":1
+        },
         "app" : {
             "main" : "Main",
             "output" : "bin",
@@ -13,6 +15,13 @@
             "mobile" : {
                 "fullscreen" : true,
                 "orientation" : "landscape",
+                "ios" : {
+                    "devices" : "Universal",
+                    "deployment_target" : "7.1",
+                    "libs":{
+                        "native":{}
+                    }
+                },
                 "android" : {
                     "build_type" : "debug",
                     "install_location" : "preferExternal",
