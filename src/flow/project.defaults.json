@@ -17,7 +17,8 @@
                 "orientation" : "landscape",
                 "ios" : {
                     "devices" : "Universal",
-                    "deployment_target" : "7.1",
+                    "cpp" : "libc++",
+                    "deployment_target" : "6.0",
                     "libs":{
                         "native":{}
                     }
