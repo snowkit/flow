@@ -25,15 +25,22 @@ exports.parse = function parse(flow, parsed, result, depth) {
 
             var depend = depends[name];
             var is_internal = false;
+            var custom_flowfile = '';
             var depend_version = '*';
 
                 //if this is dependency with a custom flow file
                 //or other options it will be a { } instead of a string
             if(depend.constructor == Object) {
-                depend_version = depend.version;
-                is_internal = depend.internal;
+                depend_version = depend.version || '*';
+                custom_flowfile = depend.flow_file || '';
+                is_internal = depend.internal || false;
             } else {
-                depend_version = depend;
+                if(depend.indexOf('.flow') != -1) {
+                    custom_flowfile = depend;
+                    depend_version = '*';
+                } else {
+                    depend_version = depend;
+                }
             }
 
             if(is_internal) {
@@ -41,14 +48,23 @@ exports.parse = function parse(flow, parsed, result, depth) {
                 found[name] = flow.project.internal_depends[name];
 
             } else {
+
                 var has = haxelib.version(flow, name, depend_version);
 
                 if(!has) {
                     failed[name] = { name:name, version:depend_version };
                     prepare.log(flow, 3, '        - %s - missing dependency %s %s', util.pad(depth*2, '', ' '), name, depend_version);
                 } else {
+
                     found[name] = { name:name, version:depend_version, path:has.path };
-                    prepare.log(flow, 3, '        - %s - found dependency %s %s', util.pad(depth*2, '', ' '), name, depend_version);
+
+                    if(custom_flowfile) {
+                        custom_flowfile = path.resolve(flow.project.root, custom_flowfile);
+                        found[name].flow_file = custom_flowfile;
+                    }
+
+                    prepare.log(flow, 3, '        - %s - found dependency %s %s %s', util.pad(depth*2, '', ' '), name, depend_version, custom_flowfile);
+
                 }
             }
 
@@ -99,7 +115,6 @@ exports.parse = function parse(flow, parsed, result, depth) {
 
         } else {
                 //but if it does...
-                //it must be absolute already
             project_file = lib.flow_file;
         }
 

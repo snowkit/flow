@@ -406,6 +406,15 @@ internal.prepare_codepaths = function (flow, prepared) {
     for(name in prepared.depends) {
         var depend = prepared.depends[name];
             prepared.flags.push('-cp ' + depend.path);
+
+        if(depend.project.project.app && depend.project.project.app.codepaths) {
+            var _paths = depend.project.project.app.codepaths.map(function(a) {
+                var _path = path.resolve(path.join(depend.path, a));
+                return '-cp ' + util.normalize(_path, true);
+            });
+            prepared.flags = util.array_union(prepared.flags, _paths);
+        }
+
     }//each depends
 
         //store the app code paths flag list
