@@ -382,6 +382,30 @@ internal.prepare_mobile = function(flow, prepared) {
                 prepared.source.project.app.mobile.ios._devices = 2;
             break;
         }
+
+        prepared.source.project.app.mobile._orientation = [];
+        switch(prepared.source.project.app.mobile.orientation) {
+            case 'landscape':
+                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationLandscapeRight');
+            break;
+            case 'landscape left':
+                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationLandscapeLeft');
+            break;
+            case 'landscape both':
+                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationLandscapeLeft');
+                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationLandscapeRight');
+            break;
+            case 'portrait':
+                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationPortrait');
+            break;
+            case 'portrait upside down':
+                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationPortraitUpsideDown');
+            break;
+            case 'portrait both':
+                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationPortrait');
+                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationPortraitUpsideDown');
+            break;
+        }
     }
 
 } //prepare_mobile
