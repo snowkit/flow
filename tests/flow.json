@@ -44,12 +44,6 @@
       }
     },
 
-    unless: {
-      mac : {
-        defines:['not_mac']
-      }
-    }
-
   },
 
   snow : {
