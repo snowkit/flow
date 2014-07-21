@@ -9,6 +9,7 @@ exports.package = require('./package/package');
 exports.setup = require('./setup/setup');
 exports.files = require('./files/files');
 exports.config = require('./config/config');
+exports.info = require('./info/info');
 
 //special
 

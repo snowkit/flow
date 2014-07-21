@@ -71,16 +71,18 @@ exports.hxml = function(flow, project, with_compile, split) {
 
     var hxml_ = '-main ' + flow.config.build.boot + split;
 
-    hxml_ += exports.defines(flow, project, split);
-    hxml_ += exports.flags(flow, project, split);
-    hxml_ += exports.target(flow, project, split);
 
         //since we want to manually invoke the builds
         //with custom configs we tell haxe only to generate
         //the files, not invoke the post generate compiler (i.e hxcpp for cpp, etc)
     if(!with_compile) {
-        hxml_ += split + '-D no-compilation';
+        hxml_ += '-D no-compilation' + split;
     }
+
+    hxml_ += exports.defines(flow, project, split);
+    hxml_ += exports.flags(flow, project, split);
+    hxml_ += exports.target(flow, project, split);
+
 
     return hxml_;
 

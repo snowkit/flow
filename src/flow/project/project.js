@@ -28,6 +28,7 @@ exports.init = function init(flow) {
         flow.flags._next('files') ||
         flow.flags._next('package') ||
         flow.flags._next('clean') ||
+        flow.flags._next('info') ||
         flow.flags._next('setup') ||
         flow.system;
 
@@ -334,6 +335,7 @@ exports.do_prepare = function(flow) {
     flow.project.file = project.file;
 
     flow.project.prepare(flow);
+    flow.project.bake(flow);
 
 } //do_prepare
 

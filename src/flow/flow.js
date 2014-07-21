@@ -149,6 +149,10 @@ internal.save_user_config = function(flow) {
 
     } else {
 
+        if(flow.flags._has('info')) {
+            flow.log_level = 0;
+        }
+
             //read any potential user config on top of the
             //existing config values, as these override defaults
         flow.server_path = path.join( flow.flow_path, 'tools/http-server/http-server');
