@@ -8,7 +8,6 @@ var   path = require('path')
 
 
 exports.parse = function parse(flow, parsed, result, depth) {
-
         //recursive, so use the one passed in otherwise
     result = result || { found:{}, failed:{} };
     depth = depth || 1;
@@ -146,22 +145,22 @@ exports.parse = function parse(flow, parsed, result, depth) {
 
             if(fs.existsSync(haxelib_json)) {
                 var json = JSON.parse( fs.readFileSync(haxelib_json, 'utf8') );
-                lib.project = { project: { name:lib.name, version:json.version, build:{} } };
-                prepare.log(flow, 3, 'prepare - %s - found a haxelib json, it says %s ', util.pad(depth*2, '', ' '), json.version);
+                var deps = {};
+                var depCount = 0;
+                //Gather haxelib dependencies
+                for(k in json.dependencies){
+                    depCount++;
+                    deps[k] = {version:json.dependencies[k]};
+                }
+                lib.project = { project: { name:lib.name, version:json.version, build:{dependencies:deps} } };
+                prepare.log(flow, 3, 'prepare - %s - found a haxelib json with %s dependencies, it says %s ', util.pad(depth*2, '', ' '),depCount, json.version);
             } else {
                 prepare.log(flow,3,'prepare - %s - unable to find any information about this dependency from the haxelib json, so it will have blank information and just the path will be add to -cp and the define be generated... nothing else can happen with this dependency');
                 //nothing we can do to define this, so ...
                 lib.project = { project : { name:lib.name, version:'', build:{} } };
             }
 
-        } else {
-            //for valid project files though, we can continue parsing their deps
-            //but only if the found deps dont contain our name, to avoid
-            //recursive dependencies
-
-            if(!result.found[parsed.project.name]) {
-                result = exports.parse(flow, state.parsed, result, depth+1);
-            }
+            result = exports.parse(flow, lib.project, result, depth+1);
         }
 
     } //each found
