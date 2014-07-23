@@ -89,6 +89,29 @@
                 }
               }
             }
+        },
+
+        "windows && arch-32 && !static_link" : {
+          libregexp : { path:"bin/Windows/regexp.dll => regexp.dll" },
+          libstd : { path:"bin/Windows/std.dll => std.dll" },
+          libzlib : { path:"bin/Windows/zlib.dll => zlib.dll" }
+        },
+
+        "mac && arch-32 && !static_link" : {
+          files : {
+            libregexp : { path:"bin/Mac/regexp.dylib => ../MacOS/regexp.dylib" },
+            libstd : { path:"bin/Mac/std.dylib => ../MacOS/std.dylib" },
+            libzlib : { path:"bin/Mac/zlib.dylib => ../MacOS/zlib.dylib" }
+          }
+        },
+
+        "mac && arch-64 && !static_link" : {
+          files : {
+            libregexp : { path:"bin/Mac64/regexp.dylib => ../MacOS/regexp.dylib" },
+            libstd : { path:"bin/Mac64/std.dylib => ../MacOS/std.dylib" },
+            libzlib : { path:"bin/Mac64/zlib.dylib => ../MacOS/zlib.dylib" }
+          }
         }
+
     }
 }
