@@ -92,24 +92,26 @@
         },
 
         "windows && arch-32 && !static_link" : {
-          libregexp : { path:"bin/Windows/regexp.dll => regexp.dll" },
-          libstd : { path:"bin/Windows/std.dll => std.dll" },
-          libzlib : { path:"bin/Windows/zlib.dll => zlib.dll" }
+          files : {
+            libregexp : { path:"bin/Windows/regexp.dll => regexp.dll", not_listed:true },
+            libstd : { path:"bin/Windows/std.dll => std.dll", not_listed:true },
+            libzlib : { path:"bin/Windows/zlib.dll => zlib.dll", not_listed:true }
+          }
         },
 
         "mac && arch-32 && !static_link" : {
           files : {
-            libregexp : { path:"bin/Mac/regexp.dylib => ../MacOS/regexp.dylib" },
-            libstd : { path:"bin/Mac/std.dylib => ../MacOS/std.dylib" },
-            libzlib : { path:"bin/Mac/zlib.dylib => ../MacOS/zlib.dylib" }
+            libregexp : { path:"bin/Mac/regexp.dylib => ../MacOS/regexp.dylib", not_listed:true },
+            libstd : { path:"bin/Mac/std.dylib => ../MacOS/std.dylib", not_listed:true },
+            libzlib : { path:"bin/Mac/zlib.dylib => ../MacOS/zlib.dylib", not_listed:true }
           }
         },
 
         "mac && arch-64 && !static_link" : {
           files : {
-            libregexp : { path:"bin/Mac64/regexp.dylib => ../MacOS/regexp.dylib" },
-            libstd : { path:"bin/Mac64/std.dylib => ../MacOS/std.dylib" },
-            libzlib : { path:"bin/Mac64/zlib.dylib => ../MacOS/zlib.dylib" }
+            libregexp : { path:"bin/Mac64/regexp.dylib => ../MacOS/regexp.dylib", not_listed:true },
+            libstd : { path:"bin/Mac64/std.dylib => ../MacOS/std.dylib", not_listed:true },
+            libzlib : { path:"bin/Mac64/zlib.dylib => ../MacOS/zlib.dylib", not_listed:true }
           }
         }
 
