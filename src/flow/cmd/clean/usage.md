@@ -17,9 +17,23 @@
         removes ALL folders inside of the app output path.
         for example, by default, this would delete (project)/bin entirely.
 
+    --clean-build
+        Removes the build folder for the target only.
+        Not compatible with --all
+        Can combine with --clean-output, which is the equivalent of clean without flags
+
+    --clean-outout
+        Removes the output folder for the target only.
+        Not compatible with --all
+        Can combine with --clean-build, which is the equivalent of clean without flags
 
   examples
 
     `flow clean`
     `flow clean --all`
-    `flow clean web`
+
+    `flow clean windows --clean-output`
+      remove only the bin/windows/ folder, forcing new copy/generate only
+
+    `flow clean mac --clean-build`
+      remove only the bin/mac.build/ folder, forcing a new build

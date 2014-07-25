@@ -26,7 +26,7 @@ exports.run = function(flow, done) {
     if(flow.timing) console.time('build - total');
 
         //if requested we clean up, do so
-    if(flow.flags.clean) {
+    if(flow.flags.clean || flow.flags['clean-output'] || flow.flags['clean-build']) {
         flow.execute(flow, cmds['clean']);
     }
 
