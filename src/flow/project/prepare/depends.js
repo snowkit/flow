@@ -160,8 +160,9 @@ exports.parse = function parse(flow, parsed, result, depth) {
                 lib.project = { project : { name:lib.name, version:'', build:{} } };
             }
 
-            result = exports.parse(flow, lib.project, result, depth+1);
         }
+
+        result = exports.parse(flow, lib.project, result, depth+1);
 
     } //each found
 
