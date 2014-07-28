@@ -132,7 +132,7 @@ exports.normalize = function(_path, _folder) {
 exports.merge_combine = function merge_combine(obj_src, obj_dest) {
   if(!obj_src) return obj_dest;
   for (var p in obj_src) {
-    if(obj_dest[p]) {
+    if(obj_dest[p] !== undefined) {
       if ( obj_src[p].constructor == Object ) {
         obj_dest[p] = merge_combine(obj_src[p], obj_dest[p]);
       } else {
@@ -149,7 +149,7 @@ exports.merge_combine = function merge_combine(obj_src, obj_dest) {
 exports.merge_unique = function merge_unique(obj_src, obj_dest) {
   if(!obj_src) return obj_dest;
   for (var p in obj_src) {
-    if(obj_dest[p]) {
+    if(obj_dest[p] !== undefined) {
       if ( obj_src[p].constructor == Object ) {
         obj_dest[p] = merge_unique(obj_src[p], obj_dest[p]);
       }
