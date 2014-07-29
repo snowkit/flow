@@ -2,6 +2,7 @@
 
 var   mac = require('./icons.mac')
     , web = require('./icons.web')
+    , ios = require('./icons.ios')
 
 var internal = {};
 
@@ -32,6 +33,9 @@ exports.run = function run(flow, data, done) {
             break;
         case 'web':
                 web.convert(flow, icon, done);
+            break;
+        case 'ios':
+                ios.convert(flow, icon, done);
             break;
         default:{
                 flow.log(2, 'no icon convert just yet for ', flow.target);
