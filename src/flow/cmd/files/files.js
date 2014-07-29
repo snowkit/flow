@@ -270,6 +270,12 @@ internal.template_file = function(flow, _template, _source, _dest) {
 
     var templates = [];
 
+    var fname = path.basename(_source);
+    if(fname.charAt(0) == '.') {
+        flow.log(3, '        -      skip hidden file ' + _source);
+        return;
+    }
+
         //we allow multiple context nodes via ['one','two']
     if(_template.constructor == Array) {
         templates = _template;
