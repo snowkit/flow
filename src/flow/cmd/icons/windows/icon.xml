@@ -1,0 +1,9 @@
+<xml>
+
+    <set name="FLOW_SOURCE" value="{{FLOW_SOURCE}}" />
+
+    <target id="haxe" tool="linker" toolid="${STD_MODULE_LINK}">
+        <vflag name="icon.res" value=""/>
+    </target>
+
+</xml>
