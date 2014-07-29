@@ -8,8 +8,9 @@ var   path = require('path')
 
 
 exports.parse = function parse(flow, parsed, result, depth) {
-        //recursive, so use the one passed in otherwise
-    result = result || { found:{}, failed:{} };
+
+    //recursive, so use the one passed in otherwise
+    result = result || { found:{}, failed:{}, list:[] };
     depth = depth || 1;
 
     prepare.log(flow, 3, '%s parsing dependencies for %s', util.pad(depth*2, '', ' '), parsed.project.name);
@@ -144,16 +145,20 @@ exports.parse = function parse(flow, parsed, result, depth) {
             var haxelib_json = path.join(lib.path, 'haxelib.json');
 
             if(fs.existsSync(haxelib_json)) {
+
                 var json = JSON.parse( fs.readFileSync(haxelib_json, 'utf8') );
                 var deps = {};
                 var depCount = 0;
+
                 //Gather haxelib dependencies
                 for(k in json.dependencies){
                     depCount++;
-                    deps[k] = {version:json.dependencies[k]};
+                    deps[k] = { version : json.dependencies[k] };
                 }
+
                 lib.project = { project: { name:lib.name, version:json.version, build:{dependencies:deps} } };
-                prepare.log(flow, 3, 'prepare - %s - found a haxelib json with %s dependencies, it says %s ', util.pad(depth*2, '', ' '),depCount, json.version);
+                prepare.log(flow, 3, 'prepare - %s - found a haxelib json with %s dependencies, it says %d dependencies and %s version', util.pad(depth*2, '', ' '), depCount, json.version);
+
             } else {
                 prepare.log(flow,3,'prepare - %s - unable to find any information about this dependency from the haxelib json, so it will have blank information and just the path will be add to -cp and the define be generated... nothing else can happen with this dependency');
                 //nothing we can do to define this, so ...
@@ -161,6 +166,8 @@ exports.parse = function parse(flow, parsed, result, depth) {
             }
 
         }
+
+            result.list.unshift(depend);
 
         result = exports.parse(flow, lib.project, result, depth+1);
 

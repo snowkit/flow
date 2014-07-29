@@ -5,7 +5,7 @@ exports.bake = function bake(flow) {
 
     var project = flow.project.prepared;
 
-    flow.log(2, 'bake - project %s\n', flow.project.parsed.project.name);
+    flow.log(3, 'bake - project %s\n', flow.project.parsed.project.name);
 
     flow.project.hxml = exports.hxml(flow, project );
 

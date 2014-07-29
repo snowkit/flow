@@ -30,7 +30,10 @@ exports.run = function(flow, done) {
         flow.execute(flow, cmds['clean']);
     }
 
-        //first copy over all the files in the project
+        //first work out the icons if any, and export the right icon to the right place
+    flow.execute(flow, cmds['icons']);
+
+        //then copy over all the files in the project
     flow.execute(flow, cmds['files']);
 
         //check for failure already

@@ -38,7 +38,8 @@ exports.prepare = function prepare(flow) {
         //start at the project base
     var prepared = {
         source : util.deep_copy(parsed),
-        depends : _depends,
+        depends : _depends.found,
+        depends_list : _depends.list,
         defines_all : {}
     }
 
@@ -205,7 +206,7 @@ internal.prepare_dependencies = function(flow, parsed) {
 
     internal.log(flow, 3, 'prepare - dependency tree - ok');
 
-    return _depends.found;
+    return { found:_depends.found, list:_depends.list };
 
 } //prepare_dependencies
 
@@ -306,6 +307,10 @@ internal.prepare_project = function(flow, prepared) {
     //flags
 
             internal.prepare_flags(flow, prepared);
+
+    //icons
+
+            internal.prepare_icons(flow, prepared);
 
     //files
 
@@ -553,6 +558,37 @@ internal.prepare_flags = function(flow, prepared) {
     internal.log(flow, 3, 'prepare - project - flags - ok');
 
 } //prepare_flags
+
+
+internal.prepare_icons = function(flow, prepared) {
+
+    //icons simply need to append their source project path so that they can be
+    //correctly located in the resulting icons command.
+
+    if(!prepared.source.project.app && !prepared.source.project.app.icon) {
+        return;
+    }
+
+    prepared.source.project.app._icon = {
+        dest : 'icon',
+        source : 'icon'
+    };
+
+        //so, do dependencies first, in order, overriding the source path only as it walks
+    for(index in prepared.depends_list) {
+
+        var name = prepared.depends_list[index];
+        var depend = prepared.depends[name];
+        prepared.source.project.app._icon.__path = depend.project.__root;
+
+    } //each depends
+
+        //then, if it's from the source project, override the value to nothing
+    if(flow.project.parsed.project.app && flow.project.parsed.project.app.icon) {
+        prepared.source.project.app._icon.__path = flow.project.root;
+    }
+
+} //prepare_icons
 
     //note that files are prepared from the parsed project instead of the prepared
     //project because they are cascaded, leaving dependencies files incorrectly

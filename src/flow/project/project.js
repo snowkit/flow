@@ -29,6 +29,7 @@ exports.init = function init(flow) {
         flow.flags._next('package') ||
         flow.flags._next('clean') ||
         flow.flags._next('info') ||
+        flow.flags._next('icons') ||
         flow.flags._next('setup') ||
         flow.system;
 
