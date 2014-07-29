@@ -4,7 +4,8 @@
         , path = require('path')
         , cmd = require('../../util/process')
         , util = require('../../util/util')
-
+        , bars = require('handlebars')
+        , fse = require('fs-extra')
 
 var internal = {};
 
@@ -132,6 +133,10 @@ exports.post_haxe = function(flow, done) {
     var cpp_path = path.join(flow.project.paths.build, 'cpp/');
         cpp_path = path.resolve(flow.run_path, cpp_path);
 
+        //write custom xml
+    exports.write_hxcpp(flow, cpp_path);
+
+        //use custom xml
     exports.build_hxcpp(flow, cpp_path, function(err) {
 
             if(flow.timing) console.timeEnd('build - hxcpp');
@@ -148,9 +153,63 @@ exports.post_haxe = function(flow, done) {
 } //exports
 
 
+    //write out the hxcpp file from the flow project into the build folder
+exports.write_hxcpp = function(flow, run_path) {
+
+    var dest_file = path.join(run_path,'flow.Build.xml');
+    var src_template = path.join(__dirname, 'cpp/flow.Build.xml');
+
+    var context = {
+        includes : { }
+    };
+
+    if(flow.project.prepared.hxcpp.includes) {
+        for(name in flow.project.prepared.hxcpp.includes) {
+            context.includes[name] = flow.project.prepared.hxcpp.includes[name];
+        }
+    }
+
+    context.includes['__haxe'] = { name:'__haxe', file:'Build.xml', path:'Build.xml', source:'flow internal' };
+
+    var template_content = fs.readFileSync(src_template, 'utf8');
+    var template = bars.compile(template_content);
+    var result = template(context);
+
+    fse.ensureFileSync(dest_file);
+    fs.writeFileSync(dest_file, result, 'utf8');
+
+        //now, for each of the includes
+        //copy them over with a special context
+        //that will allow them to know their source
+
+    for(include in context.includes) {
+        if(include != '__haxe') {
+
+            var node = context.includes[include];
+            if(fs.existsSync(node.path)) {
+
+                var inc_context = { FLOW_SOURCE:path.dirname(node.path) };
+                var inc_content = fs.readFileSync(node.path,'utf8');
+                var inc_template = bars.compile(inc_content);
+                var inc_result = inc_template(inc_context);
+
+                var inc_dest = path.join(run_path, node.file);
+
+                fse.ensureFileSync(inc_dest);
+                fs.writeFileSync(inc_dest, inc_result, 'utf8');
+
+            } else { //if exists
+                flow.log(1, 'build - hxcpp - missing external include file?? this will cause errors for sure ', node);
+            }
+
+        } //if not internal
+    }
+
+} //write_hxcpp
+
 exports.build_hxcpp = function(flow, run_path, done) {
 
-    var hxcpp_file = 'Build.xml';
+    var hxcpp_file = 'flow.Build.xml';
     var args = [hxcpp_file];
 
     if(run_path) {

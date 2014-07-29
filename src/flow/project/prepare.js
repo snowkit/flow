@@ -324,6 +324,10 @@ internal.prepare_project = function(flow, prepared) {
 
             internal.prepare_mobile(flow, prepared);
 
+    //hxcpp
+
+            internal.prepare_hxcpp(flow, prepared);
+
     //user object schema
 
             internal.prepare_schema(flow, prepared);
@@ -357,9 +361,71 @@ internal.prepare_conditional_nodes = function(flow, prepared) {
 
 } //prepare_conditional_nodes
 
+    //for hxcpp, we store the list of absolute paths so they can be used correctly
+internal.prepare_hxcpp = function(flow, prepared) {
+
+    //for each node we simply add a
+        //  <include name="absolute path" /> to the flow hxcpp output
+    prepared.hxcpp = {
+        includes : {}
+    }
+
+        //so, do dependencies first, in order
+    for(index in prepared.depends_list) {
+
+        var name = prepared.depends_list[index];
+        var depend = prepared.depends[name];
+        var project = depend.project.project;
+
+        if(project.build.hxcpp) {
+
+            flow.log(3, 'prepare - hxcpp - depend %s has hxcpp includes', name);
+
+            for(include in project.build.hxcpp) {
+                var node = project.build.hxcpp[include];
+
+                flow.log(4, 'prepare - hxcpp -      added %s : %s', include, node);
+
+                var src = path.join(depend.project.__root, node);
+                prepared.hxcpp.includes[include] = {
+                    file : path.basename(src),
+                    path : src,
+                    name : include,
+                    source : depend.project.__path
+                };
+            }
+        } else {
+            flow.log(4,'prepare - hxcpp - depend %s has no hxcpp includes', name);
+        }
+
+    } //each depends
+
+        //if it's from the source project we append the project root afterward to override
+    var source = flow.project.parsed.project;
+    if(source.build.hxcpp) {
+
+        flow.log(3, 'prepare - hxcpp - project has hxcpp includes');
+
+        for(name in source.build.hxcpp) {
+
+            var node = source.build.hxcpp[name];
+            var src = path.join(flow.project.root, node);
+            prepared.hxcpp.includes[name] = {
+                file : path.basename(src),
+                path : src,
+                name : name,
+                source : path.join(flow.project.root, flow.project.file)
+            };
+
+            flow.log(4, 'prepare - hxcpp -      added %s : %s', name, node);
+        }
+    }
+
+} //prepare_hxcpp
+
 internal.prepare_mobile = function(flow, prepared) {
 
-        //now we also handle any platform specifics that might need to be resolved to different values
+    //now we also handle any platform specifics that might need to be resolved to different values
         //like orientations or device targets etc
 
     if(flow.target == 'ios') {
