@@ -15,8 +15,6 @@ exports.convert = function(flow, icon, done) {
     var icon_file = icon.dest+'.icns';
     var icon_output = path.join(flow.project.paths.files,icon_file);
 
-    flow.log(2, 'icons - converting from %s', icon_set);
-
     cmd.exec(flow, 'iconutil', ['-c', 'icns', icon_set], { cwd:flow.project.root }, function(code, out, err){
 
         if(!code) {
@@ -34,4 +32,4 @@ exports.convert = function(flow, icon, done) {
 
     });
 
-} //
+} //convert
