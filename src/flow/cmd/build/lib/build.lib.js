@@ -1,6 +1,7 @@
 
 var   buildcpp = require('../build.cpp')
     , path = require('path')
+    , wrench = require('wrench')
     , util = require('../../../util/util')
 
 exports.run = function run(flow, data) {
@@ -9,7 +10,14 @@ exports.run = function run(flow, data) {
 
     var run_path = util.normalize( path.dirname(flow.project.path) );
 
-    buildcpp.build_hxcpp(flow, run_path, function(code,out,err){
+    var objpath = path.join(run_path, 'obj/');
+
+    if(flow.flags.clean) {
+        flow.log(2, 'build - lib - cleaning %s ... \n', objpath );
+        wrench.rmdirSyncRecursive(objpath, true);
+    }
+
+    buildcpp.build_hxcpp(flow, run_path, 'Build.xml', function(code,out,err){
 
         flow.log(2, 'build - done');
     });

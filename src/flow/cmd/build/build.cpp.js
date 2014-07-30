@@ -137,7 +137,7 @@ exports.post_haxe = function(flow, done) {
     exports.write_hxcpp(flow, cpp_path);
 
         //use custom xml
-    exports.build_hxcpp(flow, cpp_path, function(err) {
+    exports.build_hxcpp(flow, cpp_path, 'flow.Build.xml', function(err) {
 
             if(flow.timing) console.timeEnd('build - hxcpp');
 
@@ -212,9 +212,9 @@ exports.write_hxcpp = function(flow, run_path) {
 
 } //write_hxcpp
 
-exports.build_hxcpp = function(flow, run_path, done) {
+exports.build_hxcpp = function(flow, run_path, hxcpp_file, done) {
 
-    var hxcpp_file = 'flow.Build.xml';
+    var hxcpp_file = hxcpp_file || 'flow.Build.xml';
     var args = [hxcpp_file];
 
     if(run_path) {
