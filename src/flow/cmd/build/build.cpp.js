@@ -160,7 +160,12 @@ exports.write_hxcpp = function(flow, run_path) {
     var src_template = path.join(__dirname, 'cpp/flow.Build.xml');
 
     var context = {
-        includes : { }
+        includes : {
+            __haxe : { 
+                name:'__haxe', file:'Build.xml', path:'Build.xml', 
+                source:'flow internal', internal:true 
+            }
+        }
     };
 
     if(flow.project.prepared.hxcpp.includes) {
@@ -169,7 +174,6 @@ exports.write_hxcpp = function(flow, run_path) {
         }
     }
 
-    context.includes['__haxe'] = { name:'__haxe', file:'Build.xml', path:'Build.xml', source:'flow internal' };
 
     var template_content = fs.readFileSync(src_template, 'utf8');
     var template = bars.compile(template_content);
@@ -183,9 +187,10 @@ exports.write_hxcpp = function(flow, run_path) {
         //that will allow them to know their source
 
     for(include in context.includes) {
-        if(include != '__haxe') {
 
             var node = context.includes[include];
+
+        if(!node.internal) {
             if(fs.existsSync(node.path)) {
 
                 var inc_context = { FLOW_SOURCE:path.dirname(node.path) };

@@ -13,6 +13,6 @@ exports.convert = function(flow, icon) {
     var icon_output = path.join(flow.project.paths.files, icon_file);
 
     flow.log(2,'icons - ok - copying to output folder');
-    util.copy_path(flow, path.join(icon_source), icon_output);
+    util.copy_path(flow, icon_source, icon_output);
 
 } //convert
