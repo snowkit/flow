@@ -121,7 +121,7 @@ exports.find_flow_files = function(flow, root) {
 } //find_flow_files
 
 
-exports.verify = function verify(flow, project_path, project_root, quiet) {
+exports.verify = function verify(flow, project_path, project_root, is_dependency, quiet) {
 
     var project_file = flow.flags.project || project_path;
     var abs_path = '';
@@ -203,8 +203,14 @@ exports.verify = function verify(flow, project_path, project_root, quiet) {
         return fail_verify('flow projects require a { project:{ name:"", version:"" } } minimum. missing "name"');
     }
 
-        //then merge any base options from flow defaults into it
-    parsed.project = util.merge_unique(flow.project.defaults.project, parsed.project);
+        //then merge any base options from flow defaults into it,
+        //unless it is a dependency project, those don't need this
+    if(!is_dependency) {
+        parsed.project = util.merge_unique(flow.project.defaults.project, parsed.project);
+    } else {
+        var dependency_defaults = { build:{} };
+        parsed.project = util.merge_unique(dependency_defaults, parsed.project);
+    }
 
     parsed.__root = project_root;
     parsed.__path = abs_path;

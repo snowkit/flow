@@ -37,7 +37,7 @@ exports.parse = function parse(flow, parsed, result, depth) {
                 depend_version = depend.version || '*';
                 custom_flowfile = depend.flow_file || '';
                 is_internal = depend.internal || false;
-                custom_codepaths = depend.codepaths || null;
+                custom_codepaths = depend.codepaths || []
 
             } else {
 
@@ -74,7 +74,7 @@ exports.parse = function parse(flow, parsed, result, depth) {
                         found[name].flow_file = custom_flowfile;
                     }
 
-                    if( custom_codepaths ) {
+                    if( custom_codepaths && custom_codepaths.length ) {
                         found[name].codepaths = custom_codepaths;
                     }
 
@@ -116,6 +116,7 @@ exports.parse = function parse(flow, parsed, result, depth) {
 
 } //parse
 
+
 internal.process_found_dependencies = function(flow, result, found, depth) {
 
         //finally, for each locally found dependency, verify its project (if any)
@@ -148,7 +149,9 @@ internal.process_found_dependencies = function(flow, result, found, depth) {
 
         flow.log(4, '       looking for dependency project file (maybe) at %s', project_file);
 
-        var state = flow.project.verify(flow, project_file, lib.path, true);
+            //verify its validity,
+            //stating that it is a dependency (first true) and to be quiet(second true)
+        var state = flow.project.verify(flow, project_file, lib.path, true, true);
 
             //store the project value for the dependency
         lib.project = state.parsed;
@@ -171,7 +174,7 @@ internal.process_found_dependencies = function(flow, result, found, depth) {
 
             flow.log(3, 'prepare - %s - %s has no flow file, this is not an error state', util.pad(depth*2, '', ' '), depend);
 
-            lib.project = internal.attempt_haxelib_json(flow, lib);
+            lib.project = internal.attempt_haxelib_json(flow, lib, depth);
 
         } //no lib.project
 
@@ -188,7 +191,8 @@ internal.process_found_dependencies = function(flow, result, found, depth) {
 
 } //process_found_dependencies
 
-internal.attempt_haxelib_json = function(flow, lib) {
+
+internal.attempt_haxelib_json = function(flow, lib, depth) {
 
     var haxelib_json = path.join(lib.path, 'haxelib.json');
 

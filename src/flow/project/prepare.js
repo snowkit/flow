@@ -584,26 +584,52 @@ internal.prepare_codepaths = function (flow, prepared) {
 
     //store the code paths of each of the dependencies in the flag list
     for(name in prepared.depends) {
-        var depend = prepared.depends[name];
-            prepared.flags.push('-cp ' + depend.path);
 
+        var depend = prepared.depends[name];
+
+            //add the root folder of the dependency
+        prepared.flags.push('-cp ' + depend.path);
+
+             //if this dependency has its own codepaths,
+             //these are absolute paths to the project file root
         if(depend.project.project.app && depend.project.project.app.codepaths) {
+
             var _paths = depend.project.project.app.codepaths.map(function(a) {
                 var _path = path.resolve(path.join(depend.path, a));
                 return '-cp ' + util.normalize(_path, true);
             });
+
             prepared.flags = util.array_union(prepared.flags, _paths);
-        }
+
+        } //code paths in flow file
+
+            //if the codepaths were added at the usage level
+             //these are also absolute paths to the project file root
+        if(depend.codepaths && depend.codepaths.length) {
+
+            var _paths = depend.codepaths.map(function(a) {
+                var _path = path.resolve(path.join(depend.path, a));
+                return '-cp ' + util.normalize(_path, true);
+            });
+
+            prepared.flags = util.array_union(prepared.flags, _paths);
+
+        } //added to usage of dependency
 
     }//each depends
 
-        //store the app code paths flag list
+        //store the app code paths flag list,
+        //these are stored relative to the build folder
+        //because thats where haxe runs from
     if(prepared.source.project.app && prepared.source.project.app.codepaths) {
+
         var _paths = prepared.source.project.app.codepaths.map(function(a) {
             var _path = path.relative(flow.project.paths.build, path.join(flow.run_path, a));
             return '-cp ' + util.normalize(_path, true);
         });
+
         prepared.flags = util.array_union(prepared.flags, _paths);
+
     }//each depends
 
 } //prepare_codepaths
