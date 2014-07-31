@@ -41,7 +41,7 @@ exports.run = function run(flow, data, done) {
             break;
         case 'android':
                 android.convert(flow, icon, done);
-            break;        
+            break;
         case 'windows':
                 windows.convert(flow, icon, done);
             break;

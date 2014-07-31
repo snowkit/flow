@@ -31,50 +31,53 @@ exports.run = function(flow, done) {
     }
 
         //first work out the icons if any, and export the right icon to the right place
-    flow.execute(flow, cmds['icons']);
+    flow.execute(flow, cmds['icons'],
+    function() {
 
-        //then copy over all the files in the project
-    flow.execute(flow, cmds['files']);
+            //then copy over all the files in the project
+        flow.execute(flow, cmds['files']);
 
-        //check for failure already
-    if(flow.project.failed) {
-        return;
-    }
-
-        //then ensure the folder for the build data exists
-    wrench.mkdirSyncRecursive(flow.project.paths.build, 0755);
-
-        //fetch the hxml location
-    var hxml_file = internal.get_hxml_file(flow);
-    var hxml_path = util.normalize(path.join(flow.project.paths.build, hxml_file));
-
-        //write out the baked build hxml for the build
-        if(flow.timing) console.time('build - write hxml');
-
-    internal.write_hxml(flow, hxml_path);
-
-        if(flow.timing) console.timeEnd('build - write hxml');
-
-        //then run the haxe build stage, if it fails, early out
-        //but since the console will be logging the output from haxe,
-        // no need to log it again.
-    if(flow.timing) console.time('build - haxe');
-
-    internal.build_haxe(flow, hxml_file, function(code, out, err) {
-
-        if(flow.timing) console.timeEnd('build - haxe');
-
-        var outerr = out.indexOf('Aborted') != -1;
-        var errerr = err.indexOf('Aborted') != -1;
-
-        if(code || outerr || errerr) {
-            flow.log(1,'\n build - stopping because of errors in haxe compile \n');
-            return flow.project.failed = true;
+            //check for failure already
+        if(flow.project.failed) {
+            return;
         }
 
-        internal.post_haxe(flow, done);
+            //then ensure the folder for the build data exists
+        wrench.mkdirSyncRecursive(flow.project.paths.build, 0755);
 
-    }); //run haxe
+            //fetch the hxml location
+        var hxml_file = internal.get_hxml_file(flow);
+        var hxml_path = util.normalize(path.join(flow.project.paths.build, hxml_file));
+
+            //write out the baked build hxml for the build
+            if(flow.timing) console.time('build - write hxml');
+
+        internal.write_hxml(flow, hxml_path);
+
+            if(flow.timing) console.timeEnd('build - write hxml');
+
+            //then run the haxe build stage, if it fails, early out
+            //but since the console will be logging the output from haxe,
+            // no need to log it again.
+        if(flow.timing) console.time('build - haxe');
+
+        internal.build_haxe(flow, hxml_file, function(code, out, err) {
+
+            if(flow.timing) console.timeEnd('build - haxe');
+
+            var outerr = out.indexOf('Aborted') != -1;
+            var errerr = err.indexOf('Aborted') != -1;
+
+            if(code || outerr || errerr) {
+                flow.log(1,'\n build - stopping because of errors in haxe compile \n');
+                return flow.project.failed = true;
+            }
+
+            internal.post_haxe(flow, done);
+
+        }); //run haxe
+
+    }); //end icons
 
 } //run
 

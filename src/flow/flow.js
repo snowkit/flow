@@ -25,13 +25,14 @@ var flow = {
     version : require('./package.json').version,
     config : require('./config'),
     timing : require('./config').build.timing,
-    execute : function(_flow, cmd) {
+    execute : function(_flow, cmd, done) {
         cmd.verify(_flow, function(err, data) {
 
             if(!err) {
-                cmd.run(_flow, data);
+                cmd.run(_flow, data, done);
             } else {
                 cmd.error(_flow, err);
+                if(done) { done(err,null); }
             }
 
         }); //verify
