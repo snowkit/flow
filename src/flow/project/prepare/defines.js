@@ -95,7 +95,7 @@ exports.filter = function filter(flow, defines) {
     // the initial conditionals have all been parsed
 exports.satisfy = function satisfy(flow, prepared, condition) {
 
-    flow.log(4, 'defines - satisfy check', condition);
+    flow.log(5, 'defines - satisfy check', condition);
 
     var cond = conditions.conditions[condition];
     if(cond && cond.length > 1) {
@@ -265,7 +265,7 @@ internal.resolve_defines = function(flow, defines) {
             if(define.condition) {
                 var condition = conditions.conditions[define.condition];
                 if(condition && condition.length > 1) {
-                    flow.log(4, 'defines - satisfy check', define.condition);
+                    flow.log(5, 'defines - satisfy check', define.condition);
                     define.met = internal.resolve_multi(flow, defines, condition);
                 } //condition.as
             }
@@ -274,17 +274,17 @@ internal.resolve_defines = function(flow, defines) {
         var still_unknown = false;
         for(name in defines) {
             if(defines[name].met == -1) {
-                flow.log(4, 'defines - unknown found %s', name);
+                flow.log(5, 'defines - unknown found %s', name);
                 still_unknown = true;
                 break;
             }
         }
 
         if(!still_unknown) {
-            flow.log(4, 'defines - stopping because found no more unknowns');
+            flow.log(5, 'defines - stopping because found no more unknowns');
             found_unknown = false;
         } else {
-            flow.log(4, 'defines - still found unknowns');
+            flow.log(5, 'defines - still found unknowns');
         }
 
         depth++;
@@ -292,7 +292,7 @@ internal.resolve_defines = function(flow, defines) {
     } //while found unknowns or reached a max depth
 
     if(depth >= max_depth) {
-        flow.log(4, 'defines - stopping because too many loops in define tree(%d). check for cyclic references in your defines', max_depth);
+        flow.log(5, 'defines - stopping because too many loops in define tree(%d). check for cyclic references in your defines', max_depth);
     }
 
 } //satisfy conditions
