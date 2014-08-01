@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>flow - </title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <link rel="shortcut icon" href="./images/favicon.png" />
+
+        <link rel="stylesheet" type="text/css" href="./css/style.css" media="all">
+        <link rel="stylesheet" type="text/css" href="./css/code.css" media="all">
+        <link rel="stylesheet" type="text/css" href="./css/font.css" media="all">
+
+        <link rel="stylesheet" type="text/css" href="./css/tooltipster.css" media="all">
+        <link rel="stylesheet" type="text/css" href="./css/tooltipster-shadow.css" media="all">
+
+        <script src="./js/jquery-2.0.3.min.js"> </script>
+        <script src="./js/jquery.tooltipster.min.js"> </script>
+
+        <script>
+
+            $(document).ready(function() {
+
+                $('.section').css('display','none');
+                $('.readmore').click(function(e){
+                    var _child = $(this).parent().find('.section').first();
+                    var _opp = 'block';
+                    if( _child.css('display') == 'block' ) {
+                        _opp = 'none';
+                    } else {
+                    }
+                    _child.css('display', _opp);
+                });
+
+                $('div.sample').on('click', function(e){
+                        //get the data tag
+                    var content = $(this).attr('data-content');
+                        //remove clicking handler
+                    $(this).off('click');
+                        //replace the content!
+                    $(this).html('<iframe src="'+content+'" sandbox="allow-same-origin allow-scripts" style="overflow:hidden; scrollbar:none; border: 0; width:645px; height:450px;"></iframe> ')
+                });
+
+                $('.tooltip').tooltipster({
+                    theme:'tooltipster-shadow'
+                });
+
+            }); //document.ready
+
+        </script>
+    </head>
+
+    <body>
+        <div class="content">
+            <p><a href="./index.html" id="logo"><img src="./images/logo.png" /></a></p>
+<div class="topmenu">
+<a href="./usage/index.html">usage</a> . <a href="#guide">guide</a> <img src=".//images/github.png" alt="github">  <a href="https://github.com/underscorediscovery/snow">source</a> . <a href="https://github.com/underscorediscovery/snow/issues/">issues</a>
+</div>
+
+<hr>
+<h2 id="about">About</h2>
+<p><strong>flow</strong> is a project based <strong>build tool</strong> for the <strong>haxe</strong> programming language.</p>
+<p>&nbsp;</p>
+<p><a href="http://haxe.org"> <img src="./images/haxe.png" target="_blank" class="small-image"/> </a>   </p>
+<p><small class="haxedesc">Haxe is an expressive, beautiful modern programming language <br/>
+      that compiles it’s own code into other languages. <a href="http://haxe.org/" target="_blank"> learn more</a> </small></p>
+<p><br/>
+<br/></p>
+<hr>
+<div class="breakout">
+
+<a href="#guide">Install</a>
+<a href="./projects.html">Project format</a>
+<a href="#features">Features</a>
+
+</div>
+
+<hr>
+<p><a name="guide"> &nbsp;</a></p>
+<h2>Guide</h2>
+
+<p><strong>Setup guide</strong><br/>
+<br/>
+flow is setup through <a href="http://haxe.org/manual/haxelib.html" target="_blank">haxelib</a>, <br/>
+from a terminal (<a href="./guide/terminology.html" target="_blank">need help?</a>) <br/>
+by running the following command :</p>
+<p><code>haxelib install flow</code></p>
+<p>followed by</p>
+<p><code>haxelib run flow setup</code></p>
+<p>which will open a <strong>simple web interface</strong> get you started.</p>
+<p><small>
+   <strong>btw</strong> <br/></p>
+<ul>
+<li>on <code>windows</code> <a href="cmder">http://bliker.github.io/cmder/</a> is an excellent alternative to windows shell <br/></li>
+<li>on mac/linux, <a href="fish">http://fishshell.com/</a> is also a really nice bash alternative <br/>
+</small></li>
+</ul>
+<hr>
+<div class="guide">
+
+<p><strong>flow guides</strong><br/>
+<br/>
+<a href="./projects.html">usage - project format</a> <br/>
+<a href="./pipeline.html">pipeline - what flow does for a build</a> <br/>
+<a href="./design.html">design - how it fits together</a> <br/>
+<a href="./projects.html">technology - what flow is made of</a> <br/></p>
+<p></div> <!-- guide --></p>
+<p><a name="features"> &nbsp;</a></p>
+<h2>Features</h2>
+
+<p><strong>A brief list</strong><br/></p>
+<ul>
+<li>thing 1</li>
+<li>thing 1</li>
+<li>thing 1</li>
+</ul>
+<p><a name="purpose"> &nbsp;</a></p>
+<h2>Purpose and goals</h2>
+
+<p><strong>Purpose</strong><br/></p>
+<p>To build things</p>
+
+        </div>
+    </body>
+
+</html>
