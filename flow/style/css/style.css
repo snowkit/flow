@@ -70,6 +70,34 @@ a:hover h2 {
     vertical-align: bottom;
 }
 
+.version {
+    color:#CFCFCF;
+    font-size: 0.75em;
+    text-align: right;
+    margin-right: 1.7em;
+    margin-bottom: -2.5em;
+    vertical-align: middle;
+}
+.version code {
+    padding: 0;
+    padding-top: 0.1em;
+    padding-bottom: 0.2em;
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+    margin-top: -0.05em;
+}
+
+.trademark {
+    font-size: 0.8em;
+    color:#ccc;
+}
+
+.platform-icons { margin-left: 1em;}
+.platform-icons img {
+    max-height: 2.5em;
+    display: inline-block;
+}
+
 #logo {
     width: 100%;
     display: block;
