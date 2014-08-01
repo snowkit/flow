@@ -23,6 +23,7 @@ HaxeCompileError.prototype = Error.prototype;
 
 exports.run = function(flow, done) {
 
+
     if(flow.timing) console.time('build - total');
 
         //if requested we clean up, do so
@@ -39,6 +40,7 @@ exports.run = function(flow, done) {
 
             //check for failure already
         if(flow.project.failed) {
+            flow.log(1,'not running project build because flow.project.failed is true');
             return;
         }
 

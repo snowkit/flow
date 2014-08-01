@@ -22,15 +22,16 @@ exports.init = function init(flow) {
         //default to the system if no target specified,
         //but needs to watch for command lines calling target
     flow.target =
-        flow.flags._next('build') ||
-        flow.flags._next('launch') ||
-        flow.flags._next('run') ||
-        flow.flags._next('files') ||
+        flow.flags._next('build')   ||
+        flow.flags._next('launch')  ||
+        flow.flags._next('run')     ||
+        flow.flags._next('files')   ||
         flow.flags._next('package') ||
-        flow.flags._next('clean') ||
-        flow.flags._next('info') ||
-        flow.flags._next('icons') ||
-        flow.flags._next('setup') ||
+        flow.flags._next('clean')   ||
+        flow.flags._next('info')    ||
+        flow.flags._next('icons')   ||
+        flow.flags._next('hooks')   ||
+        flow.flags._next('setup')   ||
         flow.system;
 
     flow.target_arch = flow.project.find_arch(flow);

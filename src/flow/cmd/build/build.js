@@ -1,6 +1,7 @@
 
     var   cmds = require('../')
         , builder = require('./builder')
+        , hooks = require('../hooks/hooks')
 
 var internal = {};
 
@@ -46,20 +47,33 @@ var internal = {};
                 return flow.project.failed = true;
             }
 
+                //run the pre build hooks if any
+            hooks.run_hooks(flow, 'pre', function(pre_err){
+                if(!pre_err) {
 
-                //finally, if all is ok,
-                //run an actual build
-            builder.run(flow, function(err){
+                        //finally, if all is ok,
+                        //run an actual build
+                    builder.run(flow, function(err) {
 
-                flow.log(2,'build - done');
+                        flow.log(2,'build - done');
 
-                if(!err) {
-                        //if build + run was asked
-                    if(flow.action == 'run') {
-                        flow.execute(flow, cmds['launch']);
-                    }
-                }
-            });
+                        if(!err) {
+
+                                //first execute any post build hooks
+                            hooks.run_hooks(flow, 'post', function(post_err){
+                                if(!post_err) {
+                                        //if build + run was asked
+                                    if(flow.action == 'run') {
+                                        flow.execute(flow, cmds['launch']);
+                                    }
+                                }
+                            }); //run post hooks
+
+                        } //!err
+                    }); //builder.run
+
+                } //!err
+            }); //run_hooks
 
         } //!lib
 

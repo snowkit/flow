@@ -41,6 +41,7 @@ exports.prepare = function prepare(flow) {
         depends : _depends.found,
         depends_list : _depends.list,
         defines_all : {},
+        hooks : { pre:{}, post:{} },
         hxcpp : {
             includes : {}
         }
@@ -310,6 +311,10 @@ internal.prepare_project = function(flow, prepared) {
     //flags
 
             internal.prepare_flags(flow, prepared);
+
+    //hooks
+
+            internal.prepare_hooks(flow, prepared);
 
     //icons
 
@@ -651,6 +656,67 @@ internal.prepare_flags = function(flow, prepared) {
 
 } //prepare_flags
 
+
+internal.prepare_hooks = function(flow, prepared) {
+
+    //look for build.pre and build.post tags, and store them in prepared
+    //structure, as well as storing their path so we can
+    //run them in the right place etc.
+
+    //these are stored as prepared.hooks.pre and prepared.hooks.post,
+    //they are stored by project name so they can be later excluded with --skip-hook
+
+        //so, for dependencies their path differs
+    for(index in prepared.depends_list) {
+
+        var name = prepared.depends_list[index];
+        var depend = prepared.depends[name];
+
+        if(depend.project.project.build.pre) {
+
+            depend.project.project.build.pre.__path = depend.project.__root;
+            prepared.hooks.pre[name] = depend.project.project.build.pre;
+
+                //default to requiring success
+            if(prepared.hooks.pre[name].require_success === undefined) {
+                prepared.hooks.pre[name].require_success = true;
+            }
+
+        }
+
+        if(depend.project.project.build.post) {
+            depend.project.project.build.post.__path = depend.project.__root;
+            prepared.hooks.post[name] = depend.project.project.build.post;
+
+                //default to requiring success
+            if(prepared.hooks.post[name].require_success === undefined) {
+                prepared.hooks.post[name].require_success = true;
+            }
+        }
+
+    } //each depends
+
+    if(flow.project.parsed.project.build.pre) {
+        flow.project.parsed.project.build.pre.__path = flow.project.root;
+        prepared.hooks.pre['__project'] = flow.project.parsed.project.build.pre;
+
+        //default to requiring success
+        if(prepared.hooks.pre['__project'].require_success === undefined) {
+            prepared.hooks.pre['__project'].require_success = true;
+        }
+    }
+
+    if(flow.project.parsed.project.build.post) {
+        flow.project.parsed.project.build.post.__path = flow.project.root;
+        prepared.hooks.post['__project'] = flow.project.parsed.project.build.post;
+
+        //default to requiring success
+        if(prepared.hooks.post['__project'].require_success === undefined) {
+            prepared.hooks.post['__project'].require_success = true;
+        }
+    }
+
+} //prepare_hooks
 
 internal.prepare_icons = function(flow, prepared) {
 

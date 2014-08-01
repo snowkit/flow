@@ -1,7 +1,7 @@
 `flow icons [target] [--options]`
 
 Convert the `project.app.icons` value to a usable output,
-and place it in the output directory.
+and place it in the output directory, so the build can use it.
 
   options
 
