@@ -12,11 +12,18 @@ exports.run = function run(flow, data, done) {
 
     var prepared = flow.project.prepared.source;
 
+
         //don't care if there is no icon node
     var has_icon = (prepared.project.app && prepared.project.app.icon);
     if(!has_icon) {
+
+        if(done) {
+            done();
+        }
+
         return;
-    }
+
+    } //has_icon
 
     var icon = {
         dest : 'icon',
