@@ -1,0 +1,21 @@
+{
+    "project_name" : "flow",
+    "project_git_url" : "http://github.com/underscorediscovery/flow/",
+
+    "style_path" : "./flow/style/",
+    "template_path" : "./flow/templates/",
+    "images_path" : "./flow/images/",
+    "md_path" : "./flow/md/",
+
+    "md_input": ["**/+(*.md)"],
+    "output_path" : "../flow_docs/",
+    "images_output_path" : "images/",
+    "template_index" : "index.html",
+
+    "force_full" : true,
+    "force_copy_template" : true,
+
+    "replacements" : [
+    ]
+
+}
