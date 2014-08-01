@@ -13,6 +13,7 @@
 // }
 
 var   cmd = require('../../util/process')
+    , util = require('../../util/util')
 
 var internal = {};
 
@@ -80,17 +81,17 @@ internal.run_hook_list = function(flow, stage, list, done) {
     var hookitem = _list[0];
 
         //run a single instance
-    internal.run_hook(flow, stage, hookitem.name, hookitem.hook, function(code, out, err) {
+    internal.run_hook(flow, stage, hookitem.name, hookitem.hook, function(err) {
 
             //if it's failed and requires success, stop entirely
-        if(code != 0 && hookitem.hook.require_success) {
+        if(err && hookitem.hook.require_success) {
 
-            done({ code:code, out:out, err:err, source:hookitem.hook });
+            done({ err:err, source:hookitem.hook });
             return;
 
         } else {
 
-            if(code) {
+            if(err) {
                 flow.log(1, 'hooks - %s failed but was not required to succeed on', stage, hookitem.hook.name, hookitem.hook.script );
             }
 
@@ -106,6 +107,35 @@ internal.run_hook_list = function(flow, stage, list, done) {
 
 } //run_hook_list
 
+
+    //work out a special hook specific flow
+internal.get_hook_flow = function(flow, stage, _name, hook) {
+
+        // everything must be sent as a copy,
+        // as the flow object must remain immutable
+
+    return {
+        bin_path        : String(flow.bin_path),
+        run_path        : String(flow.run_path),
+        system          : String(flow.system),
+        version         : String(flow.version),
+        config          : util.deep_copy(flow.config),
+        target          : String(flow.target),
+        target_arch     : String(flow.target_arch),
+        target_cpp      : Boolean(flow.target_cpp),
+        target_js       : Boolean(flow.target_js),
+        target_desktop  : Boolean(flow.target_desktop),
+        target_mobile   : Boolean(flow.target_mobile),
+        project         : util.deep_copy(flow.project.prepared.source),
+        log_level       : Number(flow.log_level),
+        log : function(){
+            var args = Array.prototype.slice.call(arguments,0);
+            flow.log.apply(flow,args);
+        },
+
+    }
+}
+
 internal.run_hook = function(flow, stage, _name, hook, done) {
 
     var hook_file = path.join(hook.__path, hook.script);
@@ -114,19 +144,50 @@ internal.run_hook = function(flow, stage, _name, hook, done) {
     flow.log(2, 'hooks -     running %s hook %s from %s', stage, hook.name, hook.script);
     flow.log(3, 'hooks -     desc : %s', hook.desc || 'no description');
 
-    cmd.exec(flow, flow.bin_path, [hook.script], { cwd:hook.__path }, function(code, our, err){
-
-        flow.log(2, 'hooks -     %s completed with code %d, %s', stage, code, hook.script);
-
-        if(code != 0 && hook.require_success) {
+    var fail = function(e) {
+        if(hook.require_success) {
             flow.project.failed = true;
         }
 
+        flow.log(1, e);
+
         if(done) {
-            done(code, null);
+            done(e);
+        }
+    } //fail
+
+    var hook_script;
+
+    try {
+       hook_script = require(hook_file);
+    } catch(e) {
+        return fail(e);
+    }
+
+    if(hook_script) {
+
+        var hook_flow = internal.get_hook_flow(flow, stage, _name, hook);
+
+        var s = hook_script.hook.toString();
+        if(s.indexOf('done()') == -1) {
+            return fail('hook script is missing a done(); call. This will stall! fix this before trying again.');
         }
 
-    }); //exec
+        try {
+
+            hook_script.hook(hook_flow, function(err){
+                done(err);
+            });
+
+        } catch(e) {
+            return fail(e);
+        } //try
+
+    } else { //hook_script
+
+        return fail('hook script was not found at ' + hook_file);
+
+    } //if hook_script
 
 } //run_hook
 
@@ -163,7 +224,7 @@ exports.verify = function verify(flow, done) {
 
 exports.error = function(flow, err) {
 
-    flow.log(1, 'hooks command error');
+    flow.log(1, 'hooks command error', err);
 
     if(err && err.length > 0) {
         flow.log(1,'%s\n', err);
