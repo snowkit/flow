@@ -10,6 +10,8 @@ var internal = {};
 
     exports.run = function run(flow, opt) {
 
+        internal.flow = flow;
+
         if(flow.target_arch === null) {
             flow.log(1, 'unknown target arch, invalid state! can\'t build. stopping.');
             return flow.project.failed = true;
@@ -48,36 +50,52 @@ var internal = {};
             }
 
                 //run the pre build hooks if any
-            hooks.run_hooks(flow, 'pre', function(pre_err){
-                if(!pre_err) {
-
-                        //finally, if all is ok,
-                        //run an actual build
-                    builder.run(flow, function(err) {
-
-                        flow.log(2,'build - done');
-
-                        if(!err) {
-
-                                //first execute any post build hooks
-                            hooks.run_hooks(flow, 'post', function(post_err){
-                                if(!post_err) {
-                                        //if build + run was asked
-                                    if(flow.action == 'run') {
-                                        flow.execute(flow, cmds['launch']);
-                                    }
-                                }
-                            }); //run post hooks
-
-                        } //!err
-                    }); //builder.run
-
-                } //!err
-            }); //run_hooks
+            hooks.run_hooks(flow, 'pre', internal.step_one);
 
         } //!lib
 
     }; //run
+
+    internal.step_one = function(err) {
+
+        var flow = internal.flow;
+
+        if(!err) {
+
+                //run the actual build
+            builder.run(flow, internal.step_two);
+
+        } //!err
+
+    } //step_one
+
+    internal.step_two = function(err) {
+
+        var flow = internal.flow;
+
+        flow.log(2,'build - done');
+
+        if(!err) {
+                //first execute any post build hooks
+            hooks.run_hooks(flow, 'post', internal.final_step);
+
+        } //!err
+
+    } //step_two
+
+    internal.final_step = function(err) {
+
+        var flow = internal.flow;
+        if(!err) {
+
+            //if build + run was asked
+            if(flow.action == 'run') {
+                flow.execute(flow, cmds['launch']);
+            }
+
+        } //err
+
+    } //final_step
 
 
 //Verification step
