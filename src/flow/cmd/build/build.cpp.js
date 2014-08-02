@@ -13,21 +13,26 @@ exports.post_build = function(flow, done) {
 
     flow.log(3,'build - running cpp post process');
 
-    //the post build is so that we can move the binary file
-    //from the output path if needed etc, run extra scripts and so on
-    var source_path = util.normalize(path.join(flow.project.paths.build, 'cpp/' + flow.project.paths.binary.source));
+        //run upx against the newly built binary first
+    flow.execute(flow, cmds['upx'], function(){
 
-    flow.log(3,'build - moving binary from %s to %s', source_path, flow.project.paths.binary.full);
+        //the post build is so that we can move the binary file
+        //from the output path if needed etc, run extra scripts and so on
+        var source_path = util.normalize(path.join(flow.project.paths.build, 'cpp/' + flow.project.paths.binary.source));
 
-        if(flow.timing) console.time('build - binary copy');
-    util.copy_path(flow, source_path, flow.project.paths.binary.full);
-        if(flow.timing) console.timeEnd('build - binary copy');
+        flow.log(3,'build - moving binary from %s to %s', source_path, flow.project.paths.binary.full);
 
-    if(flow.target_desktop) {
-        internal.post_build_desktop(flow, source_path, done);
-    } else {
-        internal.post_build_mobile(flow, source_path, done);
-    }
+            if(flow.timing) console.time('build - binary copy');
+        util.copy_path(flow, source_path, flow.project.paths.binary.full);
+            if(flow.timing) console.timeEnd('build - binary copy');
+
+        if(flow.target_desktop) {
+            internal.post_build_desktop(flow, source_path, done);
+        } else {
+            internal.post_build_mobile(flow, source_path, done);
+        }
+
+    }); //upx
 
 } //post_build
 
@@ -102,6 +107,7 @@ internal.build_android = function(flow, done) {
 
 internal.post_build_desktop = function(flow, source_path, done) {
 
+
     if(flow.system == 'mac' || flow.system == 'linux') {
 
                 if(flow.timing) console.time('build - binary chmod');
@@ -161,9 +167,9 @@ exports.write_hxcpp = function(flow, run_path) {
 
     var context = {
         includes : {
-            __haxe : { 
-                name:'__haxe', file:'Build.xml', path:'Build.xml', 
-                source:'flow internal', internal:true 
+            __haxe : {
+                name:'__haxe', file:'Build.xml', path:'Build.xml',
+                source:'flow internal', internal:true
             }
         }
     };
