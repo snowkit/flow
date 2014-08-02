@@ -22,6 +22,15 @@ exports.to_hex = function(value) {
    return (value+0x10000).toString(16).substr(-4).toUpperCase();
 }
 
+
+exports.system_arch = function(flow) {
+    if(process.arch == 'x64') {
+        return '64';
+    } else if(process.arch == 'ia32') {
+        return '32';
+    }
+} //system_arch
+
 exports.ios_uniqueid = function(flow) {
 
     return ''+
