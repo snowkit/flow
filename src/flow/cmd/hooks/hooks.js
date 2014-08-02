@@ -57,7 +57,7 @@ internal.run_stage = function(flow, stage, hooks, done) {
     if(list.length) {
         internal.run_hook_list(flow, stage, list, done);
     } else {
-        flow.log(2, 'hooks - stage %s has no hooks', stage);
+        flow.log(3, 'hooks - no %s hooks', stage);
         if(done) {
             done();
         }
