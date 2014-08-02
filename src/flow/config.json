@@ -13,6 +13,7 @@
         "timing" : false,
         "boot" : "FlowApp",
         "command_line" : false,
+        "icons_disable_default" : false,
 
         "binary_source_name" : "{{app.boot}}{{app.debugtag}}",
         "binary_dest_name" : "{{app.name}}",

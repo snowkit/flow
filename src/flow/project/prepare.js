@@ -723,29 +723,60 @@ internal.prepare_icons = function(flow, prepared) {
     //icons simply need to append their source project path so that they can be
     //correctly located in the resulting icons command.
 
-    if(!prepared.source.project.app || !prepared.source.project.app.icon) {
-        return;
-    }
+    var using_default = true;
 
-    prepared.source.project.app._icon = {
-        dest : 'icon',
-        source : 'icon'
-    };
+    if(!prepared.source.project.app) {
+        if(flow.config.icons_disable_default) {
+            return;
+        }
+    } //no app node
 
-        //so, do dependencies first, in order, overriding the source path only as it walks
-    for(index in prepared.depends_list) {
+    if(!prepared.source.project.app.icon) {
+        if(flow.config.icons_disable_default) {
+            return;
+        }
+    } else {//no icon
 
-        var name = prepared.depends_list[index];
-        var depend = prepared.depends[name];
-        prepared.source.project.app._icon.__path = depend.project.__root;
+        using_default = false;
 
-    } //each depends
+    } //yes icon
 
-        //then, if it's from the source project, override the value to nothing
-    if(flow.project.parsed.project.app && flow.project.parsed.project.app.icon) {
-        prepared.source.project.app._icon.__path = flow.project.root;
-    }
+    if(using_default) {
 
+        var default_icon_path = path.resolve(flow.flow_path, 'cmd/icons/');
+
+        prepared.source.project.app._icon = {
+            dest : 'flow',
+            source : 'default',
+            __path : default_icon_path
+        };
+
+    } else {
+
+        prepared.source.project.app._icon = {
+            dest : 'icon',
+            source : prepared.source.project.app.icon
+        };
+
+            //so, do dependencies first, in order, overriding the source path only as it walks
+        for(index in prepared.depends_list) {
+
+            var name = prepared.depends_list[index];
+            var depend = prepared.depends[name];
+
+            prepared.source.project.app._icon.__path = depend.project.__root;
+
+        } //each depends
+
+            //then, if it's from the source project, override the value to nothing
+        if(flow.project.parsed.project.app && flow.project.parsed.project.app.icon) {
+            prepared.source.project.app._icon.__path = flow.project.root;
+        }
+
+    } //using_default
+
+        //finally, on windows, we inject a special build script for hxcpp
+        //to embed the icon into the build time step
 
     if(flow.target == 'windows') {
             //finally, for windows icons, we append a hxcpp include

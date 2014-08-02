@@ -1,7 +1,7 @@
-
 var   util = require('../../util/util')
     , cmd = require('../../util/process')
     , path = require('path')
+    , fse = require('fs-extra')
 
 exports.convert = function(flow, icon, done) {
 
@@ -13,16 +13,13 @@ exports.convert = function(flow, icon, done) {
     var icon_folder = path.join(icon.source, 'mac');
     var icon_set = path.join(icon_folder, icon.dest+'.iconset');
     var icon_file = icon.dest+'.icns';
-    var icon_output = path.join(flow.project.paths.files,icon_file);
+    var icon_output = path.join(flow.project.paths.files, icon_file);
 
-    cmd.exec(flow, 'iconutil', ['-c', 'icns', icon_set], { cwd:flow.project.root }, function(code, out, err){
+    fse.ensureFileSync(icon_output);
 
-        if(!code) {
+    cmd.exec(flow, 'iconutil', ['-c', 'icns', icon_set, '-o', icon_output], { cwd:flow.project.root }, function(code, out, err){
 
-            flow.log(2,'icons - ok - copying to output folder');
-            util.copy_path(flow, path.join(icon_folder,icon_file), icon_output);
-
-        } else {
+        if(code) {
             flow.log(2,'icons - failed - see log above');
         }
 
