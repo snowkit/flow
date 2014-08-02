@@ -7,7 +7,7 @@
 
     if:{
 
-        "ios && arch-armv7 && !static_link" : {
+        "ios && arch-armv7 && !hxcpp_static_std" : {
           build : {
             files : {
               libregexp : { path:"bin/IPhone/libregexp.iphoneos-v7.a => project/{{app.name}}/libs/armv7/libregexp.a" },
@@ -17,7 +17,7 @@
           }
         },
 
-        "ios && arch-armv6 && !static_link" : {
+        "ios && arch-armv6 && !hxcpp_static_std" : {
           build : {
             files : {
               libregexp : { path:"bin/IPhone/libregexp.iphoneos.a => project/{{app.name}}/libs/armv6/libregexp.a" },
@@ -27,7 +27,7 @@
           }
         },
 
-        "ios && ios-sim && !static_link" : {
+        "ios && ios-sim && !hxcpp_static_std" : {
           build : {
             files : {
               libregexp : { path:"bin/IPhone/libregexp.iphonesim.a => project/{{app.name}}/libs/i386/libregexp.a" },
@@ -37,7 +37,7 @@
           }
         },
 
-        "android && arch-armv7 && !static_link" : {
+        "android && arch-armv7 && !hxcpp_static_std" : {
           build : {
             files : {
               libregexp : { path:"bin/Android/libregexp-v7.so => project/libs/armeabi/libregexp.so" },
@@ -47,7 +47,7 @@
           }
         },
 
-        "android && arch-armv5 && !static_link" : {
+        "android && arch-armv5 && !hxcpp_static_std" : {
           build : {
             files : {
               libregexp : { path:"bin/Android/libregexp.so => project/libs/armeabi/libregexp.so" },
@@ -57,7 +57,7 @@
           }
         },
 
-        "android && arch-x86 && !static_link" : {
+        "android && arch-x86 && !hxcpp_static_std" : {
           build : {
             files : {
               libregexp : { path:"bin/Android/libregexp-x86.so => project/libs/armeabi/libregexp.so" },
@@ -79,7 +79,7 @@
             }
         },
 
-        "android && !static_link": {
+        "android && !hxcpp_static_std": {
             app : {
               mobile : {
                 android : {
@@ -91,7 +91,7 @@
             }
         },
 
-        "windows && arch-32 && !static_link" : {
+        "windows && arch-32 && !hxcpp_static_std" : {
           files : {
             libregexp : { path:"bin/Windows/regexp.dll => regexp.dll", not_listed:true },
             libstd : { path:"bin/Windows/std.dll => std.dll", not_listed:true },
@@ -99,7 +99,7 @@
           }
         },
 
-        "mac && arch-32 && !static_link" : {
+        "mac && arch-32 && !hxcpp_static_std" : {
           files : {
             libregexp : { path:"bin/Mac/regexp.dylib => ../MacOS/regexp.dylib", not_listed:true },
             libstd : { path:"bin/Mac/std.dylib => ../MacOS/std.dylib", not_listed:true },
@@ -107,7 +107,7 @@
           }
         },
 
-        "mac && arch-64 && !static_link" : {
+        "mac && arch-64 && !hxcpp_static_std" : {
           files : {
             libregexp : { path:"bin/Mac64/regexp.dylib => ../MacOS/regexp.dylib", not_listed:true },
             libstd : { path:"bin/Mac64/std.dylib => ../MacOS/std.dylib", not_listed:true },
