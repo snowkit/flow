@@ -44,11 +44,10 @@ exports.run = function run(flow, data, done) {
 exports.verify = function verify(flow, done) {
 
     var skip = (flow.flags.upx === false);
-
-    skip = skip || flow.config.build.upx_skip;
+        skip = skip || flow.config.build.upx_skip;
 
     if(skip) {
-        done('',null);
+        done('skipped',null);
         return;
     }
 
@@ -60,7 +59,7 @@ exports.verify = function verify(flow, done) {
 
 exports.error = function(flow, err) {
 
-    if(err && err.length > 0) {
+    if(err && err.length > 0 && err != 'skipped') {
         flow.log(1, 'upx - error', err);
     }
 
