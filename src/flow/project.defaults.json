@@ -1,12 +1,12 @@
 {
     "project" : {
+        "name" : "generic flow app",
         "build" : {
             "number":1
         },
         "app" : {
             "main" : "Main",
             "output" : "bin",
-            "title" : "flow app",
             "codepaths" : [ "src" ],
             "web" : {
                 "libs" : {
