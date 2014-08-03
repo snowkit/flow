@@ -368,6 +368,10 @@ exports.find_arch = function(flow) {
 
     var arch = '';
 
+    if(flow.target == 'web') {
+        return 'web';
+    }
+
         //check if there is any explicit arch given
     if(flow.flags.arch) {
         var _arch = flow.flags.arch;
