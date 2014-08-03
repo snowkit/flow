@@ -5,7 +5,7 @@ var   util = require('../../util/util')
 
 exports.convert = function(flow, icon, done) {
 
-    flow.log(2, 'icons / copy %s to favicon.png', icon.source, icon.dest);
+    flow.log(2, 'icons / copy %s to favicon.png', icon.source);
 
     var icon_folder = path.join(icon.source, 'web');
     var icon_source = path.join(icon_folder, icon.dest+'.png');
