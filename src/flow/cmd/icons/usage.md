@@ -1,17 +1,10 @@
 `flow icons [target] [--options]`
 
-Convert the `project.app.icons` value to a usable output,
+Convert the `project.app.icon` value to a usable output if needed,
 and place it in the output directory, so the build can use it.
+
+On iOS, also copies the splash images, as these use the same asset system.
 
   options
 
-      *todo*
-    --icon-name
-        override the name of the destination icon file for the target
-
-      *todo*
-    --icon-path
-      override the name of the folder to source the icons from.
-      Still requires the defined icon structure for the target.
-
-
+    none, currently
