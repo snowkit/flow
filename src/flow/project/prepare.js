@@ -538,6 +538,10 @@ internal.prepare_defines = function(flow, prepared) {
         prepared.defines_all['desktop'] = { name:'desktop', met:true };
     }
 
+    if(flow.flags.debug) {
+        prepared.defines_all['debug'] = { name:'debug', met:true };
+    }
+
         //we also store a few config values as defines because they can be used to configure the build
     prepared.defines_all['flow_build_command_line'] = { name:'flow_build_command_line', met:flow.config.build.command_line };
 
