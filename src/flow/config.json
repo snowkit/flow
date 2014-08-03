@@ -60,7 +60,9 @@
         "files_output_list" : true,
         "files_output_list_name" : "manifest",
         "files_error_on_missing" : false,
-        "files_ignore_dotfiles" : true
+        "files_ignore_dotfiles" : true,
+
+        "upx_skip" : false
 
     }
 }

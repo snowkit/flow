@@ -45,6 +45,8 @@ exports.verify = function verify(flow, done) {
 
     var skip = (flow.flags.upx === false);
 
+    skip = skip || flow.config.build.upx_skip;
+
     if(skip) {
         done('',null);
         return;
