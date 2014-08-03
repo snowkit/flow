@@ -10,17 +10,17 @@ exports.run = function run(flow, data, done) {
     var source_file = path.join(source_path, 'cpp/' + flow.project.paths.binary.source);
         source_file = util.normalize(source_file);
 
-    var upx_path = path.dirname(flow.bin_path);
+    var upx_path = util.normalize(path.dirname(flow.bin_path));
     var upx_file = 'upx-' + flow.system;
 
         if(flow.system == 'linux') {
             upx_path += util.system_arch();
         }
         if(flow.system == 'windows') {
-            upx_path += '.exe';
+            upx_file += '.exe';
         }
 
-    var upx_bin = path.join(upx_path, upx_file);
+    var upx_bin = util.normalize(path.join(upx_path, upx_file));
 
     flow.log(3, 'running upx from %s on %s', upx_bin, source_file);
 
