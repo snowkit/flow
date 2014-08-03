@@ -514,8 +514,8 @@ internal.prepare_defines = function(flow, prepared) {
 
     internal.log(flow, 3, 'prepare - defines ...');
 
-    //store the list of targets as met or unmet defines based on the target
-    //we are attempting to prepare for
+        //store the list of targets as met or unmet defines based on the target
+        //we are attempting to prepare for
     for(index in flow.config.build.known_targets) {
         var name = flow.config.build.known_targets[index];
         prepared.defines_all[name] = { name:name, met:flow.target == name };
@@ -542,8 +542,38 @@ internal.prepare_defines = function(flow, prepared) {
         prepared.defines_all['debug'] = { name:'debug', met:true };
     }
 
-        //we also store a few config values as defines because they can be used to configure the build
+
+        //look for command line defines, this must happen before parse, so they are met
+    if(flow.flags.d) {
+
+        var cmdline_defines = []
+
+        if(flow.flags.d.constructor == String) {
+            cmdline_defines.push(flow.flags.d);
+        } else {
+            cmdline_defines = flow.flags.d;
+        }
+
+        for(index in cmdline_defines) {
+            var def = cmdline_defines[index];
+            var parts = def.split('=');
+            var def_name = parts[0];
+            var def_value = parts[1];
+
+            prepared.defines_all[def_name] = { name:def_name, met:true };
+
+            if(def_value) {
+                prepared.defines_all[def_name].value = def_value;
+            }
+        } //cmdline_defines
+
+    } //flow.flags.d
+
+
+        //we also store a few config values as defines because they need to be be used to configure the build
     prepared.defines_all['flow_build_command_line'] = { name:'flow_build_command_line', met:flow.config.build.command_line };
+
+
 
         //now we parse all project defines from the project
     prepared.defines_all = defines.parse(flow, prepared.source, prepared.depends, prepared.defines_all);
@@ -652,7 +682,9 @@ internal.prepare_flags = function(flow, prepared) {
         prepared.flags = flags.parse(flow, prepared);
 
             //append the debug flag if requested
-        if(flow.flags.debug) { prepared.flags.push('-debug'); }
+        if(flow.flags.debug) {
+            prepared.flags.push('-debug');
+        }
 
         internal.log(flow, 4, bake.flags(flow, prepared));
 
