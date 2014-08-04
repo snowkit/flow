@@ -235,6 +235,11 @@ exports.build_hxcpp = function(flow, run_path, hxcpp_file, done) {
         args.push('-verbose');
     }
 
+    if(flow.target == 'windows' &&
+       flow.project.prepared.defines_list.indexOf('show_console') == -1) {
+        args.push('-Dno_console');
+    }
+
     args.push('-D' + flow.target);
 
     switch(flow.target_arch) {
