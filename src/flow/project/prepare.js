@@ -681,6 +681,23 @@ internal.prepare_flags = function(flow, prepared) {
         internal.prepare_codepaths(flow, prepared);
         prepared.flags = flags.parse(flow, prepared);
 
+        if(flow.flags.f) {
+
+            var cmdline_flags = []
+
+            if(flow.flags.f.constructor == String) {
+                cmdline_flags.push(flow.flags.f);
+            } else {
+                cmdline_flags = flow.flags.f;
+            }
+
+            for(index in cmdline_flags) {
+                var flag = cmdline_flags[index];
+                prepared.flags.push(flag);
+            } //each cmdline_flag
+
+        } //if flow.flags.f
+
             //append the debug flag if requested
         if(flow.flags.debug) {
             prepared.flags.push('-debug');
