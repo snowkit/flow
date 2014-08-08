@@ -78,15 +78,18 @@ internal.build_android = function(flow, done) {
 
             if(flow.timing) console.time('build - android - ant');
 
-    flow.log(2, 'build - android - using ant at %s', flow.config.build.android.ant_path);
-    if(!fs.existsSync(flow.config.build.android.ant_path)) {
-        flow.log(1, 'build - android - cannot find ant at specified path %s', flow.config.build.android.ant_path );
+    var ant_path = util.normalize(flow.config.build.android.ant_path);
+
+    flow.log(2, 'build - android - using ant at %s', ant_path);
+
+    if(!fs.existsSync(ant_path)) {
+        flow.log(1, 'build - android - cannot find ant at specified path %s', ant_path );
         return flow.project.failed = true;
     }
 
     try {
 
-        cmd.exec(flow, flow.config.build.android.ant_path, args, opt, function(code,out,err){
+        cmd.exec(flow, ant_path, args, opt, function(code,out,err){
 
                 if(flow.timing) console.timeEnd('build - android - ant');
 
