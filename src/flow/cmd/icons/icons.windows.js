@@ -45,7 +45,7 @@ exports.convert = function(flow, icon, done) {
 
                 //finally, for windows icons, we append a hxcpp include
                 //so that it can link against the icon.
-            flow.project.prepared.source.hxcpp.includes['__icon'] = {
+            flow.project.prepared.hxcpp.includes['__icon'] = {
                 name:'__icon', file:'__icon.xml', path:'__icon.xml',
                 source:'flow internal', internal:true
             };
