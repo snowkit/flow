@@ -6,6 +6,9 @@
 
 exports.run = function run(flow, data, done) {
 
+
+    flow.log(2, 'build - running upx...');
+
     var source_path = util.normalize(path.resolve(flow.project.paths.build));
     var source_file = path.join(source_path, 'cpp/' + flow.project.paths.binary.source);
         source_file = util.normalize(source_file);
@@ -43,7 +46,7 @@ exports.run = function run(flow, data, done) {
 
 exports.verify = function verify(flow, done) {
 
-    var skip = (flow.flags.upx === false);
+    var skip = !flow.flags.upx;
         skip = skip || flow.config.build.upx_skip;
 
     if(skip) {
