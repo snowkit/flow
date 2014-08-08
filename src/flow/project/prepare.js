@@ -435,7 +435,7 @@ internal.prepare_mobile = function(flow, prepared) {
 
     if(flow.target == 'ios') {
 
-            //handle native libs as these will be registered unless requested not to
+        //handle native libs as these will be registered unless requested not to
         var libs = prepared.source.project.app.mobile.ios.libs;
         if(libs) {
             if(libs.native) {

@@ -161,6 +161,8 @@ exports.merge_unique = function merge_unique(obj_src, obj_dest) {
     if(obj_dest[p] !== undefined) {
       if ( obj_src[p].constructor == Object ) {
         obj_dest[p] = merge_unique(obj_src[p], obj_dest[p]);
+      } else if(obj_src[p].constructor == Array) {
+        obj_dest[p] = exports.array_union(obj_src[p], obj_dest[p]);
       }
     } else {
       obj_dest[p] = obj_src[p];
