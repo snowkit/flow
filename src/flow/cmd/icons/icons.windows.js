@@ -33,13 +33,24 @@ exports.convert = function(flow, icon, done) {
     fs.writeFileSync(rcfilepath, rccontent, 'utf8');
 
     	//:todo: configure/safety
-    var vsdir = process.env['VS100COMNTOOLS'] || process.env['VS110COMNTOOLS'] || process.env['VS120COMNTOOLS'];
+    var vsdir = process.env['VS100COMNTOOLS'] ||
+                process.env['VS110COMNTOOLS'] ||
+                process.env['VS120COMNTOOLS'];
+
     var vsvars = path.resolve(vsdir, '../../vc/vcvarsall.bat');
 
     cmd.exec(flow,'cmd.exe', ['/c', vsvars, '&&', 'rc', '/r', 'icon.rc'], {cwd:cpp_path,quiet:false}, function(code,out,err) {
 
     	if(!code) {
-            flow.log(2,'icons - ok - embedded in exe at link time');
+
+                //finally, for windows icons, we append a hxcpp include
+                //so that it can link against the icon.
+            prepared.hxcpp.includes['__icon'] = {
+                name:'__icon', file:'__icon.xml', path:'__icon.xml',
+                source:'flow internal', internal:true
+            };
+
+            flow.log(2,'icons - ok - will be embedded in exe at link time');
         } else {
             flow.log(2,'icons - failed - see log above');
         }
