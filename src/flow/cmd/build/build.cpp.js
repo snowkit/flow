@@ -78,30 +78,43 @@ internal.build_android = function(flow, done) {
 
             if(flow.timing) console.time('build - android - ant');
 
-    cmd.exec(flow, flow.config.build.android.ant_path, args, opt, function(code,out,err){
+    flow.log(2, 'build - android - using ant at %s', flow.config.build.android.ant_path);
+    if(!fs.existsSync(flow.config.build.android.ant_path)) {
+        flow.log(1, 'build - android - cannot find ant at specified path %s', flow.config.build.android.ant_path );
+        return flow.project.failed = true;
+    }
 
-            if(flow.timing) console.timeEnd('build - android - ant');
+    try {
 
-        if(code != 0) {
-            flow.log(1,'build - android - stopping because ant failed to build, exit code %d', code);
-            return flow.project.failed = true;
-        }
+        cmd.exec(flow, flow.config.build.android.ant_path, args, opt, function(code,out,err){
 
-            //now move the apk out into the user bin folder
-        var apk_name = flow.project.prepared.source.project.app.name + '-' + build_type + '.apk';
-        var apk_path = path.join(project_root, 'bin/' + apk_name);
-        var apk_dest = path.join(flow.project.paths.output, apk_name);
+                if(flow.timing) console.timeEnd('build - android - ant');
 
-            if(flow.timing) console.time('build - apk copy');
-        util.copy_path(flow, apk_path, apk_dest);
-            if(flow.timing) console.timeEnd('build - apk copy');
+            if(code != 0) {
+                flow.log(1,'build - android - stopping because ant failed to build, exit code %d', code);
+                return flow.project.failed = true;
+            }
+
+                //now move the apk out into the user bin folder
+            var apk_name = flow.project.prepared.source.project.app.name + '-' + build_type + '.apk';
+            var apk_path = path.join(project_root, 'bin/' + apk_name);
+            var apk_dest = path.join(flow.project.paths.output, apk_name);
+
+                if(flow.timing) console.time('build - apk copy');
+            util.copy_path(flow, apk_path, apk_dest);
+                if(flow.timing) console.timeEnd('build - apk copy');
 
 
-        if(done) {
-            done(code,out,err);
-        }
+            if(done) {
+                done(code,out,err);
+            }
 
-    });
+        });
+
+    } catch(e) {
+        flow.log(1, 'build - android - cannot execute ant', e );
+        return done('cannot execute ant...', null);
+    }
 
 } //build_android
 
