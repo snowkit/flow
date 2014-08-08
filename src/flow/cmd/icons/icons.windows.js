@@ -36,7 +36,7 @@ exports.convert = function(flow, icon, done) {
     var vsdir = process.env['VS100COMNTOOLS'] || process.env['VS110COMNTOOLS'] || process.env['VS120COMNTOOLS'];
     var vsvars = path.resolve(vsdir, '../../vc/vcvarsall.bat');
 
-    cmd.exec(flow,'cmd.exe', ['/c', vsvars, '&&', 'rc', '/r', 'icon.rc'], {cwd:cpp_path,quiet:true}, function(code,out,err) {
+    cmd.exec(flow,'cmd.exe', ['/c', vsvars, '&&', 'rc', '/r', 'icon.rc'], {cwd:cpp_path,quiet:false}, function(code,out,err) {
 
     	if(!code) {
             flow.log(2,'icons - ok - embedded in exe at link time');
