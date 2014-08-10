@@ -124,7 +124,7 @@ exports.find_flow_files = function(flow, root) {
 
 exports.verify = function verify(flow, project_path, project_root, is_dependency, quiet) {
 
-    var project_file = flow.flags.project || project_path;
+    var project_file = project_path;
     var abs_path = '';
 
     function fail_verify(reason) {
@@ -143,19 +143,20 @@ exports.verify = function verify(flow, project_path, project_root, is_dependency
         var flow_files = exports.find_flow_files(flow);
 
         if(flow_files.length > 1) {
-            return fail_verify('uh.. multiple *.flow files found, which one did you mean? use --project <your.flow> or keep a single project file in the root of your project');
+            return fail_verify('uh.. multiple *.flow files found, which one did you mean? use --project <your.flow> or keep a single flow file in the root of your project');
         } else if(flow_files.length == 0) {
-            return fail_verify('cannot find any *.flow project files in the current working directory. run flow from your project root alongside your.flow file');
+            return fail_verify('cannot find any *.flow project files in the current working directory. run flow from your project root alongside your.flow file or use --project <your.flow>');
         } else {
             project_file = flow_files[0];
         }
 
-    } //!project_file
+    }
 
     abs_path = util.normalize(path.resolve(project_file));
 
     project_root = project_root || path.dirname(abs_path);
     project_root = util.normalize(project_root, true);
+
 
     if(!flow.quiet.project && !quiet) {
         flow.log(2, 'project - using project file %s', abs_path)
@@ -330,7 +331,9 @@ exports.do_prepare = function(flow) {
     flow.quiet.prepare = true;
     flow.quiet.project = true;
 
-    var project = flow.project.verify(flow);
+        //if no project given, it will look for one
+    var _current_project = flow.flags.project;
+    var project = flow.project.verify(flow, _current_project);
 
         //if no valid project was found
     if(!project.parsed) {
@@ -342,10 +345,21 @@ exports.do_prepare = function(flow) {
     flow.project.path = project.path;
     flow.project.file = project.file;
 
+    exports.ensure_path(flow);
+
     flow.project.prepare(flow);
     flow.project.bake(flow);
 
 } //do_prepare
+
+exports.ensure_path = function(flow) {
+
+        //ensure we are in the correct place to perform any operations
+
+    flow.log(2, 'project - switch to run in %s', flow.project.root);
+    process.chdir(flow.project.root);
+
+} //ensure_path
 
 internal._error_project = function(flow, reason){
 

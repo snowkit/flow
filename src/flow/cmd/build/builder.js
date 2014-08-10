@@ -148,7 +148,7 @@ internal.build_haxe = function(flow, hxml_file, done) {
 
     var opt = {
         // quiet : false,
-        cwd: path.resolve(flow.run_path, flow.project.paths.build)
+        cwd: path.resolve(flow.project.root, flow.project.paths.build)
     }
 
     cmd.exec(flow, 'haxe', [hxml_file], opt, done);

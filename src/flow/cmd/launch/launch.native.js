@@ -33,8 +33,8 @@ internal.launch = function(flow) {
 
     if(flow.target_desktop) {
 
-        var abs_binary = path.resolve(flow.run_path, flow.project.paths.binary.full);
-        var abs_outpath = path.resolve(flow.run_path, flow.project.paths.output);
+        var abs_binary = path.resolve(flow.project.root, flow.project.paths.binary.full);
+        var abs_outpath = path.resolve(flow.project.root, flow.project.paths.output);
 
         cmd.exec(flow, abs_binary, [], { cwd: abs_outpath });
 
@@ -71,7 +71,7 @@ internal.android_launch_init = function(flow) {
         //work out the name of the apk
     internal.apk_name = project.app.name + '-' + internal.build_type + '.apk';
         //work out the apk location
-    internal.abs_outpath = path.resolve(flow.run_path, flow.project.paths.output);
+    internal.abs_outpath = path.resolve(flow.project.root, flow.project.paths.output);
 
 } //android_launch_init
 

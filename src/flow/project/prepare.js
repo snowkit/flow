@@ -663,7 +663,7 @@ internal.prepare_codepaths = function (flow, prepared) {
     if(prepared.source.project.app && prepared.source.project.app.codepaths) {
 
         var _paths = prepared.source.project.app.codepaths.map(function(a) {
-            var _path = path.relative(flow.project.paths.build, path.join(flow.run_path, a));
+            var _path = path.relative(flow.project.paths.build, path.join(flow.project.root, a));
             return '-cp ' + util.normalize(_path, true);
         });
 

@@ -153,7 +153,7 @@ exports.post_haxe = function(flow, done) {
             if(flow.timing) console.time('build - hxcpp');
 
     var cpp_path = path.join(flow.project.paths.build, 'cpp/');
-        cpp_path = path.resolve(flow.run_path, cpp_path);
+        cpp_path = path.resolve(flow.project.root, cpp_path);
 
         //write custom xml
     exports.write_hxcpp(flow, cpp_path);

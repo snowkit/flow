@@ -23,6 +23,8 @@ var internal = {};
         flow.project.path = opt.project.path;
         flow.project.file = opt.project.file;
 
+        flow.project.ensure_path(flow);
+
         flow.log(2,'build - %s %s for %s',
             flow.project.parsed.project.name, flow.project.parsed.project.version, flow.target);
 
@@ -106,7 +108,9 @@ var internal = {};
         var result = {};
         var target = flow.target;
 
-        var project = flow.project.verify(flow);
+                //if no project given, it will look for one
+        var _current_project = flow.flags.project;
+        var project = flow.project.verify(flow, _current_project);
 
             //if no valid project was found
         if(!project.parsed) {

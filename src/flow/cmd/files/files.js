@@ -230,7 +230,7 @@ internal.template_folder_recursively = function(flow, node, _dest, _overwrite) {
     var _source_path = node.source;
         //if a relative path from our project, make it absolute
     if(!node.source_name) {
-        _source_path = util.normalize(path.resolve(flow.run_path, node.source), true);
+        _source_path = util.normalize(path.resolve(flow.project.root, node.source), true);
     }
 
     var _source_list = wrench.readdirSyncRecursive(_source_path);

@@ -4,7 +4,7 @@ var  cmd = require('../../util/process')
 
 exports.launch = function(flow) {
 
-    var abs_outpath = path.resolve(flow.run_path, flow.project.paths.output);
+    var abs_outpath = path.resolve(flow.project.root, flow.project.paths.output);
 
     var port = flow.flags.port || flow.config.build.web.port;
     var node = flow.bin_path;

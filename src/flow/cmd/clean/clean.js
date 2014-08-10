@@ -11,18 +11,18 @@ exports.run = function run(flow, opt) {
     if(opt.all) {
 
         flow.log(2, 'clean - cleaning %s ... \n', flow.project.parsed.project.app.output );
-        wrench.rmdirSyncRecursive(path.resolve(flow.run_path, flow.project.parsed.project.app.output), true);
+        wrench.rmdirSyncRecursive(path.resolve(flow.project.root, flow.project.parsed.project.app.output), true);
 
     } else {
 
         if(opt.build) {
             flow.log(2, 'clean - cleaning %s ... ', flow.project.paths.build );
-            wrench.rmdirSyncRecursive(path.resolve(flow.run_path, flow.project.paths.build), true);
+            wrench.rmdirSyncRecursive(path.resolve(flow.project.root, flow.project.paths.build), true);
         }
 
         if(opt.output) {
             flow.log(2, 'clean - cleaning %s ... \n', flow.project.paths.output );
-            wrench.rmdirSyncRecursive(path.resolve(flow.run_path, flow.project.paths.output), true);
+            wrench.rmdirSyncRecursive(path.resolve(flow.project.root, flow.project.paths.output), true);
         }
 
     }
