@@ -74,7 +74,7 @@ var HTTPServer = exports.HTTPServer = function (options) {
           }
 
           if(_list.length == 0) {
-            process.exit();
+            // process.exit();
           }
           // console.log(_list);
 
