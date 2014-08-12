@@ -43,7 +43,8 @@ exports.prepare = function prepare(flow) {
         defines_all : {},
         hooks : { pre:{}, post:{} },
         hxcpp : {
-            includes : {}
+            includes : {},
+            flags : [],
         }
     }
 
@@ -384,47 +385,85 @@ internal.prepare_hxcpp = function(flow, prepared) {
 
         if(project.build.hxcpp) {
 
-            flow.log(3, 'prepare - hxcpp - depend %s has hxcpp includes', name);
+            if(project.build.hxcpp.includes) {
 
-            for(include in project.build.hxcpp) {
-                var node = project.build.hxcpp[include];
+                flow.log(3, 'prepare - hxcpp - depend %s has hxcpp includes', name);
 
-                flow.log(4, 'prepare - hxcpp -      added %s : %s', include, node);
+                for(include in project.build.hxcpp.includes) {
+                    var node = project.build.hxcpp.includes[include];
 
-                var src = path.join(depend.project.__root, node);
-                prepared.hxcpp.includes[include] = {
-                    file : path.basename(src),
-                    path : src,
-                    name : include,
-                    source : depend.project.__path
-                };
+                    flow.log(4, 'prepare - hxcpp -      added %s : %s', include, node);
+
+                    var src = path.join(depend.project.__root, node);
+                    prepared.hxcpp.includes[include] = {
+                        file : path.basename(src),
+                        path : src,
+                        name : include,
+                        source : depend.project.__path
+                    };
+                }
+
+            } else {
+                flow.log(4,'prepare - hxcpp - depend %s has no hxcpp includes', name);
             }
-        } else {
-            flow.log(4,'prepare - hxcpp - depend %s has no hxcpp includes', name);
-        }
+
+            if(project.build.hxcpp.flags) {
+                prepared.hxcpp.flags = util.array_union(prepared.hxcpp.flags, project.build.hxcpp.flags);
+            }
+
+        } //hxcpp node
 
     } //each depends
 
         //if it's from the source project we append the project root afterward to override
     var source = flow.project.parsed.project;
+
     if(source.build.hxcpp) {
 
-        flow.log(3, 'prepare - hxcpp - project has hxcpp includes');
+        if(source.build.hxcpp.includes) {
 
-        for(name in source.build.hxcpp) {
+            flow.log(3, 'prepare - hxcpp - project has hxcpp includes');
 
-            var node = source.build.hxcpp[name];
-            var src = path.join(flow.project.root, node);
-            prepared.hxcpp.includes[name] = {
-                file : path.basename(src),
-                path : src,
-                name : name,
-                source : path.join(flow.project.root, flow.project.file)
-            };
+            for(name in source.build.hxcpp.includes) {
 
-            flow.log(4, 'prepare - hxcpp -      added %s : %s', name, node);
+                var node = source.build.hxcpp.includes[name];
+                var src = path.join(flow.project.root, node);
+                prepared.hxcpp.includes[name] = {
+                    file : path.basename(src),
+                    path : src,
+                    name : name,
+                    source : path.join(flow.project.root, flow.project.file)
+                };
+
+                flow.log(4, 'prepare - hxcpp -      added %s : %s', name, node);
+
+            } //each include
+
+        } //if includes
+
+        if(source.build.hxcpp.flags) {
+            prepared.hxcpp.flags = util.array_union(prepared.hxcpp.flags, source.build.hxcpp.flags);
         }
-    }
+
+    } //if hxcpp node
+
+
+        //finally, we parse the command line for --f-hxcpp flags
+    if(flow.flags['f-hxcpp']) {
+
+        var cmdline_hxcpp_flags = []
+
+        if(flow.flags['f-hxcpp'].constructor == String) {
+            cmdline_hxcpp_flags.push(flow.flags['f-hxcpp']);
+        } else if(flow.flags['f-hxcpp'].constructor == Array) {
+            cmdline_hxcpp_flags = flow.flags['f-hxcpp'];
+        } else {
+            //nothing to do here...
+        }
+
+        prepared.hxcpp.flags = util.array_union(prepared.hxcpp.flags, cmdline_hxcpp_flags);
+
+    } //f-hxcpp flags exist
 
 } //prepare_hxcpp
 

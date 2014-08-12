@@ -289,6 +289,9 @@ exports.build_hxcpp = function(flow, run_path, hxcpp_file, done) {
         args.push('-Dandroid-' + flow.project.parsed.project.app.mobile.android.sdk_target);
     }
 
+        //append command line + project based flags
+    args = util.array_union(args, flow.project.prepared.hxcpp.flags);
+
     flow.log(2, 'build - running hxcpp ...');
     flow.log(3, 'haxelib run hxcpp %s', args.join(' ') );
     flow.log(3, 'running hxcpp from %s', run_path );
