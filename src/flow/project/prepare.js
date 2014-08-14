@@ -24,6 +24,7 @@ exports.prepare = function prepare(flow) {
         //preparation starts with the parsed project
     var parsed = flow.project.parsed;
 
+        //
     internal.log(flow, 2, 'prepare - project %s', parsed.project.name );
 
         //dependencies are a special case as they affect everything, they
@@ -55,9 +56,7 @@ exports.prepare = function prepare(flow) {
         //once cascaded we can safely calculate the paths from it
     internal.prepare_config_paths(flow, prepared);
 
-        //this step simply pulls out any conditionals in any root node,
-        //tokenizes it, verifies it and pushes it into a cache for later
-        //checks against a condition being met
+        //then prepare the remaining nodes that need it
     internal.prepare_project(flow, prepared);
 
         //finally, store it in the project as valid and return
@@ -278,7 +277,7 @@ internal.fail = function(flow, prepared, section, msg) {
 
     return flow.project.failed = true;
 
-}
+} //fail
 
 internal.prepare_project = function(flow, prepared) {
 
@@ -309,35 +308,35 @@ internal.prepare_project = function(flow, prepared) {
                 return internal.fail(flow, prepared, 'defines', state.err);
             }
 
-    //flags
+    // project.build.flags and --f cli
 
             internal.prepare_flags(flow, prepared);
 
-    //hooks
+    // project.build.hooks
 
             internal.prepare_hooks(flow, prepared);
 
-    //icons
+    // project.app.icon
 
             internal.prepare_icons(flow, prepared);
 
-    //files
+    // project.files and project.build.files
 
             internal.prepare_files(flow, prepared);
 
-    //conditional nodes
+    // if:
 
-            internal.prepare_conditional_nodes(flow, prepared);
+            internal.prepare_conditionals(flow, prepared);
 
-    //mobile
+    // mobile specifics
 
             internal.prepare_mobile(flow, prepared);
 
-    //hxcpp
+    // hxcpp injection / --f-hxcpp
 
             internal.prepare_hxcpp(flow, prepared);
 
-    //user object schema
+    // user object schema
 
             internal.prepare_schema(flow, prepared);
 
@@ -347,7 +346,7 @@ internal.prepare_project = function(flow, prepared) {
 } //prepare_project
 
 
-internal.prepare_conditional_nodes = function(flow, prepared) {
+internal.prepare_conditionals = function(flow, prepared) {
 
         //backmerge known conditional nodes against the project itself
     if(prepared.source.if) {
@@ -355,26 +354,26 @@ internal.prepare_conditional_nodes = function(flow, prepared) {
             if(defines.satisfy(flow, prepared, condition)) {
 
                 var node = prepared.source.if[condition];
+
                 if(node.app && node.app.mobile) {
+
                     if(node.app.mobile.ios) {
                         prepared.source.project.app.mobile.ios.libs = util.merge_unique(node.app.mobile.ios.libs, prepared.source.project.app.mobile.ios.libs);
                     }
                     if(node.app.mobile.android) {
                         prepared.source.project.app.mobile.android.libs = util.merge_unique(node.app.mobile.android.libs, prepared.source.project.app.mobile.android.libs);
                     }
-                }
 
-            }
-        }
-    } //each condition
+                } //if app and app.mobile
 
-} //prepare_conditional_nodes
+            } //if satisfied
+        } //each condition
+    } //if conditional node
+
+} //prepare_conditionals
 
     //for hxcpp, we store the list of absolute paths so they can be used correctly
 internal.prepare_hxcpp = function(flow, prepared) {
-
-    //for each node we simply add a
-        //  <include name="absolute path" /> to the flow hxcpp output
 
         //so, do dependencies first, in order
     for(index in prepared.depends_list) {
