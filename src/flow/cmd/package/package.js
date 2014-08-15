@@ -26,7 +26,7 @@ exports.run = function run(flow, data) {
 
     var extension = internal.extensions[internal.format];
 
-    var outfile = path.join(flow.project.parsed.project.app.output, flow.target + '.' + internal.date_string());
+    var outfile = path.join(flow.project.parsed.project.app.output, flow.project.parsed.project.app.name + '.' +flow.target + '.' + internal.date_string());
         outfile = flow.flags['archive-name'] || outfile;
 
     var out_file = outfile + '.' + extension;
