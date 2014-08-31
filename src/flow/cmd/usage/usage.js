@@ -62,7 +62,9 @@ exports.run = function run(flow, err) {
             console.log('command list : \n%s%s\n', util.pad(4, '', ' '), internal.commands.join(', '));
         }
 
-        internal.print_cmd(flow, 'usage');
+        if(flow.flags._has('usage')) {
+            internal.print_cmd(flow, 'usage');
+        }
 
     }
 
