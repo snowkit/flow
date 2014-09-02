@@ -175,6 +175,9 @@ internal.save_user_config = function(flow) {
             flow.log(2, 'target arch is %s', flow.target_arch);
         }
 
+        if(flow.flags.debug) {
+            flow.log(2, 'debug is true');
+        }
             //init haxelib cache,
             //and when it's complete,
             //run the main path
