@@ -182,7 +182,7 @@ internal.prepare_dependencies = function(flow, parsed) {
 
         //now we add internal deps as required
     if(flow.target_cpp && !parsed.project.lib) {
-        internal.log(flow, 2, 'prepare - dependency tree - adding dependency hxcpp *');
+        internal.log(flow, 4, 'prepare - dependency tree - adding dependency hxcpp *');
         parsed.project.build.dependencies = parsed.project.build.dependencies || {};
         parsed.project.build.dependencies['hxcpp'] = { version:'*', internal:true };
     }
