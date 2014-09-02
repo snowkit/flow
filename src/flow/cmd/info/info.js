@@ -10,7 +10,9 @@ exports.run = function run(flow, data) {
 
     var result = {
         hxml : flow.project.hxml,
-        paths : flow.project.paths
+        paths : flow.project.paths,
+        targets_known : flow.config.build.known_targets,
+        targets_invalid : flow.config.build.invalid_targets[flow.system],
     }
 
     console.log(JSON.stringify(result, null, '  '));
