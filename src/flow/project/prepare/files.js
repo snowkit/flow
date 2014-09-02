@@ -41,6 +41,10 @@ exports.parse = function parse(flow, prepared, source, srcpath) {
 
     } else {
 
+            //first map it to the flow project root
+        project_file_list = internal.append_source(flow, project_file_list, flow.project.root);
+        build_file_list = internal.append_source(flow, build_file_list, flow.project.root);
+
             //then filter unsafe/non-relative paths
         project_file_list = internal.filter_unsafe(flow, project_file_list, project_root, project_out, project_root);
         build_file_list = internal.filter_unsafe(flow, build_file_list, project_root, project_out, project_root);

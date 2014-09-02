@@ -16,11 +16,12 @@ exports.run = function run(flow, files) {
 
         if(!ignore_files) {
             wrench.mkdirSyncRecursive(flow.project.paths.files, 0755);
-            flow.log(2, 'files - copying project assets to %s', flow.project.paths.files);
+            flow.log(2, 'files - copying project files to %s', flow.project.paths.files);
             flow.log(3,'');
         }
 
-        var projectfiles = internal.copy_files(flow, files.project_files, flow.project.paths.files, ignore_files);
+        var project_file_path = path.join(flow.project.root, flow.project.paths.files);
+        var projectfiles = internal.copy_files(flow, files.project_files, project_file_path, ignore_files);
 
         var ignore_build_files = (flow.flags['build-files'] === false);
 
@@ -31,18 +32,21 @@ exports.run = function run(flow, files) {
             flow.log(3,'');
         }
 
-        var buildfiles = internal.copy_files(flow, files.build_files, flow.project.paths.build, ignore_build_files);
+        var project_build_file_path = path.join(flow.project.root, flow.project.paths.build);
+        var buildfiles = internal.copy_files(flow, files.build_files, project_build_file_path, ignore_build_files);
 
         //clean up the list of files by their destination
     projectfiles.map(function(_path, i){
         _path = util.normalize(_path);
-        projectfiles[i] = _path.replace(flow.project.paths.files,'');
+        var _root = path.join(flow.project.root, flow.project.paths.files);
+        projectfiles[i] = _path.replace(_root,'');
     });
 
         //clean up the list of files by their destination
     buildfiles.map(function(_path, i){
         _path = util.normalize(_path);
-        buildfiles[i] = _path.replace(flow.project.paths.build,'');
+        var _root = path.join(flow.project.root, flow.project.paths.build);
+        buildfiles[i] = _path.replace(_root,'');
     });
 
         //store the lists
