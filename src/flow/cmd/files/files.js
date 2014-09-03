@@ -39,6 +39,7 @@ exports.run = function run(flow, files) {
     projectfiles.map(function(_path, i){
         _path = util.normalize(_path);
         var _root = path.join(flow.project.root, flow.project.paths.files);
+            _root = util.normalize(_root);
         projectfiles[i] = _path.replace(_root,'');
     });
 
@@ -46,6 +47,7 @@ exports.run = function run(flow, files) {
     buildfiles.map(function(_path, i){
         _path = util.normalize(_path);
         var _root = path.join(flow.project.root, flow.project.paths.build);
+            _root = util.normalize(_root);
         buildfiles[i] = _path.replace(_root,'');
     });
 
