@@ -18,7 +18,7 @@ exports.convert = function(flow, icon, done) {
 
     flow.log(3, 'icons / copy %s to Images.xcassets in the build folder', icon_folder, icon_output);
 
-    flow.log(2,'icons - ok - copying to output folder');
+    flow.log(3,'icons - ok - copying to output folder');
 
     if(fs.existsSync(icon_folder)) {
         util.copy_path(flow, icon_folder, icon_output);

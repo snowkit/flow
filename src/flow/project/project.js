@@ -356,7 +356,7 @@ exports.ensure_path = function(flow) {
 
         //ensure we are in the correct place to perform any operations
 
-    flow.log(2, 'project - switch to run in %s', flow.project.root);
+    flow.log(3, 'project - switch to run in %s', flow.project.root);
     process.chdir(flow.project.root);
 
 } //ensure_path

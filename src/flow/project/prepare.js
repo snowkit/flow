@@ -25,7 +25,7 @@ exports.prepare = function prepare(flow) {
     var parsed = flow.project.parsed;
 
         //
-    internal.log(flow, 2, 'prepare - project %s', parsed.project.name );
+    internal.log(flow, 3, 'prepare - project %s', parsed.project.name );
 
         //dependencies are a special case as they affect everything, they
         //come first and are required to be complete before anything else
@@ -281,7 +281,7 @@ internal.fail = function(flow, prepared, section, msg) {
 
 internal.prepare_project = function(flow, prepared) {
 
-    internal.log(flow, 2, 'prepare - project ...');
+    internal.log(flow, 3, 'prepare - project ...');
 
     //conditions
 
@@ -341,7 +341,7 @@ internal.prepare_project = function(flow, prepared) {
             internal.prepare_schema(flow, prepared);
 
 
-    internal.log(flow, 2, 'prepare - project - ok');
+    internal.log(flow, 3, 'prepare - project - ok');
 
 } //prepare_project
 

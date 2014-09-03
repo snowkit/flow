@@ -19,9 +19,9 @@ exports.convert = function(flow, icon, done) {
     var icon_folder = path.join(icon.source, 'android');
     var icon_output = path.join(flow.project.paths.build, flow.project.paths.android.project, 'res');
 
-    flow.log(2, 'icons / copy %s to %s', icon_folder, icon_output);
+    flow.log(3, 'icons / copy %s to %s', icon_folder, icon_output);
 
-    flow.log(2,'icons - ok - copying to output folder');
+    flow.log(3,'icons - ok - copying to output folder');
 
     util.copy_path(flow, icon_folder, icon_output);
 

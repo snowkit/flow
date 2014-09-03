@@ -13,7 +13,7 @@ exports.convert = function(flow, icon, done) {
     var icon_source = util.normalize(path.join(icon_folder, icon_file));
 	var cpp_path = path.join(flow.project.paths.build,'cpp');
 
-    flow.log(2, 'icons / converting %s for use', icon.source );
+    flow.log(3, 'icons / converting %s for use', icon.source );
 
     var icon_xml = path.join(__dirname,'windows','icon.xml');
 
@@ -50,9 +50,9 @@ exports.convert = function(flow, icon, done) {
                 source:'flow internal', internal:true
             };
 
-            flow.log(2,'icons - ok - will be embedded in exe at link time');
+            flow.log(3,'icons - ok - will be embedded in exe at link time');
         } else {
-            flow.log(2,'icons - failed - see log above');
+            flow.log(1,'icons - failed - see log above');
         }
 
         if(done) {

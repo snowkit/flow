@@ -5,7 +5,7 @@ var   util = require('../../util/util')
 
 exports.convert = function(flow, icon, done) {
 
-    flow.log(2, 'icons / convert %s to %s.icns', icon.source, icon.dest);
+    flow.log(3, 'icons / convert %s to %s.icns', icon.source, icon.dest);
 
     //run iconutil -c icns <source>/mac/<dest>.iconset/
     //for docs on this https://developer.apple.com/library/mac/documentation/GraphicsAnimation/Conceptual/HighResolutionOSX/Optimizing/Optimizing.html
@@ -20,7 +20,7 @@ exports.convert = function(flow, icon, done) {
     cmd.exec(flow, 'iconutil', ['-c', 'icns', icon_set, '-o', icon_output], { cwd:flow.project.root }, function(code, out, err){
 
         if(code) {
-            flow.log(2,'icons - failed - see log above');
+            flow.log(1,'icons - failed - see log above');
         }
 
         if(done) {

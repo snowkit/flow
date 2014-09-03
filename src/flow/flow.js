@@ -62,7 +62,7 @@ internal.run = function() {
 
         //builds happen in the working path
     flow.log('');
-    flow.log(2, 'running in %s', flow.run_path);
+    flow.log(3, 'running in %s', flow.run_path);
     process.chdir(flow.run_path);
 
             //get the requested command
@@ -168,16 +168,23 @@ internal.save_user_config = function(flow) {
 
             //useful immediate information
         flow.log(2, '%s', flow.version);
-        flow.log(2, 'current platform is %s', flow.system);
-        flow.log(2, 'target is %s', flow.target);
+        flow.log(3, 'current platform is %s', flow.system);
+        flow.log(2, 'target is %s', flow.target, flow.target != 'web' ? '( arch '+flow.target_arch+' )' : '' );
 
-        if(flow.target != 'web'){
-            flow.log(2, 'target arch is %s', flow.target_arch);
+        var state = [];
+
+        if(flow.flags._has('build')) {
+            state.push('build only');
         }
 
         if(flow.flags.debug) {
-            flow.log(2, 'debug is true');
+            state.push('debug = true');
         }
+
+        if(state.length) {
+            flow.log(2, state.join(', '));
+        }
+
             //init haxelib cache,
             //and when it's complete,
             //run the main path

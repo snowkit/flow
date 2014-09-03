@@ -16,7 +16,7 @@ exports.run = function run(flow, files) {
 
         if(!ignore_files) {
             wrench.mkdirSyncRecursive(flow.project.paths.files, 0755);
-            flow.log(2, 'files - copying project files to %s', flow.project.paths.files);
+            flow.log(3, 'files - copying project files to %s', flow.project.paths.files);
             flow.log(3,'');
         }
 
@@ -28,7 +28,7 @@ exports.run = function run(flow, files) {
         if(!ignore_build_files) {
             wrench.mkdirSyncRecursive(flow.project.paths.build, 0755);
             flow.log(3,'');
-            flow.log(2, 'files - copying build files to %s', flow.project.paths.build);
+            flow.log(3, 'files - copying build files to %s', flow.project.paths.build);
             flow.log(3,'');
         }
 
@@ -146,7 +146,7 @@ internal.write_files_list = function(flow) {
 
             if(flow.project.prepared.files.project_files_output.length > 0) {
 
-                flow.log(2, 'files - writing file list to ' + output_path);
+                flow.log(3, 'files - writing file list to ' + output_path);
 
                 fse.ensureFileSync(output_path);
                 fs.writeFileSync(output_path, output, 'utf8');
