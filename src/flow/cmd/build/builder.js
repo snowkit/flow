@@ -71,7 +71,7 @@ exports.run = function(flow, done) {
             var errerr = err.indexOf('Aborted') != -1;
 
             if(code || outerr || errerr) {
-                flow.log(1,'\n build - stopping because of errors in haxe compile \n');
+                flow.log(3,'build - stopping because of errors in haxe compile \n');
                 return flow.project.failed = true;
             }
 
