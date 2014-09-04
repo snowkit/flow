@@ -12,38 +12,50 @@ var   exec = require('child_process').exec
         //returns the results as a string for immediate use (blocking)
     exports.exec = function(flow, cmd, args, opt, done) {
 
-        var prevwd = process.cwd();
-
-        args = args || [];
-        opt = opt || { env:process.env };
-
         flow.log(3, 'process util - running : %s', cmd, args.join(' '));
 
-        var _process = spawn(cmd, args, opt);
-        var stderr = '';
-        var stdout = '';
+        try {
 
-        _process.stdout.on('data', function (data) {
-            var latest = data.toString('utf8');
-            stdout += latest;
-            if(!opt.quiet) {
-                process.stdout.write(latest);
-            }
-        });
+            var prevwd = process.cwd();
 
-        _process.stderr.on('data', function (data) {
-            var latest = data.toString('utf8');
-            stderr += latest;
-            if(!opt.quiet) {
-                process.stdout.write(latest);
-            }
-        });
+            args = args || [];
+            opt = opt || { env:process.env };
 
-        _process.on('close', function (code) {
-            flow.log(4, 'process util - child process %s exited with code %d', cmd, code);
-            process.chdir(prevwd);
-            if(done) done(code, stdout, stderr);
-        });
+            var _process = spawn(cmd, args, opt);
+            var stderr = '';
+            var stdout = '';
+
+            _process.stdout.on('data', function (data) {
+                var latest = data.toString('utf8');
+                stdout += latest;
+                if(!opt.quiet) {
+                    process.stdout.write(latest);
+                }
+            });
+
+            _process.stderr.on('data', function (data) {
+                var latest = data.toString('utf8');
+                stderr += latest;
+                if(!opt.quiet) {
+                    process.stdout.write(latest);
+                }
+            });
+
+            _process.on('error', function (err) {
+                 flow.log(1, 'process util - failed to run : %s', cmd, args.join(' '));
+                 flow.log(1, 'process util -', err);
+            });
+
+            _process.on('close', function (code) {
+                flow.log(4, 'process util - child process %s exited with code %d', cmd, code);
+                process.chdir(prevwd);
+                if(done) done(code, stdout, stderr);
+            });
+
+        } catch(e) {
+            flow.log(1, 'process util - failed to run! : %s', cmd, args.join(' '));
+            flow.log(1, 'process util -', e);
+        }
 
     } //exec
 
