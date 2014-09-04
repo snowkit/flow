@@ -1,0 +1,3 @@
+output
+src/flow/node_modules/.bin/handlebars.cmd
+src/flow/node_modules/handlebars/node_modules/.bin/uglifyjs.cmd
