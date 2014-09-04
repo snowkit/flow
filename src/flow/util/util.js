@@ -206,10 +206,10 @@ exports.openurl = function(flow, url) {
 
 } //openurl
 
-exports.launch_server = function(flow, port, serve_path, silent, directories) {
+exports.launch_server = function(flow, port, serve_path, timeout, silent, directories) {
 
     var node = flow.bin_path;
-    var args = [ flow.server_path, "-c-1", "-p", port ];
+    var args = [ flow.server_path, "-c-1", "-p", port, "-t", timeout ];
 
     if(silent) {
         args.push('-s');

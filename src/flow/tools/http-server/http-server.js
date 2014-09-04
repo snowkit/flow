@@ -21,6 +21,10 @@ var HTTPServer = exports.HTTPServer = function (options) {
     }
   }
 
+  if(options.timeout) {
+    this.timeout = options.timeout;
+  }
+
   if (options.headers) {
     this.headers = options.headers;
   }
@@ -43,7 +47,7 @@ var HTTPServer = exports.HTTPServer = function (options) {
       session({secret:'notreallyasecretdevonly'}),
       function (req, res) {
         req.socket.setKeepAlive(false);
-        req.socket.setTimeout(10000);
+        req.socket.setTimeout(options.timeout * 1000);
         if(!req.session.id) {
           req.session.id = uuid();
         }
@@ -73,7 +77,7 @@ var HTTPServer = exports.HTTPServer = function (options) {
             }
           }
 
-          if(_list.length == 0) {
+          if(_list.length == 0 && options.timeout) {
             process.exit();
           }
           // console.log(_list);

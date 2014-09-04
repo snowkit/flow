@@ -20,6 +20,7 @@ if (argv.h || argv.help) {
     "  --cors             Enable CORS via the 'Access-Control-Allow-Origin' header",
     "  -o                 Open browser window after staring the server",
     "  -c                 Set cache time (in seconds). e.g. -c10 for 10 seconds.",
+    "  -t                 Set timeout time (in seconds). after time of no requests, server quits",
     "                     To disable caching, use -c-1.",
     "  -h --help          Print this list and exit."
   ].join('\n'));
@@ -29,6 +30,7 @@ if (argv.h || argv.help) {
 var port = argv.p || parseInt(process.env.PORT, 10),
     host = argv.a || '0.0.0.0',
     log = (argv.s || argv.silent) ? (function () {}) : console.log,
+    timeout = (argv.t === undefined) ? 10 : argv.t,
     requestLogger;
 
 if (!argv.s && !argv.silent) {
@@ -55,6 +57,7 @@ function listen(port) {
     cache: argv.c,
     showDir: argv.d,
     autoIndex: argv.i,
+    timeout: timeout,
     ext: argv.e || argv.ext,
     logFn: requestLogger
   };
@@ -69,7 +72,10 @@ function listen(port) {
       + server.root.cyan
       + ' on port: '.yellow
       + port.toString().cyan);
-    log('CTRL-C to stop the server, or it will time out after 10 seconds of no requests');
+    log('CTRL-C to stop the server or');
+    if(options.timeout){
+      log('server will shutdown after '+ options.timeout +' seconds of no requests');
+    }
     if (argv.o) {
       opener('http://127.0.0.1:' + port.toString());
     }

@@ -10,6 +10,7 @@ exports.launch = function(flow) {
     var node = flow.bin_path;
     var launch_wait = flow.config.build.launch_wait;
     var url = 'http://localhost:'+port;
+    var timeout = flow.flags.timeout === undefined ? 10 : flow.flags.timeout;
 
         var flag_launch_wait = flow.flags['launch-wait'];
         var flag_url = flow.flags['url'];
@@ -38,7 +39,7 @@ exports.launch = function(flow) {
 
     if(flow.flags.server !== false) {
 
-        util.launch_server(flow, port, abs_outpath);
+        util.launch_server(flow, port, abs_outpath, timeout);
 
     } else {
 
