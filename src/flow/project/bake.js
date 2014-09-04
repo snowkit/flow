@@ -1,5 +1,6 @@
 
 var   path = require('path')
+    , util = require('../util/util')
 
 exports.bake = function bake(flow) {
 
@@ -43,18 +44,25 @@ exports.target = function(flow, project, split) {
 
     split = split || '\n';
 
-    var values = '-cp haxe/';
+    var haxe_files_path = path.join(flow.project.paths.build, 'haxe/');
+        haxe_files_path = path.relative(flow.project.root, haxe_files_path);
+        haxe_files_path = util.normalize(haxe_files_path);
+
+    var values = '-cp ' + haxe_files_path;
 
     if(flow.target_cpp) {
 
-        values += split + '-cpp cpp/';
+        var cpp_files_path = path.join(flow.project.paths.build, 'cpp/');
+            cpp_files_path = path.relative(flow.project.root, cpp_files_path);
+            cpp_files_path = util.normalize(cpp_files_path);
+
+        values += split + '-cpp ' + cpp_files_path;
 
     } else if(flow.target_js) {
 
             //js the file can go straight out to the dest path
         var out_file = path.join(flow.project.paths.output, project.source.project.app.name+'.js');
-        var abs_out_path = path.join(flow.project.root, flow.project.paths.build);
-        out_file = path.relative(abs_out_path, out_file);
+        out_file = path.relative(flow.project.root, out_file);
 
         values += split + '-js ' + out_file;
 

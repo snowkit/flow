@@ -49,7 +49,8 @@ exports.run = function(flow, done) {
 
             //fetch the hxml location
         var hxml_file = internal.get_hxml_file(flow);
-        var hxml_path = util.normalize(path.join(flow.project.paths.build, hxml_file));
+        var hxml_path = util.normalize( path.join(flow.project.paths.build, hxml_file) );
+            hxml_path = path.relative( flow.project.root, hxml_path );
 
             //write out the baked build hxml for the build
             if(flow.timing) console.time('build - write hxml');
@@ -63,7 +64,7 @@ exports.run = function(flow, done) {
             // no need to log it again.
         if(flow.timing) console.time('build - haxe');
 
-        internal.build_haxe(flow, hxml_file, function(code, out, err) {
+        internal.build_haxe(flow, hxml_path, function(code, out, err) {
 
             if(flow.timing) console.timeEnd('build - haxe');
 
@@ -148,7 +149,7 @@ internal.build_haxe = function(flow, hxml_file, done) {
 
     var opt = {
         // quiet : false,
-        cwd: path.resolve(flow.project.root, flow.project.paths.build)
+        cwd: path.resolve(flow.project.root)
     }
 
     cmd.exec(flow, 'haxe', [hxml_file], opt, done);
