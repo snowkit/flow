@@ -40,7 +40,7 @@ exports.run = function(flow, done) {
 
             //check for failure already
         if(flow.project.failed) {
-            flow.log(1,'not running project build because flow.project.failed is true');
+            flow.log(1,'not running project build because failed is set to true');
             return;
         }
 

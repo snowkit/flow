@@ -37,6 +37,20 @@ exports.convert = function(flow, icon, done) {
                 process.env['VS110COMNTOOLS'] ||
                 process.env['VS120COMNTOOLS'];
 
+    if(!vsdir) {
+
+        flow.log(1,'icons - failed - do you have visual C++ installed?');
+
+        flow.project.failed = true;
+
+        if(done) {
+            done('cannot find vs directory');
+        }
+
+        return;
+
+    } //vsdir
+
     var vsvars = path.resolve(vsdir, '../../vc/vcvarsall.bat');
 
     cmd.exec(flow,'cmd.exe', ['/c', vsvars, '&&', 'rc', '/r', 'icon.rc'], {cwd:cpp_path,quiet:true}, function(code,out,err) {
