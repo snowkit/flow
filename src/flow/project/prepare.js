@@ -328,6 +328,10 @@ internal.prepare_project = function(flow, prepared) {
 
             internal.prepare_conditionals(flow, prepared);
 
+    // web specifics
+
+            internal.prepare_web(flow, prepared);
+
     // mobile specifics
 
             internal.prepare_mobile(flow, prepared);
@@ -465,6 +469,14 @@ internal.prepare_hxcpp = function(flow, prepared) {
     } //f-hxcpp flags exist
 
 } //prepare_hxcpp
+
+internal.prepare_web = function(flow, prepared) {
+
+    if(flow.flags.min) {
+        prepared.source.project.app.web.min = true;
+    }
+
+} //prepare_web
 
 internal.prepare_mobile = function(flow, prepared) {
 

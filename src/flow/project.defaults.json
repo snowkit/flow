@@ -9,6 +9,7 @@
             "output" : "bin",
             "codepaths" : [ "src" ],
             "web" : {
+                "min" : false,
                 "libs" : {
                 }
             },
