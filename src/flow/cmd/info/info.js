@@ -8,6 +8,11 @@ exports.run = function run(flow, data) {
         return;
     }
 
+    if(flow.flags.project_prepared) {
+        console.log( JSON.stringify(flow.project.prepared.source, null, '  ') );
+        return;
+    }
+
     var result = {
         hxml : flow.project.hxml,
         paths : flow.project.paths,
