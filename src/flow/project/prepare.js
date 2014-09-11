@@ -476,6 +476,17 @@ internal.prepare_web = function(flow, prepared) {
         prepared.source.project.app.web.min = true;
     }
 
+    var project = prepared.source;
+    for(condition in project.if) {
+        var node = project.if[condition];
+        if(node.app && node.app.web) {
+                //merge libs upward if met
+            if(defines.satisfy(flow, prepared, condition)) {
+                project.project.app.web = util.merge_combine(project.project.app.web, node.app.web);
+            }
+        }
+    }
+
 } //prepare_web
 
 internal.prepare_mobile = function(flow, prepared) {
@@ -485,7 +496,7 @@ internal.prepare_mobile = function(flow, prepared) {
 
     if(flow.target == 'ios') {
 
-        //handle native libs as these will be registered unless requested not to
+        //handle native libs
         var libs = prepared.source.project.app.mobile.ios.libs;
         if(libs) {
             if(libs.native) {
