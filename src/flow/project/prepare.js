@@ -170,6 +170,12 @@ internal.prepare_dependencies = function(flow, parsed) {
     for(index in internal_deps) {
         var dep = internal_deps[index];
         var lib = haxelib.version(flow, dep, '*');
+
+        if(lib == null) {
+            internal.log(flow, 1, 'prepare - dependency not found - %s, please run `haxelib install %s`', dep, dep);
+            return null;
+        }
+
         internal_depends[dep] = {
             name : dep,
             path : lib.path,
