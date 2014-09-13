@@ -67,7 +67,7 @@
           }
         },
 
-        "ios": {
+        "ios && !hxcpp_static_std": {
             app : {
               mobile : {
                 ios : {
