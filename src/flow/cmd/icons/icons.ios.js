@@ -16,16 +16,20 @@ exports.convert = function(flow, icon, done) {
     var icon_output = path.join(xcasset_folder, 'AppIcon.appiconset/' );
     var launch_output = path.join(xcasset_folder, 'LaunchImage.launchimage/');
 
-    flow.log(3, 'icons / copy %s to Images.xcassets in the build folder', icon_folder, icon_output);
-
-    flow.log(3,'icons - ok - copying to output folder');
+    flow.log(3, 'icons / copy %s and %s to Images.xcassets in the build folder', icon_folder, launch_folder, icon_output);
 
     if(fs.existsSync(icon_folder)) {
         util.copy_path(flow, icon_folder, icon_output);
+        flow.log(3,'icons - ok - copied icons to output folder');
+    } else {
+        flow.log(2,'icons - cannot find the source icons at %s', icon_folder );
     }
 
     if(fs.existsSync(launch_folder)) {
         util.copy_path(flow, launch_folder, launch_output);
+        flow.log(3,'icons - ok - copied launch to output folder');
+    } else {
+        flow.log(2,'icons - cannot find the source launch images at %s', launch_folder );
     }
 
     if(done) {
