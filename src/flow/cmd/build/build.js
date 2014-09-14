@@ -14,7 +14,8 @@ var internal = {};
 
         if(flow.target_arch === null) {
             flow.log(1, 'unknown target arch, invalid state! can\'t build. stopping.');
-            return flow.project.failed = true;
+            flow.project.failed = true;
+            return flow.finished();
         }
 
             //set the project values
@@ -33,7 +34,8 @@ var internal = {};
 
         if(!flow.project.prepared) {
             flow.log(1, 'build - failed at `prepare`\n');
-            return flow.project.failed = true;
+            flow.project.failed = true;
+            return flow.finished();
         }
 
             //if building a library we defer this to it's own commmand
@@ -48,7 +50,8 @@ var internal = {};
 
             if(!flow.project.baked) {
                 flow.log(1, 'build - failed at `bake`\n');
-                return flow.project.failed = true;
+                flow.project.failed = true;
+                return flow.finished();
             }
 
                 //run the pre build hooks if any
@@ -67,7 +70,11 @@ var internal = {};
                 //run the actual build
             builder.run(flow, internal.step_two);
 
-        } //!err
+        } else { //!err
+
+            return flow.finished();
+
+        } //err
 
     } //step_one
 
@@ -81,7 +88,11 @@ var internal = {};
                 //first execute any post build hooks
             hooks.run_hooks(flow, 'post', internal.final_step);
 
-        } //!err
+        } else { //!err
+
+            return flow.finished();
+
+        }
 
     } //step_two
 
@@ -95,7 +106,11 @@ var internal = {};
                 flow.execute(flow, cmds['launch']);
             }
 
-        } //err
+        } else { //err
+
+            return flow.finished();
+
+        }
 
     } //final_step
 
@@ -110,7 +125,8 @@ var internal = {};
 
                 //if no project given, it will look for one
         var _current_project = flow.flags.project;
-        var project = flow.project.verify(flow, _current_project);
+        var _current_project_root = flow.flags['project-root'];
+        var project = flow.project.verify(flow, _current_project, _current_project_root);
 
             //if no valid project was found
         if(!project.parsed) {

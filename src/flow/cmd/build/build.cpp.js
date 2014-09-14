@@ -84,7 +84,8 @@ internal.build_android = function(flow, done) {
 
     if(!fs.existsSync(ant_path)) {
         flow.log(1, 'build - android - cannot find ant at specified path %s', ant_path );
-        return flow.project.failed = true;
+        flow.project.failed = true;
+        return flow.finished();
     }
 
     try {
@@ -95,7 +96,8 @@ internal.build_android = function(flow, done) {
 
             if(code != 0) {
                 flow.log(1,'build - android - stopping because ant failed to build, exit code %d', code);
-                return flow.project.failed = true;
+                flow.project.failed = true;
+                return flow.finished();
             }
 
                 //now move the apk out into the user bin folder
@@ -165,7 +167,8 @@ exports.post_haxe = function(flow, done) {
 
         if(err) {
             flow.log(1, '\n build - stopping because of errors in hxcpp compile \n');
-            return flow.project.failed = true;
+            flow.project.failed = true;
+            return flow.finished();
         }
 
         done();

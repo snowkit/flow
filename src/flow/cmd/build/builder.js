@@ -40,8 +40,8 @@ exports.run = function(flow, done) {
 
             //check for failure already
         if(flow.project.failed) {
-            flow.log(1,'not running project build because failed is set to true');
-            return;
+            flow.log(1,'not running project build because failure state is set');
+            return flow.finished();
         }
 
             //then ensure the folder for the build data exists
@@ -59,6 +59,13 @@ exports.run = function(flow, done) {
 
             if(flow.timing) console.timeEnd('build - write hxml');
 
+            //some options avoid build, so skip
+        if(flow.project.skip_build) {
+            flow.log(2, 'build - skipping build steps');
+            if(done) { done(); }
+            return flow.finished();
+        }
+
             //then run the haxe build stage, if it fails, early out
             //but since the console will be logging the output from haxe,
             // no need to log it again.
@@ -73,7 +80,8 @@ exports.run = function(flow, done) {
 
             if(code || outerr || errerr) {
                 flow.log(3,'build - stopping because of errors in haxe compile \n');
-                return flow.project.failed = true;
+                flow.project.failed = true;
+                return flow.finished();
             }
 
             internal.post_haxe(flow, done);
@@ -114,7 +122,7 @@ internal.complete = function(flow, done) {
 
     flow.log(3,'');
 
-    if(done) done(flow.project.failed);
+    if(done) { done(flow.project.failed); }
 
 } //complete
 

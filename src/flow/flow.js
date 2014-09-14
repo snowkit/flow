@@ -32,7 +32,9 @@ var flow = {
                 cmd.run(_flow, data, done);
             } else {
                 cmd.error(_flow, err);
-                if(done) { done(err,null); }
+                if(done) {
+                    done(err,null);
+                }
             }
 
         }); //verify
@@ -54,11 +56,25 @@ var flow = {
 
 //main command processing, called after haxelib
 //async init to query paths and config
+internal.finished = function() {
+
+        //restore
+    process.chdir(internal.start_cwd);
+
+        //make sure failures are returned as such
+    if(flow.project.failed) {
+        process.exit(1);
+    }
+
+} //finished
 
 internal.run = function() {
 
+        //for when the build process is complete
+    flow.finished = internal.finished;
+
     //store old path because we will go back
-    var cwd = process.cwd();
+    internal.start_cwd = process.cwd();
 
         //builds happen in the working path
     flow.log('');
@@ -78,8 +94,6 @@ internal.run = function() {
             cmds.usage.run(flow, requested ? 'unknown command ' + requested : '');
         }
 
-        //restore
-    process.chdir(cwd);
 
 } //run
 
@@ -179,6 +193,10 @@ internal.save_user_config = function(flow) {
 
         if(flow.flags.debug) {
             state.push('debug = true');
+        }
+
+        if(flow.flags.sim) {
+            state.push('simulator = true');
         }
 
         if(state.length) {
