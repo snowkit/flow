@@ -40,8 +40,8 @@ class Flow {
             //then give node the script name
         sys_args.unshift(node_script);
 
-            //run it
-        Sys.command(node_path, sys_args);
+            //run and return result
+        Sys.exit( Sys.command(node_path, sys_args) );
 
     } //main
 
