@@ -13,6 +13,10 @@
         a time in seconds to wait before actually launching the build. on desktop and mobile this is 0, ignored,   
         and on web it is set to 0.3s in order to allow the internal web server to start up first.
 
+    --with-files
+        when launching, run the files command ensuring assets and configs are updated. This is faster than running   
+        build directly because it skips haxe and pre/post hooks and simply copies the files.
+
     target specific options:
 
         web
