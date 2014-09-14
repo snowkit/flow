@@ -340,7 +340,6 @@ exports.do_prepare = function(flow) {
         //if no project given, it will look for one
     var _current_project = flow.flags.project;
     var _current_project_root = flow.flags['project-root'];
-    console.log('flags:',_current_project_root);
     var project = flow.project.verify(flow, _current_project, _current_project_root);
 
         //if no valid project was found
