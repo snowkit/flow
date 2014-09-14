@@ -113,7 +113,7 @@ exports.find_flow_files = function(flow, root) {
 
     var list = [];
 
-    glob( "*.flow" , { sync:true, cwd:root || process.cwd() }, function(er, files) {
+    glob( "*.flow" , { sync:true, cwd:root }, function(er, files) {
         list = list.concat(files);
     });
 
@@ -125,6 +125,10 @@ exports.find_flow_files = function(flow, root) {
 exports.verify = function verify(flow, project_path, project_root, is_dependency, quiet) {
 
     var project_file = project_path;
+        project_root = project_root || process.cwd();
+
+    project_root = path.resolve(project_root);
+
     var abs_path = '';
 
     function fail_verify(reason) {
@@ -140,19 +144,21 @@ exports.verify = function verify(flow, project_path, project_root, is_dependency
         //if no explicit project given, search for one
     if(!project_file) {
 
-        var flow_files = exports.find_flow_files(flow);
+        flow.log(2, 'project - searching project root %s', project_root)
+
+        var flow_files = exports.find_flow_files(flow, project_root);
 
         if(flow_files.length > 1) {
-            return fail_verify('uh.. multiple *.flow files found, which one did you mean? use --project <your.flow> or keep a single flow file in the root of your project');
+            return fail_verify('uh.. multiple *.flow files found, which one did you mean? use --project <your.flow> or keep a single flow file in the root of your project. root:' + project_root);
         } else if(flow_files.length == 0) {
-            return fail_verify('cannot find any *.flow project files in the current working directory. run flow from your project root alongside your.flow file or use --project <your.flow>');
+            return fail_verify('cannot find any *.flow project files in '+project_root+'/ - run flow from your project root alongside your.flow file or use --project <your.flow>');
         } else {
             project_file = flow_files[0];
         }
 
-    }
+    } //project_file
 
-    abs_path = util.normalize(path.resolve(project_file));
+    abs_path = util.normalize(path.resolve(project_root, project_file));
 
     project_root = project_root || path.dirname(abs_path);
     project_root = util.normalize(project_root, true);
@@ -333,7 +339,9 @@ exports.do_prepare = function(flow) {
 
         //if no project given, it will look for one
     var _current_project = flow.flags.project;
-    var project = flow.project.verify(flow, _current_project);
+    var _current_project_root = flow.flags['project-root'];
+    console.log('flags:',_current_project_root);
+    var project = flow.project.verify(flow, _current_project, _current_project_root);
 
         //if no valid project was found
     if(!project.parsed) {
@@ -418,6 +426,13 @@ exports.find_arch = function(flow) {
 
         //default to armv7 on mobile, use --arch armv6 etc to override
     if(flow.target == 'ios' || flow.target == 'android') {
+
+            //if running from an xcode build
+        if(process.env['XCODE_VERSION_ACTUAL']) {
+            if(process.env['CURRENT_ARCH'] == 'i386') {
+                flow.flags.sim = true;
+            }
+        }
 
         if(flow.flags.sim) {
                 //force sim arch
