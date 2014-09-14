@@ -502,21 +502,26 @@ internal.prepare_mobile = function(flow, prepared) {
 
     if(flow.target == 'ios') {
 
-        //handle native libs
+            //handle project lib as ldflag
+        var lib_ldflags = [prepared.source.project.app.name];
+            //handle native libs as lib_ldflags
         var libs = prepared.source.project.app.mobile.ios.libs;
         if(libs) {
             if(libs.native) {
-                libs._native = {};
                 for(name in libs.native) {
                     //generate a unique ID for this file reference
-                    libs._native[name] = {
-                        fileRef : util.ios_uniqueid(flow),
-                        nodeRef : util.ios_uniqueid(flow),
-                        name : name
-                    }
+                    lib_ldflags.push(name);
                 }
             }
         }
+
+            //add the -l parts
+        lib_ldflags = lib_ldflags.map(function(a) { return '-l ' + a; });
+            //join with spaces
+        var _lib_ldflags = lib_ldflags.join(' ');
+        flow.log(3, 'prepare - ios ldflags set to `%s`', _lib_ldflags);
+
+        prepared.source.project.app.mobile.ios.ldflags = _lib_ldflags;
 
             //handle conversion from named device target to enum for project file
         switch(prepared.source.project.app.mobile.ios.devices) {
@@ -554,7 +559,9 @@ internal.prepare_mobile = function(flow, prepared) {
                 prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationPortraitUpsideDown');
             break;
         }
-    }
+
+
+    } //ios
 
 } //prepare_mobile
 
@@ -592,9 +599,24 @@ internal.prepare_defines = function(flow, prepared) {
     var arch = 'arch-' + flow.target_arch;
     prepared.defines_all[arch] = { name:arch, met:true };
 
-    if(flow.target == 'ios' && flow.flags.sim) {
-        prepared.defines_all['ios-sim'] = { name:'ios-sim', met:true };
-    }
+    if(flow.target == 'ios') {
+
+        if(flow.flags.sim) {
+                prepared.defines_all['ios-sim'] = { name:'ios-sim', met:true };
+        }
+
+            //ios has a special flag to handle the project folder generation,
+            //if this flag is give the framework can use it to write the project
+        var ios_project_path = path.resolve( flow.project.root, flow.config.build.ios.project );
+        var ios_project_exists = fs.existsSync( ios_project_path );
+
+        if(flow.flags['xcode-project'] || !ios_project_exists) {
+            flow.log(2, 'project - ios project will be generated at', ios_project_path);
+            prepared.defines_all['ios-xcode-project'] = { name:'ios-xcode-project', met:true };
+            flow.project.skip_build = true;
+        }
+
+    } //ios
 
         //and we store "mobile" for convenience
     if(flow.target_mobile) {

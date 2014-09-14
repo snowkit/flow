@@ -8,7 +8,7 @@ exports.convert = function(flow, icon, done) {
 
     var project = flow.project.prepared.source.project;
 
-    var project_folder = path.join(flow.project.paths.build, flow.project.paths.ios.project, project.app.name);
+    var project_folder = path.join(flow.project.root, flow.project.paths.ios.project, 'project');
     var icon_folder = path.join(icon.source, 'ios', 'icon');
     var launch_folder = path.join(icon.source, 'ios', 'launch');
 
