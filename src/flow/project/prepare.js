@@ -163,12 +163,19 @@ internal.prepare_dependencies = function(flow, parsed) {
     internal.log(flow, 3, 'prepare - dependency tree ...');
 
 
-    var internal_deps = ['hxcpp'];
+    var internal_dep_list = [];
+
+    if(flow.target_cpp) {
+        internal_dep_list.push('hxcpp');
+    }
+
     var dep_path = path.resolve(flow.flow_path, 'project/dependencies/');
 
     var internal_depends = {};
-    for(index in internal_deps) {
-        var dep = internal_deps[index];
+
+    for(index in internal_dep_list) {
+
+        var dep = internal_dep_list[index];
         var lib = haxelib.version(flow, dep, '*');
 
         if(lib == null) {
@@ -182,7 +189,8 @@ internal.prepare_dependencies = function(flow, parsed) {
             flow_file:path.join(dep_path, dep+'.flow'),
             version:'*'
         };
-    }
+
+    } //index in list
 
     flow.project.internal_depends = internal_depends;
 
