@@ -905,7 +905,8 @@ internal.prepare_icons = function(flow, prepared) {
 
         prepared.source.project.app._icon = {
             dest : 'icon',
-            source : prepared.source.project.app.icon
+            source : prepared.source.project.app.icon,
+            __path : ''
         };
 
             //so, do dependencies first, in order, overriding the source path only as it walks
@@ -914,13 +915,15 @@ internal.prepare_icons = function(flow, prepared) {
             var name = prepared.depends_list[index];
             var depend = prepared.depends[name];
 
-            prepared.source.project.app._icon.__path = depend.project.__root;
+            flow.log(4, 'prepare - icon - in depends', name, depend.project.__root);
+            prepared.source.project.app._icon.__path = depend.project.__root || prepared.source.project.app._icon.__path;
 
         } //each depends
 
             //then, if it's from the source project, override the value to nothing
         if(flow.project.parsed.project.app && flow.project.parsed.project.app.icon) {
             prepared.source.project.app._icon.__path = flow.project.root;
+            flow.log(4, 'prepare - icon - sourced from project', flow.project.root);
         }
 
     } //using_default
