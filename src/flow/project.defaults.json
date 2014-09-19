@@ -7,6 +7,7 @@
         "app" : {
             "main" : "Main",
             "output" : "bin",
+            "package" : "org.snowkit.flow_app",
             "codepaths" : [ "src" ],
             "web" : {
                 "min" : false,
