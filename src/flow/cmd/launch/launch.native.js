@@ -1,5 +1,6 @@
 var  cmd = require('../../util/process')
    , path = require('path')
+   , fs = require('graceful-fs')
 
 var internal = {};
 
@@ -158,5 +159,15 @@ internal.launch_android_logcat = function(flow) {
 } //launch_android_logcat
 
 internal.launch_ios = function(flow) {
+
+        //open the xcode project path
+    var ios_project_path = path.resolve( flow.project.root, flow.config.build.ios.project );
+    var ios_project_file = path.join( ios_project_path, flow.project.prepared.source.project.app.name + '.xcodeproj' );
+
+    if(fs.existsSync(ios_project_file)) {
+        cmd.exec(flow, 'open', [ios_project_file]);
+    } else {
+        flow.log(1, 'seems the project is not located at expected location %s, can\'t focus it?', ios_project_file);
+    }
 
 }
