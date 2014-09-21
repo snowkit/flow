@@ -2,16 +2,17 @@
 <a href="{{{rel_path}}}index.html" id="logo"><img src="{{{rel_path}}}images/logo.png" /></a>
 
 <div class="topmenu">
-[usage]({{{rel_path}}}usage.html) . [guide](#guide) ![github]({{{rel_path}}}/images/github.png)  [source](https://github.com/underscorediscovery/flow) . [issues](https://github.com/underscorediscovery/flow/issues/)
+[usage](#usage) . [guide](#guide) ![github]({{{rel_path}}}/images/github.png)  [source](https://github.com/underscorediscovery/flow) . [issues](https://github.com/underscorediscovery/flow/issues/)
 </div>
 
 ---
-<div class="version">current version `1.0.0-beta`</div>
+<script src="{{{rel_path}}}js/release.version.js"> </script>
+<div class="version">current version <a href="#" id="version_notes_link" target="_blank">notes</a> <code> <a id="version_tag" target="_blank" href="#"> latest </a></code> </div>
 
 <br/>
 ##About
 
-**flow** is a project based **build tool** for the **haxe** programming language.
+**flow** is a project based **build tool** for the **haxe** programming language. <br/>It is free and <a href="https://github.com/underscorediscovery/snow/blob/master/LICENSE.md" data-tooltip="MIT license" class="tooltip">open source</a>.
 
 &nbsp;
 
@@ -35,14 +36,28 @@
 
 ---
 
+###Alpha
+
+<small>
+Please note   
+
+flow is currently considered alpha, which means there may be bugs, inconsistencies, incomplete implementations, and possible minor usage/project changes.
+It is still considered fairly stable and is being used by multiple frameworks and games,
+but there are things to tighten up before 1.0.0 release can be called final. 
+
+Join us in developing and testing the framework and tools, below.
+</small>
+
+---
+
 <a name="workflow"> &nbsp; </a>
 <h2>What does it do?</h2>
 
 
 <h4>brief overview</h4>
 
-flow is a project based build tool, meaning that it simply takes a “flow file”, <br/>
-and executes the commands and tasks you request - according to your project.
+flow is a project based build tool, meaning that it takes a flow file, <br/>
+and executes the commands and tasks in the flow file to build an application.
 <br/><br/>
 An example of some of the available commands : <br/>
 
@@ -51,7 +66,7 @@ An example of some of the available commands : <br/>
 - `package` - creates a zip or tar archive from a build
 - `run` - builds, copies files, icons, runs hooks and launches the application
 
-For a full list, see the [usage]({{{rel_path}}}usage.html) guide.
+For a full list, see the [usage](#usage) guide.
 
 --- 
 
@@ -65,13 +80,14 @@ A flow file is a project. It is a simple, not-strict json file.
 
 
 <hr/>
+<br/>
+<h2>Where does flow fit in?</h2>
 
-<h2>Why do I need it?</h2>
-
-To understand why flow exists, you must understand the way haxe works it's magic.
-
-<h3>A _target_ and a _platform_ are not the same thing.</h3>
-
+To understand where flow fits, you should understand the way haxe works it's magic.
+<br/>
+<br/>
+<b>A _target_ and a _platform_ are not the same thing.</b>
+<br/>
 The haxe compiler transforms code from the _haxe language_, into another _target_ language.<br/>
 <br/>
 _haxe_ -&gt; _javascript_ <br/>
@@ -129,11 +145,13 @@ A list of the supported platforms : <br/>
 **Setup guide**<br/>
 
 flow is setup through <a href="http://haxe.org/manual/haxelib.html" target="_blank">haxelib</a>, <br/>
-from a terminal (<a href="{{{rel_path}}}guide/terminology.html" target="_blank">need help?</a>) <br/>
+from a terminal (<a class="tooltip" data-tooltip="A terminal is a command line interface from your operating system. <br/><br/> <em>windows</em>: cmd.exe <br/> <em>mac</em>: Terminal.app <br/><br/> In Windows cmd.exe is terrible. There is a good alternative linked below.">need help?</a>) <br/>
 
 by running the following command :
 
 `haxelib install flow`
+
+![](images/install.gif)
 
 followed by
 
@@ -153,27 +171,71 @@ This opens a **simple web interface** get you setup.
 
 <div class="guide">
 
-**flow guides**<br/>
-<br/>
+
+###Usage
+
+The usage guide is accessed in full from the cli,   
+simply run `flow` without arguments, or `flow usage`
+
+####for basic use
+
+- `flow build <target> [--debug]`
+- `flow run <target> [--debug]`
+- `flow clean <target>`
+- `flow package <target>`
+
+If target is not specified, it will use your current system i.e
+
+`flow build` on a mac will result in `flow build mac --arch 64`
+
+---
+
+##Editor support
+
+Where possible, full code completion and building from the editor is supplied.
+
+[Sublime Text](guide/sublimetext.html) (mac/windows/linux) <br/><br/>
+[![](images/plugins/1.png)](guide/sublimetext.html)
+
+[FlashDevelop](guide/flashdevelop.html) (windows only)<br/><br/>
+[![](images/plugins/5.png)](guide/flashdevelop.html)
+
+---
+
+### Features
+
+- `icons` - embeds and converts icons for all targets (except linux)
+- `package` - zip or tar your builds quickly
+- `hooks` - pre and post hooks (runs a [node.js](http://nodejs.org) script)
+- `clean` - delete build and project output separately, or together
+- `upx` - for desktop platforms, final binary can be auto compressed
+- `files` - flexible copy and templating system
+- `build` - take haxe code, and generate a deployable app
+- `launch` - run the app, with file sync, internal web server and more
+
+###flow guides
+
 [flow files - the project format]({{{rel_path}}}flow.html) <br/>
-[pipeline - what flow does exactly]({{{rel_path}}}pipeline.html) <br/>
-[platforms - all the gory details]({{{rel_path}}}platforms.html) <br/>
-[design - how flow fits together]({{{rel_path}}}design.html) <br/>
-[contribute - discuss, build, test]({{{rel_path}}}contribute.html) <br/>
+~~pipeline - what flow does exactly~~ <br/>
+~~platforms - all the gory details~~ <br/>
+~~design - how flow fits together~~ <br/>
+~~contribute - discuss, build, test~~ <br/>
 
+<br/>
 
+---
 
 <a name="projects"> &nbsp;</a>
 <h2>Projects using flow</h2>
 
-[luxe engine](#) - game engine for haxe <br/>
-[snow](#) - a minimal toolkit for building applications and games <br/>
+[luxe engine](http://luxeengine.com/) - a high level game engine for haxe to build apps or games <br/>
+[snow](http://snowkit.org/snow) - a minimal low level toolkit for building frameworks <br/>
 
 </div> <!-- guide -->
 
 <h2>Technology</h2>
 
-flow is proudly built using <a href="http://nodejs.org/" target="_blank"> node.js </a>
+flow is built using <a href="http://nodejs.org/" target="_blank"> node.js </a>
 
 <img src="{{{rel_path}}}images/nodejs-light.png"/>
 
@@ -184,7 +246,7 @@ flow is proudly built using <a href="http://nodejs.org/" target="_blank"> node.j
 
 ---
 
-[feedback](http://snowkit.org)
+[feedback](https://github.com/underscorediscovery/flow/issues)
 <br/>
 <br/>
 <br/>
