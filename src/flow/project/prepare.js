@@ -893,6 +893,8 @@ internal.prepare_icons = function(flow, prepared) {
 
     if(using_default) {
 
+        console.log(4, 'prepare - icon - using default');
+
         var default_icon_path = path.resolve(flow.flow_path, 'cmd/icons/');
 
         prepared.source.project.app._icon = {
@@ -915,8 +917,10 @@ internal.prepare_icons = function(flow, prepared) {
             var name = prepared.depends_list[index];
             var depend = prepared.depends[name];
 
-            flow.log(4, 'prepare - icon - in depends', name, depend.project.__root);
-            prepared.source.project.app._icon.__path = depend.project.__root || prepared.source.project.app._icon.__path;
+            if(depend.project.project.app && depend.project.project.app.icon) {
+                flow.log(4, 'prepare - icon - in depends', name, depend.project.__root);
+                prepared.source.project.app._icon.__path = depend.project.__root || prepared.source.project.app._icon.__path;
+            }
 
         } //each depends
 
