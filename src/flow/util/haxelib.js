@@ -120,13 +120,15 @@ internal.parse_versions = function(flow) {
     for(lib in libs) {
 
         var _lib = libs[lib];
-        var _vlist = _lib._versions_.split(' ');
+        var _split = /([^\s[]+|\[.*\])/igm;
+        var _vlist = _lib._versions_.split(_split);
 
         _lib.versions = {};
 
         for(index in _vlist) {
 
             var v = _vlist[index].trim();
+            if(!v) continue;
             var current = v.indexOf('[') != -1;
 
                 //strip [ ] if current
@@ -155,12 +157,13 @@ internal.parse_versions = function(flow) {
                 _lib.versions['*'] = { version:v, path:lib_path };
             }
 
-            flow.log(3, '    haxelib - lib %s', lib, _lib);
-
                 //remove _versions_
             delete _lib._versions_;
 
         } //each in vlist
+
+        flow.log(4, lib, _lib.versions);
+
     } //each in libs
 
 }
