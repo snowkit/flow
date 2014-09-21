@@ -47,7 +47,7 @@ var internal = {};
                     match = name_ver.exec(list);
                 }
 
-                internal.parse_versions();
+                internal.parse_versions(flow);
 
                 if(done) {
                     done();
@@ -115,7 +115,7 @@ var internal = {};
 
     } //get
 
-internal.parse_versions = function() {
+internal.parse_versions = function(flow) {
 
     for(lib in libs) {
 
@@ -154,6 +154,8 @@ internal.parse_versions = function() {
             if(current) {
                 _lib.versions['*'] = { version:v, path:lib_path };
             }
+
+            flow.log(3, '    haxelib - lib %s', lib, _lib);
 
                 //remove _versions_
             delete _lib._versions_;
