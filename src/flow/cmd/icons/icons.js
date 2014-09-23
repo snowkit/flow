@@ -49,7 +49,10 @@ exports.run = function run(flow, data, done) {
                 windows.convert(flow, icon, done);
             break;
         default:{
-                flow.log(2, 'no icon convert just yet for ', flow.target);
+                flow.log(2, 'no icon convert just yet for', flow.target);
+                if(done) {
+                    done();
+                }
             break;
         }
     } //flow.target
