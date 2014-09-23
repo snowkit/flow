@@ -17,7 +17,7 @@ exports.run = function run(flow, data, done) {
     var upx_file = 'upx-' + flow.system;
 
         if(flow.system == 'linux') {
-            upx_path += util.system_arch();
+            upx_file += util.system_arch();
         }
         if(flow.system == 'windows') {
             upx_file += '.exe';
