@@ -49,6 +49,9 @@ exports.prepare = function prepare(flow) {
         }
     }
 
+        //
+    internal.prepare_config(flow);
+
         //we then merge the project values against our own,
         //so that they cascade and override each other
     internal.cascade_project(flow, prepared);
@@ -76,6 +79,12 @@ internal.log = function(flow) {
     //expose for children code
 exports.log = internal.log;
 
+
+internal.prepare_config = function(flow) {
+    var _app = flow.project.parsed.project.app;
+    var _app_main = _app.main || 'FlowApp';
+    flow.config.build.boot = _app_main;
+}
 
 internal.template_config_path = function(flow, prepared, path_node, context) {
     var template = bars.compile(path_node);
@@ -893,7 +902,7 @@ internal.prepare_icons = function(flow, prepared) {
 
     if(using_default) {
 
-        console.log(4, 'prepare - icon - using default');
+        flow.log(4, 'prepare - icon - using default');
 
         var default_icon_path = path.resolve(flow.flow_path, 'cmd/icons/');
 
