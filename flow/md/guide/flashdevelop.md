@@ -12,7 +12,6 @@
 
 ##Flash develop template project
 
-
 ![](../images/plugins/5.png)
 
 ###Install
@@ -28,12 +27,17 @@ To get autocompletion :
 - Go to Tools > Program Settings
 - In HaxeContext, set the Completion Mode to CompletionServer
 
+![](../images/plugins/7.png)
+
 #### Dependencies
 
 Everytime you add a build dependendy to your project.flow, add it to your project settings :
 
 - Go to Project > Properties
 - In the Compiler Options tab, add the lib to Libraries
+
+![](../images/plugins/8.png)
+
 
 This is only until FD becomes more flexible with its build pipeline.
 

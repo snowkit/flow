@@ -198,6 +198,8 @@ Where possible, full code completion and building from the editor is supplied.
 [![](images/plugins/1.png)](guide/sublimetext.html)
 
 [FlashDevelop](guide/flashdevelop.html) (windows only)<br/><br/>
+template is in `setup/`, but here is a [Download link](https://github.com/underscorediscovery/flow/blob/master/setup/flow_FlashDevelopTemplate.fdz?raw=true)   
+
 [![](images/plugins/5.png)](guide/flashdevelop.html)
 
 ---
