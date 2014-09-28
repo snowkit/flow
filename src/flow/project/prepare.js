@@ -473,6 +473,15 @@ internal.prepare_hxcpp = function(flow, prepared) {
 
     } //if hxcpp node
 
+    for(condition in prepared.source.if) {
+        var node = prepared.source.if[condition];
+        if(node.build && node.build.hxcpp && node.build.hxcpp.flags) {
+            if(defines.satisfy(flow, prepared, condition)) {
+                prepared.hxcpp.flags = util.array_union(prepared.hxcpp.flags, node.build.hxcpp.flags);
+            }
+        }
+    }
+
 
         //finally, we parse the command line for --f-hxcpp flags
     if(flow.flags['f-hxcpp']) {
