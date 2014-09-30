@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>flow - </title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <link rel="shortcut icon" href="./images/favicon.png" />
+
+        <link rel="stylesheet" type="text/css" href="./css/style.css" media="all">
+        <link rel="stylesheet" type="text/css" href="./css/code.css" media="all">
+        <link rel="stylesheet" type="text/css" href="./css/font.css" media="all">
+
+        <link rel="stylesheet" type="text/css" href="./css/tooltipster.css" media="all">
+        <link rel="stylesheet" type="text/css" href="./css/tooltipster-shadow.css" media="all">
+
+        <script src="./js/jquery-2.0.3.min.js"> </script>
+        <script src="./js/jquery.tooltipster.min.js"> </script>
+
+        <script>
+
+            $(document).ready(function() {
+
+                $('.section').css('display','none');
+                $('.readmore').click(function(e){
+                    var _child = $(this).parent().find('.section').first();
+                    var _opp = 'block';
+                    if( _child.css('display') == 'block' ) {
+                        _opp = 'none';
+                    } else {
+                    }
+                    _child.css('display', _opp);
+                });
+
+                $('div.sample').on('click', function(e){
+                        //get the data tag
+                    var content = $(this).attr('data-content');
+                        //remove clicking handler
+                    $(this).off('click');
+                        //replace the content!
+                    $(this).html('<iframe src="'+content+'" sandbox="allow-same-origin allow-scripts" style="overflow:hidden; scrollbar:none; border: 0; width:645px; height:450px;"></iframe> ')
+                });
+
+                $('.tooltip').tooltipster({
+                    theme:'tooltipster-shadow'
+                });
+
+            }); //document.ready
+
+        </script>
+    </head>
+
+    <body>
+        <div class="content">
+            <p><a href="./index.html" id="logo"><img src="./images/logo.png" /></a></p>
+<div class="topmenu">
+<a href="./usage/index.html">usage</a> . <a href="#guide">guide</a> <img src=".//images/github.png" alt="github">  <a href="https://github.com/underscorediscovery/snow">source</a> . <a href="https://github.com/underscorediscovery/snow/issues/">issues</a>
+</div>
+
+<hr>
+<h2 id="usage">Usage</h2>
+<p>To read this usage on the command line, simply run <code>flow</code> without arguments, or <code>flow usage</code></p>
+<p>key :
+  […] optional
+  &lt;…&gt; replace with suggested</p>
+<p>For usage on a specific command, use</p>
+<p>  <code>flow usage &lt;command&gt;</code></p>
+<p>flow specific options</p>
+<p>  <code>--version</code><br>      alias of flow version   </p>
+<p>  <code>--log &lt;level&gt;</code><br>      allows changing the default log level.<br>      The default log level is 2. example, <code>flow run --log 3</code></p>
+<pre><code>  The log levels are as follows
+
+    - `<span class="hljs-number">0</span>` - silence :  no logging
+    - `<span class="hljs-number">1</span>` - error :  only logging, only errors will be logged
+    - `<span class="hljs-number">2</span>` - <span class="hljs-keyword">default</span> :  critical and useful info
+    - `<span class="hljs-number">3</span>` - debug :  shows information required to diagnose issues
+    - `<span class="hljs-number">4</span>` - verbose :  shows internal and more debug info
+    - `<span class="hljs-number">5</span>` - verboser : shows even more internal and debug info
+</code></pre><p>  <code>--json</code>
+      return json values where applicable (for use in IDE’s, or other data consumption of flags/values).
+      Only used for special commands, and special usage options.</p>
+<p><strong>flow special commands</strong></p>
+<p>  <code>flow version</code>
+    return a plain, parseable version number</p>
+<p><strong>special usage options</strong></p>
+<p>  <code>flow usage commands [--options]</code><br>    will list commands only (for use also with —json)</p>
+<p>  <code>flow usage targets [--options]</code><br>    will list the set of known targets that flow supports.<br>      options :<br>        —invalid<br>            will list the invalid targets for your system.<br>            for example, building for mac from windows is not valid.</p>
+
+        </div>
+    </body>
+
+</html>

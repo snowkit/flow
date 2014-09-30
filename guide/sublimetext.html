@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>flow - </title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <link rel="shortcut icon" href="../images/favicon.png" />
+
+        <link rel="stylesheet" type="text/css" href="../css/style.css" media="all">
+        <link rel="stylesheet" type="text/css" href="../css/code.css" media="all">
+        <link rel="stylesheet" type="text/css" href="../css/font.css" media="all">
+
+        <link rel="stylesheet" type="text/css" href="../css/tooltipster.css" media="all">
+        <link rel="stylesheet" type="text/css" href="../css/tooltipster-shadow.css" media="all">
+
+        <script src="../js/jquery-2.0.3.min.js"> </script>
+        <script src="../js/jquery.tooltipster.min.js"> </script>
+
+        <script>
+
+            $(document).ready(function() {
+
+                $('.section').css('display','none');
+                $('.readmore').click(function(e){
+                    var _child = $(this).parent().find('.section').first();
+                    var _opp = 'block';
+                    if( _child.css('display') == 'block' ) {
+                        _opp = 'none';
+                    } else {
+                    }
+                    _child.css('display', _opp);
+                });
+
+                $('div.sample').on('click', function(e){
+                        //get the data tag
+                    var content = $(this).attr('data-content');
+                        //remove clicking handler
+                    $(this).off('click');
+                        //replace the content!
+                    $(this).html('<iframe src="'+content+'" sandbox="allow-same-origin allow-scripts" style="overflow:hidden; scrollbar:none; border: 0; width:645px; height:450px;"></iframe> ')
+                });
+
+                $('.tooltip').each(function(e){
+                    var c = $(this).attr('data-tooltip');
+                    $(this).tooltipster({
+                        content:$('<span>' + c + '</span>'),
+                        interactive:true,
+                    theme:'tooltipster-shadow'
+                    });
+                });
+
+            }); //document.ready
+
+        </script>
+    </head>
+
+    <body>
+        <div class="content">
+            <p><a href="../index.html" id="logo"><img src="../images/logo.png" /></a></p>
+<div class="topmenu">
+<a href="#usage">usage</a> . <a href="#guide">guide</a> <img src="..//images/github.png" alt="github">  <a href="https://github.com/underscorediscovery/flow">source</a> . <a href="https://github.com/underscorediscovery/flow/issues/">issues</a>
+</div>
+
+<hr>
+<p><br/></p>
+<h2 id="sublime-text-plugins">Sublime text plugins</h2>
+<p>These plugins are for <a href="http://sublimetext.com/3">sublime text 3</a> only.</p>
+<h4 id="install-plugins">Install plugins</h4>
+<p>To install the sublime text plugins for code completion, syntax highlighting and building:</p>
+<ul>
+<li>Make sure you have <a href="https://sublime.wbond.net/installation">package control</a></li>
+<li>Press <code>Ctrl/cmd + Shift + P</code> <code>Package Control : Add repository</code></li>
+<li>Do this twice, add <ul>
+<li><a href="https://github.com/underscorediscovery/sublime_haxe_completion">https://github.com/underscorediscovery/sublime_haxe_completion</a></li>
+<li><a href="https://github.com/underscorediscovery/sublime_flow">https://github.com/underscorediscovery/sublime_flow</a></li>
+</ul>
+</li>
+<li>Press <code>Ctrl/cmd + Shift + P</code> <code>Package Control : Install Package</code></li>
+<li>Do this twice, and choose<ul>
+<li>sublime_flow</li>
+<li>sublime_haxe_completion</li>
+</ul>
+</li>
+<li>Restart sublime text</li>
+</ul>
+<h4 id="using-the-plugins">Using the plugins</h4>
+<p>A luxe project is usually a folder with a flow file in it. This is by default called <em>project.flow</em> but can be called anything as long as the extension is <em>.flow</em>.</p>
+<p>The plugin works by specifying <em>which</em> flow file you want to use as your current active project.</p>
+<ul>
+<li><code>File</code> -&gt; <code>Open Folder</code></li>
+<li>Open a luxe project folder</li>
+<li>Open the flow file (double click on it)</li>
+<li>Right click <em>inside</em> the flow file </li>
+<li>Choose “set as current flow project” (<code>ctrl+shift+9</code>)</li>
+</ul>
+<p><img src="../images/plugins/0.png" alt=""></p>
+<ul>
+<li>Right click <em>inside</em> the flow file, and choose “flow status” (<code>ctrl+shift+0</code>)</li>
+</ul>
+<p><img src="../images/plugins/1.png" alt=""></p>
+<p>The flow status window has some options:</p>
+<ul>
+<li>selecting the flow file will open the active project file</li>
+<li>selecting the target will show the build dialog window</li>
+<li>the other options are self explained</li>
+</ul>
+<p><img src="../images/plugins/2.png" alt=""></p>
+<h5 id="code-completion">Code completion</h5>
+<p>Once you have an active flow file, the code completion should automatically work when using libraries.</p>
+<p><img src="../images/plugins/3.png" alt=""></p>
+<h6 id="building">Building</h6>
+<p>To build, press <code>ctrl/cmd + B</code> or select Tools -&gt; Build. This will show the build output, which can be reopened with Tools -&gt; Build Results -&gt; Show Results.</p>
+<p>If you have errors, you can double click the error in the console, and it will jump to that line + file in the message. You can press F4 or Shift F4 to cycle errors as well.</p>
+<p><img src="../images/plugins/4.png" alt=""></p>
+<p><em>Take note that if you have the main, default Haxe plugin installed already, disable it using <code>Package Control : Disable Package</code>. 
+This one has similar features, but supports the flow build tool chain and reliable code completion. You can toggle between them at any time.
+This is a temporary state as this set of plugins were created to modularize the main plugin where possible.
+</em></p>
+<p>&nbsp;
+&nbsp;</p>
+
+        </div>
+    </body>
+
+</html>

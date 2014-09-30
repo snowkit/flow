@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>flow - </title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <link rel="shortcut icon" href="./images/favicon.png" />
+
+        <link rel="stylesheet" type="text/css" href="./css/style.css" media="all">
+        <link rel="stylesheet" type="text/css" href="./css/code.css" media="all">
+        <link rel="stylesheet" type="text/css" href="./css/font.css" media="all">
+
+        <link rel="stylesheet" type="text/css" href="./css/tooltipster.css" media="all">
+        <link rel="stylesheet" type="text/css" href="./css/tooltipster-shadow.css" media="all">
+
+        <script src="./js/jquery-2.0.3.min.js"> </script>
+        <script src="./js/jquery.tooltipster.min.js"> </script>
+
+        <script>
+
+            $(document).ready(function() {
+
+                $('.section').css('display','none');
+                $('.readmore').click(function(e){
+                    var _child = $(this).parent().find('.section').first();
+                    var _opp = 'block';
+                    if( _child.css('display') == 'block' ) {
+                        _opp = 'none';
+                    } else {
+                    }
+                    _child.css('display', _opp);
+                });
+
+                $('div.sample').on('click', function(e){
+                        //get the data tag
+                    var content = $(this).attr('data-content');
+                        //remove clicking handler
+                    $(this).off('click');
+                        //replace the content!
+                    $(this).html('<iframe src="'+content+'" sandbox="allow-same-origin allow-scripts" style="overflow:hidden; scrollbar:none; border: 0; width:645px; height:450px;"></iframe> ')
+                });
+
+                $('.tooltip').each(function(e){
+                    var c = $(this).attr('data-tooltip');
+                    $(this).tooltipster({
+                        content:$('<span>' + c + '</span>'),
+                        interactive:true,
+                    theme:'tooltipster-shadow'
+                    });
+                });
+
+            }); //document.ready
+
+        </script>
+    </head>
+
+    <body>
+        <div class="content">
+            <p><a href="./index.html" id="logo"><img src="./images/logo.png" /></a></p>
+<div class="topmenu">
+<a href="#usage">usage</a> . <a href="#guide">guide</a> <img src=".//images/github.png" alt="github">  <a href="https://github.com/underscorediscovery/flow">source</a> . <a href="https://github.com/underscorediscovery/flow/issues/">issues</a>
+</div>
+
+<hr>
+<p><script src="./js/release.version.js"> </script></p>
+<div class="version">current version <a href="https://github.com/underscorediscovery/flow" id="version_notes_link" target="_blank">notes</a> <code> <a id="version_tag" target="_blank" href="https://github.com/underscorediscovery/flow"> master </a></code> </div>
+
+<p><br/></p>
+<h2 id="about">About</h2>
+<p><strong>flow</strong> is a project based <strong>build tool</strong> for the <strong>haxe</strong> programming language. <br/>It is free and <a href="https://github.com/underscorediscovery/snow/blob/master/LICENSE.md" data-tooltip="MIT license" class="tooltip">open source</a>.</p>
+<p>&nbsp;</p>
+<p><a href="http://haxe.org"> <img src="./images/haxe.png" target="_blank" class="small-image"/> </a>   </p>
+<p><small class="haxedesc">Haxe is an expressive, beautiful modern programming language <br/>
+      that compiles it’s own code into other languages. <a href="http://haxe.org/" target="_blank"> learn more</a> </small></p>
+<p><br/>
+<br/></p>
+<hr>
+<div class="breakout">
+
+<a href="#guide">Install</a>
+<a href="./flow.html">Project format</a>
+<a href="#features">Features</a>
+
+</div>
+
+<hr>
+<h3 id="alpha">Alpha</h3>
+<p><small>
+Please note   </p>
+<p>flow is currently considered alpha, which means there may be bugs, inconsistencies, incomplete implementations, and possible minor usage/project changes.
+It is still considered fairly stable and is being used by multiple frameworks and games,
+but there are things to tighten up before 1.0.0 release can be called final. </p>
+<p>Join us in developing and testing the framework and tools, below.
+</small></p>
+<hr>
+<p><a name="workflow"> &nbsp; </a></p>
+<h2>What does it do?</h2>
+
+
+<h4>brief overview</h4>
+
+<p>flow is a project based build tool, meaning that it takes a flow file, <br/>
+and executes the commands and tasks in the flow file to build an application.
+<br/><br/>
+An example of some of the available commands : <br/></p>
+<ul>
+<li><code>files</code> - copies and templates files from your project to the build</li>
+<li><code>icons</code> - copies, converts and embeds icons for a build</li>
+<li><code>package</code> - creates a zip or tar archive from a build</li>
+<li><code>run</code> - builds, copies files, icons, runs hooks and launches the application</li>
+</ul>
+<p>For a full list, see the <a href="#usage">usage</a> guide.</p>
+<hr>
+<h3>Example flow file</h3>
+A flow file is a project. It is a simple, not-strict json file.
+
+<br/>
+<br/>
+
+<img src="./images/project.png" alt="flow file">
+
+
+<hr/>
+<br/>
+<h2>Where does flow fit in?</h2>
+
+To understand where flow fits, you should understand the way haxe works it’s magic.
+<br/>
+<br/>
+<b>A <em>target</em> and a <em>platform</em> are not the same thing.</b>
+<br/>
+The haxe compiler transforms code from the <em>haxe language</em>, into another <em>target</em> language.<br/>
+<br/>
+<em>haxe</em> -&gt; <em>javascript</em> <br/>
+<em>haxe</em> -&gt; <em>c++</em> <br/>
+<br/>
+It’s important to know the difference, using the js <em>target</em> as an example. <br/>
+<strong>The javascript language, is the target</strong>. <br/><br/>
+There is no single <em>platform</em> associated with js, it can run in the <em>browser</em>, on the <em>server</em>, in a standalone executable on <em>desktop</em> or <em>mobile</em>.
+The most common <em>platform</em> is the web. <br/>
+<strong>The web, is a platform</strong>. <br/>
+
+<h3>Building an application</h3>
+
+<p>The code that haxe generates is 100% ready to use, in a webpage or an application, <br/>haxe has done it’s job now and it’s your turn. <br/>
+<br/>
+You need to put all this together, maybe in an html file or an app bundle, maybe package an apk for android, add some assets, an icon and make this work over a few platforms. <br/>
+<br/>
+What if you want to run a script automatically before building? <br/>
+What if you want to package nightly builds of your application for testers? <br/></p>
+<p><h3>This is what flow is for</h3> <br/>
+flow takes the haxe output, your project input, and creates shippable applications, <br/> games, websites or more on it’s supported <em>platforms</em>.</p>
+<p>flow has many built in tools, from javascript minify to interacting with the cpp build pipeline - it’s an expressive tool designed around flexibility and control.</p>
+<hr>
+<h2>Supported Platforms</h2>
+
+<p>A list of the supported platforms : <br/></p>
+<div class="platform-icons">
+<img src="./images/platforms/web64.png" alt="web">
+<img src="./images/platforms/mac64.png" alt="mac">
+<img src="./images/platforms/linux64.png" alt="linux">
+<img src="./images/platforms/windows64.png" alt="windows">
+<img src="./images/platforms/android64.png" alt="android">
+<img src="./images/platforms/ios64.png" alt="ios">
+</div>
+
+<ul>
+<li><code>web</code> - js (.js)</li>
+<li><code>mac</code> - c++ (.app)</li>
+<li><code>windows</code> - c++ (.exe)</li>
+<li><code>linux</code> - c++ (binary)</li>
+<li><code>android</code> - c++ (.apk)</li>
+<li><code>ios</code> - c++ (.xcodeproj)</li>
+</ul>
+<hr>
+<p><a name="guide"> </a></p>
+<h2>Guide</h2>
+
+<p><strong>Setup guide</strong><br/></p>
+<p>flow is setup through <a href="http://haxe.org/manual/haxelib.html" target="_blank">haxelib</a>, <br/>
+from a terminal (<a class="tooltip" data-tooltip="A terminal is a command line interface from your operating system. <br/><br/> <em>windows</em>: cmd.exe <br/> <em>mac</em>: Terminal.app <br/><br/> In Windows cmd.exe is terrible. There is a good alternative linked below.">need help?</a>) <br/></p>
+<p>by running the following command :</p>
+<p><code>haxelib install flow</code></p>
+<p><img src="images/install.gif" alt=""></p>
+<p>followed by</p>
+<p><code>haxelib run flow setup</code></p>
+<p>This opens a <strong>simple web interface</strong> get you setup.</p>
+<hr>
+<p><small>
+   <strong>btw</strong> <br/></p>
+<ul>
+<li>on <strong>windows</strong> <a href="http://bliker.github.io/cmder/">cmder</a> is an excellent alternative to cmd.exe garbage <br/></li>
+<li>on <strong>mac/linux</strong> <a href="http://fishshell.com/">fish</a> is also a really nice shell <br/>
+</small></li>
+</ul>
+<hr>
+<div class="guide">
+
+
+<h3 id="usage">Usage</h3>
+<p>The usage guide is accessed in full from the cli,<br>simply run <code>flow</code> without arguments, or <code>flow usage</code></p>
+<h4 id="for-basic-use">for basic use</h4>
+<ul>
+<li><code>flow build &lt;target&gt; [--debug]</code></li>
+<li><code>flow run &lt;target&gt; [--debug]</code></li>
+<li><code>flow clean &lt;target&gt;</code></li>
+<li><code>flow package &lt;target&gt;</code></li>
+</ul>
+<p>If target is not specified, it will use your current system i.e</p>
+<p><code>flow build</code> on a mac will result in <code>flow build mac --arch 64</code></p>
+<hr>
+<h2 id="editor-support">Editor support</h2>
+<p>Where possible, full code completion and building from the editor is supplied.</p>
+<p><a href="guide/sublimetext.html">Sublime Text</a> (mac/windows/linux) <br/><br/>
+<a href="guide/sublimetext.html"><img src="images/plugins/1.png" alt=""></a></p>
+<p><a href="guide/flashdevelop.html">FlashDevelop</a> (windows only)<br/><br/>
+template is in <code>setup/</code>, but here is a <a href="https://github.com/underscorediscovery/flow/blob/master/setup/flow_FlashDevelopTemplate.fdz?raw=true">Download link</a>   </p>
+<p><a href="guide/flashdevelop.html"><img src="images/plugins/5.png" alt=""></a></p>
+<hr>
+<h3 id="features">Features</h3>
+<ul>
+<li><code>icons</code> - embeds and converts icons for all targets (except linux)</li>
+<li><code>package</code> - zip or tar your builds quickly</li>
+<li><code>hooks</code> - pre and post hooks (runs a <a href="http://nodejs.org">node.js</a> script)</li>
+<li><code>clean</code> - delete build and project output separately, or together</li>
+<li><code>upx</code> - for desktop platforms, final binary can be auto compressed</li>
+<li><code>files</code> - flexible copy and templating system</li>
+<li><code>build</code> - take haxe code, and generate a deployable app</li>
+<li><code>launch</code> - run the app, with file sync, internal web server and more</li>
+</ul>
+<h3 id="flow-guides">flow guides</h3>
+<p><a href="./flow.html">flow files - the project format</a> <br/>
+<del>pipeline - what flow does exactly</del> <br/>
+<del>platforms - all the gory details</del> <br/>
+<del>design - how flow fits together</del> <br/>
+<del>contribute - discuss, build, test</del> <br/></p>
+<p><br/></p>
+<hr>
+<p><a name="projects"> &nbsp;</a></p>
+<h2>Projects using flow</h2>
+
+<p><a href="http://luxeengine.com/">luxe engine</a> - a high level game engine for haxe to build apps or games <br/>
+<a href="http://snowkit.org/snow">snow</a> - a minimal low level toolkit for building frameworks <br/></p>
+<p></div> <!-- guide --></p>
+<h2>Technology</h2>
+
+<p>flow is built using <a href="http://nodejs.org/" target="_blank"> node.js </a></p>
+<p><img src="./images/nodejs-light.png"/></p>
+<p><a name="alternatives"> &nbsp;</a></p>
+<h2>Things like flow</h2>
+
+<p><a href="https://github.com/openfl/aether">aether</a> is a long standing haxe build tool (a.k.a lime-tools), used by <a href="https://openfl.org">OpenFL</a>.</p>
+<hr>
+<p><a href="https://github.com/underscorediscovery/flow/issues">feedback</a>
+<br/>
+<br/>
+<br/>
+<br/>
+<small class="trademark"> All trademarks and registered trademarks are the property of their respective owners.</small></p>
+
+        </div>
+    </body>
+
+</html>

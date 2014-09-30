@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>flow - </title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <link rel="shortcut icon" href="../images/favicon.png" />
+
+        <link rel="stylesheet" type="text/css" href="../css/style.css" media="all">
+        <link rel="stylesheet" type="text/css" href="../css/code.css" media="all">
+        <link rel="stylesheet" type="text/css" href="../css/font.css" media="all">
+
+        <link rel="stylesheet" type="text/css" href="../css/tooltipster.css" media="all">
+        <link rel="stylesheet" type="text/css" href="../css/tooltipster-shadow.css" media="all">
+
+        <script src="../js/jquery-2.0.3.min.js"> </script>
+        <script src="../js/jquery.tooltipster.min.js"> </script>
+
+        <script>
+
+            $(document).ready(function() {
+
+                $('.section').css('display','none');
+                $('.readmore').click(function(e){
+                    var _child = $(this).parent().find('.section').first();
+                    var _opp = 'block';
+                    if( _child.css('display') == 'block' ) {
+                        _opp = 'none';
+                    } else {
+                    }
+                    _child.css('display', _opp);
+                });
+
+                $('div.sample').on('click', function(e){
+                        //get the data tag
+                    var content = $(this).attr('data-content');
+                        //remove clicking handler
+                    $(this).off('click');
+                        //replace the content!
+                    $(this).html('<iframe src="'+content+'" sandbox="allow-same-origin allow-scripts" style="overflow:hidden; scrollbar:none; border: 0; width:645px; height:450px;"></iframe> ')
+                });
+
+                $('.tooltip').each(function(e){
+                    var c = $(this).attr('data-tooltip');
+                    $(this).tooltipster({
+                        content:$('<span>' + c + '</span>'),
+                        interactive:true,
+                    theme:'tooltipster-shadow'
+                    });
+                });
+
+            }); //document.ready
+
+        </script>
+    </head>
+
+    <body>
+        <div class="content">
+            <p><a href="../index.html" id="logo"><img src="../images/logo.png" /></a></p>
+<div class="topmenu">
+<a href="#usage">usage</a> . <a href="#guide">guide</a> <img src="..//images/github.png" alt="github">  <a href="https://github.com/underscorediscovery/flow">source</a> . <a href="https://github.com/underscorediscovery/flow/issues/">issues</a>
+</div>
+
+<hr>
+<p><br/></p>
+<h2 id="flash-develop-template-project">Flash develop template project</h2>
+<p><img src="../images/plugins/5.png" alt=""></p>
+<h3 id="install">Install</h3>
+<p>Double click the <code>.fdz</code> file that you downloaded for the template project. This will make a new template project show up in FD when you choose <code>File -&gt; New Project</code>.</p>
+<p><img src="../images/plugins/6.png" alt=""></p>
+<h4 id="autocompletion">Autocompletion</h4>
+<p>To get autocompletion :</p>
+<ul>
+<li>Go to Tools &gt; Program Settings</li>
+<li>In HaxeContext, set the Completion Mode to CompletionServer</li>
+</ul>
+<p><img src="../images/plugins/7.png" alt=""></p>
+<h4 id="dependencies">Dependencies</h4>
+<p>Everytime you add a build dependendy to your project.flow, add it to your project settings :</p>
+<ul>
+<li>Go to Project &gt; Properties</li>
+<li>In the Compiler Options tab, add the lib to Libraries</li>
+</ul>
+<p><img src="../images/plugins/8.png" alt=""></p>
+<p>This is only until FD becomes more flexible with its build pipeline.</p>
+<hr>
+<p>Thanks to <a href="https://github.com/chman">chman</a> for contributing the FD templates.</p>
+<p>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;   </p>
+
+        </div>
+    </body>
+
+</html>

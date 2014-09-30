@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>flow - </title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <link rel="shortcut icon" href="./images/favicon.png" />
+
+        <link rel="stylesheet" type="text/css" href="./css/style.css" media="all">
+        <link rel="stylesheet" type="text/css" href="./css/code.css" media="all">
+        <link rel="stylesheet" type="text/css" href="./css/font.css" media="all">
+
+        <link rel="stylesheet" type="text/css" href="./css/tooltipster.css" media="all">
+        <link rel="stylesheet" type="text/css" href="./css/tooltipster-shadow.css" media="all">
+
+        <script src="./js/jquery-2.0.3.min.js"> </script>
+        <script src="./js/jquery.tooltipster.min.js"> </script>
+
+        <script>
+
+            $(document).ready(function() {
+
+                $('.section').css('display','none');
+                $('.readmore').click(function(e){
+                    var _child = $(this).parent().find('.section').first();
+                    var _opp = 'block';
+                    if( _child.css('display') == 'block' ) {
+                        _opp = 'none';
+                    } else {
+                    }
+                    _child.css('display', _opp);
+                });
+
+                $('div.sample').on('click', function(e){
+                        //get the data tag
+                    var content = $(this).attr('data-content');
+                        //remove clicking handler
+                    $(this).off('click');
+                        //replace the content!
+                    $(this).html('<iframe src="'+content+'" sandbox="allow-same-origin allow-scripts" style="overflow:hidden; scrollbar:none; border: 0; width:645px; height:450px;"></iframe> ')
+                });
+
+                $('.tooltip').each(function(e){
+                    var c = $(this).attr('data-tooltip');
+                    $(this).tooltipster({
+                        content:$('<span>' + c + '</span>'),
+                        interactive:true,
+                    theme:'tooltipster-shadow'
+                    });
+                });
+
+            }); //document.ready
+
+        </script>
+    </head>
+
+    <body>
+        <div class="content">
+            <p><a href="./index.html" id="logo"><img src="./images/logo.png" /></a></p>
+<div class="topmenu">
+<a href="./usage/index.html">usage</a> . <a href="#guide">guide</a> <img src=".//images/github.png" alt="github">  <a href="https://github.com/underscorediscovery/snow">source</a> . <a href="https://github.com/underscorediscovery/snow/issues/">issues</a>
+</div>
+
+<hr>
+<h1 id="flow-file-format">flow file format</h1>
+<p>The flow file format is based on JSON, which should be familiar. The difference is that the format is parsed very loosely, allowing clarity and simplicity over inane JSON errors, while still supporting concise error reporting when errors are found in the project.</p>
+<p>The following convention is used below :</p>
+<ul>
+<li><code>node</code> a json object i.e <code>{ }</code></li>
+<li><code>list</code> an array i.e <code>[ ]</code></li>
+<li><code>key</code> a key/value pair <code>name: &#39;value&#39;</code></li>
+</ul>
+<h2 id="root-nodes">Root nodes</h2>
+<p>Root nodes are in the parent object.<br><strong>There are three reserved nodes</strong>.  </p>
+<h3 id="-flow-"><code>flow</code></h3>
+<p>The flow node is your direct route to the flow tool config from a project file, to override and augment flow itself, as needed.</p>
+<h3 id="-project-"><code>project</code></h3>
+<p>This is your project root node, where the majority of your flow is described.</p>
+<h3 id="-if-"><code>if</code></h3>
+<p>This is a conditional <code>project</code> node. It mirrors some features of the project node, but wraps the nodes inside of conditions, allowing expressive control over the flow based on defines.</p>
+<hr>
+<h3 id="custom-root-nodes">Custom root nodes</h3>
+<p>Aside from the three nodes above, the entirety of the flow file belongs to you, and the flow files in your dependency tree (more on this later).</p>
+<p>What the project uses these nodes for is entirely up to the project, and flow will simply maintain the nodes and pass them to hooks, file templates and so on.</p>
+<hr>
+<p><a name="defines"></a></p>
+<h2 id="project-defines">Project defines</h2>
+<p>When defined (shown later), these can be used in haxe code :</p>
+<pre><code class="lang-haxe"><span class="hljs-preprocessor">#<span class="hljs-keyword">if</span> desktop</span>
+  desktop_code();
+<span class="hljs-preprocessor">#<span class="hljs-keyword">else</span></span>
+  other_code();
+<span class="hljs-preprocessor">#<span class="hljs-keyword">end</span></span>
+</code></pre>
+<p>and in the conditional project nodes :</p>
+<pre><code class="lang-js"><span class="hljs-keyword">if</span>: {
+    desktop: {
+        files: { desktop_config:<span class="hljs-string">'config/desktop.json =&gt; config.json'</span> }
+    }
+}
+</code></pre>
+<h2 id="built-in-defines">Built in defines</h2>
+<ul>
+<li><em><code>dependency</code></em><ul>
+<li>any dependency will define it’s <code>name</code> as a define</li>
+<li>i.e <code>{ dependencies:{nape:&#39;*&#39;} }</code><ul>
+<li><code>nape</code> is defined</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>desktop</code><ul>
+<li>when building for mac, windows, or linux</li>
+</ul>
+</li>
+<li><code>mobile</code><ul>
+<li>when building for android, ios</li>
+</ul>
+</li>
+<li><em><code>target</code></em><ul>
+<li>the current target is automatically defined</li>
+<li>web, android, ios, mac, linux, android etc.</li>
+</ul>
+</li>
+<li><code>arch-</code><em>arch</em><ul>
+<li>on web, <code>arch-web</code> is used</li>
+<li>if on 64 bit, <code>arch-64</code>, 32 bit is <code>arch-32</code></li>
+<li>arch-armv7, arch-i386 and so on</li>
+</ul>
+</li>
+<li><code>ios-sim</code><ul>
+<li>only defined if <code>--sim</code> is specifed when building</li>
+</ul>
+</li>
+<li><code>debug</code><ul>
+<li>defined when <code>--debug</code> is enabled</li>
+</ul>
+</li>
+</ul>
+<p>For more info see the <a href="#build.defines">build.defines node</a></p>
+<hr>
+<p><a name="conditions"></a></p>
+<h2 id="conditional-project-nodes">Conditional project nodes</h2>
+<p>inside the <code>if</code> node in the root, currently following nodes can be used :</p>
+<ul>
+<li>files</li>
+<li>build.files</li>
+<li>build.defines</li>
+<li>build.flags</li>
+</ul>
+<p>The conditional nodes rely soley on the defines.</p>
+<h3 id="condition-resolution">condition resolution</h3>
+<p>The conditional system allows you to use defines <em>defined later</em>. This means that all defines will be resolved (and all conditions that define new defines) before hand, so you can safely use one define to  include new defines, and then use those defines. This can help simplify complex define expressions. For example :</p>
+<pre><code class="lang-js"><span class="hljs-keyword">if</span> : {
+    <span class="hljs-string">"mac || windows || linux || android || ios"</span> : {
+      build: {
+        defines : [<span class="hljs-string">'is_native'</span>]
+      }
+    },
+    <span class="hljs-string">"is_native &amp;&amp; arch-32"</span> : {
+        ...
+    }
+}
+</code></pre>
+<p>Instead of using the entire long expression each time, a single shorthand can be defined, and relied upon to be resolved.</p>
+<h3 id="conditional-statements">conditional statements</h3>
+<p>The conditions node supports the following operands</p>
+<ul>
+<li><code>!</code> not</li>
+<li><code>||</code> or</li>
+<li><code>&amp;&amp;</code> and</li>
+</ul>
+<p>This means that you can use expressions to define exclusion/inclusion.
+<strong>Take note that due to the syntax, conditional statements with operands must be inside of quotes, single or double.</strong></p>
+<pre><code class="lang-js"><span class="hljs-keyword">if</span>: {
+    <span class="hljs-string">'desktop &amp;&amp; web'</span>: {
+        ..
+    },
+    <span class="hljs-string">'mac &amp;&amp; arch-32 &amp;&amp; !static_link'</span>: {
+        ..
+    }
+}
+</code></pre>
+<hr>
+<h3 id="a-flow-file">A flow file</h3>
+<p>Each of the links below take you to the relevant node on this page.<br><strong> Take note </strong> that a lot of this is not required as the defaults will fill in the gaps.</p>
+<pre><code class='js'>
+{
+
+  <a href="#">project</a> : {
+    <a href="#project.name">name</a> : 'empty',
+    <a href="#project.version">version</a> : '1.0.0',
+    <a href="#project.author">author</a> : 'luxeengine',
+
+    <a href="#app">app</a> : {
+      <a href="#app.name">name</a> : 'luxe_empty',
+      <a href="#app.package">package</a> : 'org.snowkit.empty'
+      <a href="#app.output">output</a> : 'bin/'
+      <a href="#app.main">main</a> : 'Game',
+
+        <a href="#app.web">web</a> : {
+            <a href="#app.web">libs</a> : { ... }
+        },
+
+        <a href="#app.mobile">mobile</a> : {
+            ..
+            <a href="#app.mobile.ios">ios</a> : { ... },
+            <a href="#app.mobile.android">android</a> : { ... }
+        }
+    },
+
+    <a href="#build">build</a> : {
+      <a href="#build.flags">flags</a> : ['-v', '--macro keep(example)'],
+      <a href="#defines">defines</a> : ['no_sfx', 'no_music'],
+      <a href="#build.dependencies">dependencies</a> : {
+        example : '*'
+      }
+    },
+
+    <a href="#files">files</a> : {
+      config : { 
+          path: 'config.template.json => config.json', 
+          <a href="#templating">template</a>:'project' 
+      },
+      data : 'data/ => assets/'
+    }
+
+  },
+
+  <a href="#conditions">if</a> : {
+    ...
+  }
+
+}
+</code>
+</pre>
+
+<h2 id="-project-properties"><code>project</code> properties</h2>
+<ul>
+<li><p><code>name</code></p>
+<ul>
+<li>string</li>
+<li>the display name of this project</li>
+<li><code>mobile</code> this shows on the launch screen/menus</li>
+<li><strong>required</strong></li>
+</ul>
+</li>
+<li><p><code>version</code></p>
+<ul>
+<li>string</li>
+<li>the version number</li>
+<li>use <a href="http://semver.org/">semantic versioning</a></li>
+<li>not related to haxelib versioning</li>
+<li><strong>required</strong></li>
+</ul>
+</li>
+<li><p><code>author</code></p>
+<ul>
+<li>string</li>
+<li>the author/owner/maintainer of the project</li>
+<li>can be any alphanumeric string</li>
+</ul>
+</li>
+</ul>
+<hr>
+<pre><code class="lang-js">{
+    project: {
+        name: <span class="hljs-string">'hello'</span>,
+        version: <span class="hljs-string">'1.0.0-beta.1+2345'</span>,
+        author: <span class="hljs-string">'snowkit.org'</span>
+    }
+}
+</code></pre>
+<hr>
+<h2 id="-project-nodes"><code>project</code> nodes</h2>
+<ul>
+<li><a href="#app">app</a></li>
+<li><a href="#build">build</a></li>
+<li><a href="#files">files</a></li>
+</ul>
+<p><br/></p>
+<p><a name="app"></a></p>
+<h3 id="-app-"><code>app</code></h3>
+<p>The app node controls build configurations specific to the binary/app output of a flow, if any.   </p>
+<p><a name="app.name"></a></p>
+<ul>
+<li><code>name</code><ul>
+<li>string</li>
+<li>the binary file name</li>
+<li>should not use special characters</li>
+<li>default <code>flow_app</code></li>
+</ul>
+</li>
+</ul>
+<p><a name="app.package"></a></p>
+<ul>
+<li><code>package</code><ul>
+<li>string</li>
+<li>the bundle/package/app identifier</li>
+<li>should not use special characters or spaces</li>
+<li><em>change this</em></li>
+<li>default <code>org.snowkit.flow_app</code></li>
+</ul>
+</li>
+</ul>
+<p><a name="app.output"></a></p>
+<ul>
+<li><code>output</code><ul>
+<li>string</li>
+<li>the output directory</li>
+<li>default <code>&#39;bin&#39;</code></li>
+</ul>
+</li>
+</ul>
+<p><a name="app.main"></a></p>
+<ul>
+<li><code>main</code><ul>
+<li>string</li>
+<li>the main class for haxe to use</li>
+<li>no hx extension, just the name</li>
+<li>default <code>&#39;Main&#39;</code></li>
+</ul>
+</li>
+</ul>
+<p><a name="app.codepaths"></a></p>
+<ul>
+<li><code>codepaths</code><ul>
+<li>list of strings <code>[ ]</code></li>
+<li>local code paths, for haxe to use (<code>-cp</code>)</li>
+<li>default <code>[&#39;src&#39;]</code></li>
+</ul>
+</li>
+</ul>
+<p><a name="app.icon"></a></p>
+<ul>
+<li><code>icon</code><ul>
+<li>string</li>
+<li>specifies the location of your icons</li>
+<li><code>path =&gt; name</code> OR <code>path</code> (assumed name = ‘icon’)</li>
+<li><code>path</code> is relative to your flow file</li>
+<li><code>name</code> name is used, if not given <code>icon</code> is used</li>
+<li>default : internal default flow icons</li>
+<li>examples : <code>flow/src/flow/cmd/icons/default</code></li>
+<li>create a folder with fixed structure :<ul>
+<li><code>path/</code><ul>
+<li><code>icons/</code><ul>
+<li><code>windows/</code></li>
+<li><code>mac/</code></li>
+<li><code>linux/</code></li>
+<li><code>android/</code></li>
+<li><code>ios/</code></li>
+<li><code>web/</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>inside the folders :<ul>
+<li><code>web/</code><ul>
+<li><code>source.png</code></li>
+<li>any valid favicon</li>
+</ul>
+</li>
+<li><code>windows</code><ul>
+<li><code>name.ico</code></li>
+<li>must be a valid .ico format</li>
+<li>many tools <a href="http://www.convertico.com/">online</a></li>
+</ul>
+</li>
+<li><code>mac</code><ul>
+<li><code>name.iconset/</code><ul>
+<li><code>icon_512x512@2x.png</code></li>
+<li>…</li>
+<li>sizes in <a href="https://developer.apple.com/library/mac/documentation/GraphicsAnimation/Conceptual/HighResolutionOSX/Optimizing/Optimizing.html">Mac docs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>android</code><ul>
+<li><code>drawable-hdpi/</code><ul>
+<li><code>name.png</code></li>
+</ul>
+</li>
+<li>…</li>
+<li>sizes in <a href="http://developer.android.com/design/style/iconography.html">Android docs</a></li>
+<li>just follow the sizes</li>
+</ul>
+</li>
+<li><code>ios</code><ul>
+<li>uses contents of <a href="https://developer.apple.com/library/ios/recipes/xcode_help-image_catalog-1.0/Recipe.html">Images.xcassets</a></li>
+<li><code>icon/</code><ul>
+<li><code>Contents.json</code></li>
+<li><code>29.png</code></li>
+<li>…</li>
+</ul>
+</li>
+<li><code>launch/</code><ul>
+<li><code>Contents.json</code></li>
+<li><code>640x1136.png</code></li>
+<li>…</li>
+<li>splash images</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="-app-nodes"><code>app</code> nodes</h4>
+<ul>
+<li><p><code>mobile</code></p>
+<ul>
+<li>node <code>{ }</code></li>
+<li>mobile specific build options</li>
+</ul>
+</li>
+<li><p><code>web</code></p>
+<ul>
+<li>node <code>{ }</code></li>
+<li>web specific build options</li>
+</ul>
+</li>
+</ul>
+<p><a name="app.web"></a></p>
+<h5 id="-app-web-properties"><code>app.web</code> properties</h5>
+<ul>
+<li><code>libs</code><ul>
+<li>node of keys <code>{ libname:&#39;path&#39; }</code></li>
+<li>you determine what you name these but</li>
+<li>can be overridden from project tree per name</li>
+<li>passed through to templates, for use in html</li>
+<li><code>libs: { jquery:&#39;js/jquery.js&#39;, index:&#39;index.js&#39; }</code><ul>
+<li>key: given lib name<ul>
+<li><code>jquery</code></li>
+</ul>
+</li>
+<li>value: path string<ul>
+<li>relative to project output</li>
+<li>or absolute link/http</li>
+<li><code>js/jquery.js</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><a name="app.mobile"></a></p>
+<h5 id="-app-mobile-properties"><code>app.mobile</code> properties</h5>
+<ul>
+<li><p><code>fullscreen</code></p>
+<ul>
+<li>bool</li>
+<li>if device fullscreen is used </li>
+<li>default <code>true</code></li>
+</ul>
+</li>
+<li><p><code>orientation</code></p>
+<ul>
+<li>string</li>
+<li>device orientation</li>
+<li>available options<ul>
+<li><code>landscape</code></li>
+<li><code>landscape left</code></li>
+<li><code>landscape both</code></li>
+<li><code>portrait</code></li>
+<li><code>portrait upside down</code></li>
+<li><code>portrait both</code></li>
+</ul>
+</li>
+<li>default <code>landscape</code></li>
+</ul>
+</li>
+<li><p><code>ios</code></p>
+<ul>
+<li>node <code>{ }</code></li>
+<li>ios specific settings</li>
+</ul>
+</li>
+<li><p><code>android</code></p>
+<ul>
+<li>node <code>{ }</code></li>
+<li>android specific settings</li>
+</ul>
+</li>
+</ul>
+<p><a name="app.mobile.ios"></a></p>
+<h5 id="-app-mobile-ios-properties"><code>app.mobile.ios</code> properties</h5>
+<ul>
+<li><p><code>devices</code></p>
+<ul>
+<li>string</li>
+<li>matches the device types in xcode</li>
+<li>available options<ul>
+<li><code>Universal</code></li>
+<li><code>iPhone</code></li>
+<li><code>iPad</code></li>
+</ul>
+</li>
+<li>default <code>Universal</code></li>
+</ul>
+</li>
+<li><p><code>deployment_target</code></p>
+<ul>
+<li>string</li>
+<li>a version of iOS that is the minimum target</li>
+<li>default <code>6.0</code></li>
+</ul>
+</li>
+<li><p><code>cpp</code></p>
+<ul>
+<li>string</li>
+<li>the xcode formal name for the cpp</li>
+<li>don’t change unless the framework requires it</li>
+<li>allows framework developers to customize cpp lib</li>
+<li>default <code>libc++</code></li>
+</ul>
+</li>
+</ul>
+<p><a name="app.mobile.android"></a></p>
+<h5 id="-app-mobile-android-properties"><code>app.mobile.android</code> properties</h5>
+<ul>
+<li><p><code>build_type</code></p>
+<ul>
+<li>string</li>
+<li>debug/store build flags</li>
+<li>available options<ul>
+<li><code>debug</code></li>
+<li><code>store</code></li>
+</ul>
+</li>
+<li>default <code>debug</code></li>
+</ul>
+</li>
+<li><p><code>install_location</code></p>
+<ul>
+<li>string</li>
+<li>matches <a href="http://developer.android.com/guide/topics/manifest/manifest-element.html#install">installLocation in android manifest</a></li>
+<li>default <code>preferExternal</code></li>
+</ul>
+</li>
+<li><p><code>sdk_min</code></p>
+<ul>
+<li>string</li>
+<li>matches the <a href="http://developer.android.com/guide/topics/manifest/uses-sdk-element.html">sdk min in android manifest</a></li>
+<li>default <code>10</code></li>
+</ul>
+</li>
+<li><p><code>sdk_target</code></p>
+<ul>
+<li>string</li>
+<li>matches the <a href="http://developer.android.com/guide/topics/manifest/uses-sdk-element.html">sdk target in android manifest</a></li>
+<li>commonly set to the highest available</li>
+<li>default <code>19</code></li>
+</ul>
+</li>
+<li><p><code>permissions</code></p>
+<ul>
+<li>list of strings <code>[ ]</code></li>
+<li>matches the <a href="http://developer.android.com/reference/android/Manifest.permission.html">android manifest permissions</a></li>
+<li>permissions will combine in project tree</li>
+<li>default <code>[&#39;READ_EXTERNAL_STORAGE&#39;, &#39;INTERNET&#39;]</code></li>
+</ul>
+</li>
+<li><p><code>certificate</code></p>
+<ul>
+<li><code>:todo:</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<p><a name="build"></a></p>
+<h3 id="-build-"><code>build</code></h3>
+<p>The build node controls build specific configurations and files.   </p>
+<p><a name="build.dependencies"></a></p>
+<ul>
+<li><code>dependencies</code><ul>
+<li>node of keys <code>{ depend:&#39;version&#39; }</code></li>
+<li>dependencies use haxelib directly</li>
+<li>dependencies do not require a flow file, just a haxelib entry</li>
+<li><code>haxelib.json</code> will be read if no flow file is found, including dependencies</li>
+<li>missing dependencies fail early, clear error messages</li>
+<li><code>cpp</code> on cpp targets, hxcpp will automatically be added</li>
+<li>key: dependency name, must match <code>haxelib list</code><ul>
+<li><code>mylib</code></li>
+</ul>
+</li>
+<li>value: dependency version<ul>
+<li><code>&#39;*&#39;</code> currently active haxelib version</li>
+<li><code>&#39;1.0.0&#39;</code> require haxelib version 1,0,0</li>
+</ul>
+</li>
+<li>default <code>[]</code></li>
+</ul>
+</li>
+</ul>
+<p><a name="build.flags"></a></p>
+<ul>
+<li><code>flags</code><ul>
+<li>list of strings <code>[ ]</code></li>
+<li>haxe flags, passed directly to haxe</li>
+<li>default <code>[]</code></li>
+<li>example <code>[&#39;-resource version.txt@version&#39;]</code></li>
+</ul>
+</li>
+</ul>
+<p><a name="build.defines"></a></p>
+<ul>
+<li><p><code>defines</code></p>
+<ul>
+<li>list of strings <code>[ ]</code></li>
+<li>haxe defines, passed to haxe (<code>-D define</code>)</li>
+<li>default <code>[]</code></li>
+<li>example <code>[&#39;some_define&#39;]</code></li>
+<li>see <a href="#defines">defines</a> usage</li>
+</ul>
+</li>
+<li><p><code>files</code></p>
+<ul>
+<li>see <a href="#files">files below</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<p><a name="files"></a></p>
+<h3 id="-files-"><code>files</code></h3>
+<p>&nbsp;</p>
+<h4 id="copying">copying</h4>
+<ul>
+<li>in project <code>files</code> node, copies to output/<em>target</em>/<ul>
+<li>i.e <code>bin/web/</code></li>
+</ul>
+</li>
+<li>in project <code>build.files</code> node, copies to output/<em>target</em>.build/<ul>
+<li>i.e <code>bin/web.build/</code></li>
+</ul>
+</li>
+<li>list of nodes <code>{ }</code></li>
+<li><code>{ filereference : &#39;path/source.name =&gt; dest/path/dest.name&#39; }</code></li>
+<li><strong>source part</strong><ul>
+<li>file path must be relative to the flow file</li>
+</ul>
+</li>
+<li><strong>destination part</strong><ul>
+<li><strong>dest</strong> path <strong>must</strong> end up alongside or below flow file</li>
+<li>i.e relative paths are ok, but not escaping project<ul>
+<li>i.e for <code>project.files</code>: <ul>
+<li><code>../../</code> is <code>output/target/../../</code></li>
+<li>same location as flow file, but <code>../../../</code> is invalid</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>dest</strong> will be created, includings folders if needed</li>
+<li><strong>dest</strong> will be overwritten (see below for stopping this)</li>
+<li><strong>dest</strong> part is optional, <ul>
+<li><code>file.json</code> is same as <code>file.json =&gt; file.json</code></li>
+<li><code>path/file.name</code> is same as <code>path/file.name =&gt; path/file.name</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="templating">templating</h4>
+<ul>
+<li>templates are run using <a href="http://handlebarsjs.com/">handlebars</a></li>
+<li>a file node has a <code>template</code> property</li>
+<li>the <code>template</code> property is sourced from <strong>root nodes</strong> only</li>
+<li>you can specify a single node or a list <code>[&#39;project&#39;, &#39;custom&#39;]</code></li>
+<li>any root node (except for <code>if</code>) can be requested<ul>
+<li>this includes custom nodes</li>
+<li>the <code>project</code> node is a post-processed project, including special values and preprocessed paths, links and more</li>
+</ul>
+</li>
+<li>examples :<ul>
+<li>copy config.json over, template it against the project</li>
+<li>using <code>{ project:{ name:&#39;the name&#39; } }</code> in flow file</li>
+<li>and <code>{ config : &#39;config.json&#39;, template:&#39;project&#39; }</code></li>
+<li>and config.json contains</li>
+<li><code>{ project_name:</code> “&#123;&#123; <code>project.name</code> &#125;&#125;” <code>}</code></li>
+<li>becomes</li>
+<li><code>{ project_name: &quot;the name&quot; }</code></li>
+</ul>
+</li>
+<li><p>custom root</p>
+<ul>
+<li>using <code>{ project:{}, custom:{ value:2 } }</code> in flow file</li>
+<li>and <code>{ config : &#39;config.json&#39;, template:&#39;custom&#39; }</code></li>
+<li>and config.json contains</li>
+<li><code>{ custom_value:</code> &#123;&#123; <code>custom.value</code> &#125;&#125; <code>}</code></li>
+<li>becomes</li>
+<li><code>{ custom_value: 2 }</code></li>
+</ul>
+</li>
+<li><p>handlebars helpers (<a href="http://handlebarsjs.com/#helpers">usage docs</a>)</p>
+<ul>
+<li>&#123;&#123; <code>json value</code> &#125;&#125;<ul>
+<li>dump json object from scope to debug</li>
+<li>i.e request <code>project</code> and use to inspect<ul>
+<li>&#123;&#123; <code>json project</code> &#125;&#125;</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>&#123;&#123; <code>toString custom.bool</code> &#125;&#125;<ul>
+<li>because “falsey” values are ignored, it wont template if literal false</li>
+<li>use toString for all bool/falsey types to ensure correct output</li>
+</ul>
+</li>
+<li>&#123;&#123; <code>upperFirst string</code> &#125;&#125;<ul>
+<li>if string contains “something” it becomes Something</li>
+</ul>
+</li>
+<li>&#123;&#123; <code>#if value &#39;==&#39; &#39;other&#39;</code> &#125;&#125;<ul>
+<li>extensions on the default if block helper</li>
+<li>supports <code>&#39;==&#39;</code>, <code>&#39;===&#39;</code>, <code>&#39;!==&#39;</code>, <code>&#39;&lt;&#39;</code>, <code>&#39;&lt;=&#39;</code>, <code>&#39;&gt;&#39;</code>, <code>&#39;&gt;=&#39;</code>, <code>&#39;||&#39;</code>, <code>&#39;&amp;&amp;&#39;</code></li>
+<li>operand must be in quotes</li>
+<li>see <a href="http://stackoverflow.com/questions/8853396/logical-operator-in-a-handlebars-js-if-conditional">this stackoverflow for logic</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<p>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;   </p>
+
+        </div>
+    </body>
+
+</html>

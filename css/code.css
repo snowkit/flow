@@ -71,7 +71,7 @@ pre,code { font-family:'dsm',monospace; background:#272822; border-radius:0.2em;
 
 code { color:#666; border:solid 1px rgba(39,40,34,0.3); }
 code a { color:#f6007b; }
-code a:hover { color:#000; }
+code a:hover { color:#06b4fb; }
 
 
 pre {
@@ -80,8 +80,8 @@ pre {
 }
 
 code {
-  display: inline-block;
-  font-size: 0.79em;
+  display: inline;
+  font-size: 0.8em;
   padding-bottom: 0.1em;
   padding-left: 0.4em;
   padding-right: 0.4em;
