@@ -19,7 +19,7 @@
 [ <img src="{{{rel_path}}}images/haxe.png" target="_blank" class="small-image"/> ](http://haxe.org)   
 
 <small class="haxedesc">Haxe is an expressive, beautiful modern programming language <br/>
-      that compiles it's own code into other languages. <a href="http://haxe.org/" target="_blank"> learn more</a> </small>
+      that compiles its own code into other languages. <a href="http://haxe.org/" target="_blank"> learn more</a> </small>
 
 <br/>
 <br/>
@@ -59,7 +59,7 @@ Join us in developing and testing the framework and tools, below.
 flow is a project based build tool, meaning that it takes a flow file, <br/>
 and executes the commands and tasks in the flow file to build an application.
 <br/><br/>
-An example of some of the available commands : <br/>
+An example of some of the available commands: <br/>
 
 - `files` - copies and templates files from your project to the build
 - `icons` - copies, converts and embeds icons for a build
@@ -101,7 +101,7 @@ The most common _platform_ is the web. <br/>
 
 <h3>Building an application</h3>
 
-The code that haxe generates is 100% ready to use, in a webpage or an application, <br/>haxe has done it's job now and it's your turn. <br/>
+The code that haxe generates is 100% ready to use, in a webpage or an application, <br/>haxe has done its job now and it's your turn. <br/>
 <br/>
 You need to put all this together, maybe in an html file or an app bundle, maybe package an apk for android, add some assets, an icon and make this work over a few platforms. <br/>
 <br/>
@@ -109,7 +109,7 @@ What if you want to run a script automatically before building? <br/>
 What if you want to package nightly builds of your application for testers? <br/>
 
 <h3>This is what flow is for</h3> <br/>
-flow takes the haxe output, your project input, and creates shippable applications, <br/> games, websites or more on it's supported _platforms_.
+flow takes the haxe output, your project input, and creates shippable applications, <br/> games, websites or more on its supported _platforms_.
 
 
 flow has many built in tools, from javascript minify to interacting with the cpp build pipeline - it's an expressive tool designed around flexibility and control.
