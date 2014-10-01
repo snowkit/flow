@@ -1,3 +1,3 @@
 ![flow](flow.png)
 
-#### https://snowkit.org/
+#### https://snowkit.org/flow
