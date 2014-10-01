@@ -83,7 +83,7 @@ A flow file is a project. It is a simple, not-strict json file.
 <br/>
 <h2>Where does flow fit in?</h2>
 
-To understand where flow fits, you should understand the way haxe works it's magic.
+To understand where flow fits, you should understand the way haxe works its magic.
 <br/>
 <br/>
 <b>A _target_ and a _platform_ are not the same thing.</b>
