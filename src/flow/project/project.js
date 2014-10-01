@@ -355,7 +355,12 @@ exports.do_prepare = function(flow) {
     exports.ensure_path(flow);
 
     flow.project.prepare(flow);
-    flow.project.bake(flow);
+
+    if(flow.project.prepared) {
+        flow.project.bake(flow);
+    } else {
+        flow.log(1, 'project - failed at prepare');
+    }
 
 } //do_prepare
 
@@ -379,9 +384,9 @@ internal._error_project = function(flow, reason){
 } //_error_project
 
 
-exports.bake = function bake(flow, project) {
+exports.bake = function bake(flow) {
 
-    return _bake.bake(flow, project);
+    return _bake.bake(flow);
 
 } //exports.bake
 

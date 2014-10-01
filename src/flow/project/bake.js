@@ -8,7 +8,7 @@ exports.bake = function bake(flow) {
 
     flow.log(3, 'bake - project %s\n', flow.project.parsed.project.name);
 
-    flow.project.hxml = exports.hxml(flow, project );
+    flow.project.hxml = exports.hxml( flow, project );
 
     flow.log(3, flow.project.hxml);
     flow.log(3, '');

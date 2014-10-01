@@ -33,6 +33,7 @@ exports.prepare = function prepare(flow) {
 
         //get out early if missing any dependency
     if(_depends == null) {
+        internal.log(flow, 4, 'prepare - early out due to failed depends' );
         return null;
     }
 
