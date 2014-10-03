@@ -26,7 +26,7 @@ Restart Flashdevelop to finish the installation.
 
 ---
 
-Thanks to [chman](https://github.com/chman) for contributing the FD templates.
+Thanks to [chman](https://github.com/chman) for contributing the FD templates. You can contribute to them directly in the [snowkit FD](https://github.com/Chman/Snowkit-FD) repo.
 
 &nbsp;   
 &nbsp;   
