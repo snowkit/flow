@@ -543,7 +543,7 @@ internal.prepare_mobile = function(flow, prepared) {
         }
 
             //add the -l parts
-        lib_ldflags = lib_ldflags.map(function(a) { return '-l ' + a; });
+        lib_ldflags = lib_ldflags.map(function(a) { return '-l \'' + a +'\''; });
             //join with spaces
         var _lib_ldflags = lib_ldflags.join(' ');
         flow.log(3, 'prepare - ios ldflags set to `%s`', _lib_ldflags);
