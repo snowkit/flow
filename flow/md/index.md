@@ -7,7 +7,7 @@
 
 ---
 <script src="{{{rel_path}}}js/release.version.js"> </script>
-<div class="version">current version <a href="#" id="version_notes_link" target="_blank">notes</a> <code> <a id="version_tag" target="_blank" href="#"> latest </a></code> </div>
+<div class="version">current version <a href="https://github.com/underscorediscovery/flow" id="version_notes_link" target="_blank">notes</a> <code> <a id="version_tag" target="_blank" href="https://github.com/underscorediscovery/flow"> master </a></code> </div>
 
 <br/>
 ##About
@@ -149,15 +149,15 @@ from a terminal (<a class="tooltip" data-tooltip="A terminal is a command line i
 
 by running the following command :
 
-`haxelib install flow`
+`haxelib git flow https://github.com/underscorediscovery/flow.git`
 
-![](images/install.gif)
+<!-- ![](images/install.gif) -->
 
-followed by
+<!-- followed by -->
 
-`haxelib run flow setup`
+<!-- `haxelib run flow setup` -->
 
-This opens a **simple web interface** get you setup.
+<!-- This opens a **simple web interface** get you setup. -->
 
 ---
 
