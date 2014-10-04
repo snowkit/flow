@@ -11,7 +11,7 @@ exports.post_build = function(flow, done) {
     var min_code = fs.readFileSync(out_file + '.js', 'utf8');
 
         //minify step
-    if(flow.flags.min) {
+    if(flow.flags.min || flow.project.prepared.source.project.app.web.min) {
 
         flow.log(2, 'build - uglifying js output');
 
