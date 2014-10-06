@@ -42,7 +42,9 @@ internal.launch = function(flow) {
     } else if(flow.target_mobile) {
 
         switch(flow.target) {
+
             case 'android':
+
                 internal.android_launch_init(flow);
 
                 internal.install_android(flow, function(code) {
@@ -53,8 +55,17 @@ internal.launch = function(flow) {
                     }
                 });
 
+                break;
+
             case 'ios':
+
                 internal.launch_ios(flow);
+
+                break;
+
+            default:
+                flow.log(1, 'launch - stopping due to unknown target');
+
         }
 
     } //target mobile
