@@ -285,7 +285,6 @@ exports.build_hxcpp = function(flow, run_path, hxcpp_file, done) {
         args.push('-Diphone');
         args.push('-DHXCPP_CPP11');
         args.push('-DHXCPP_CLANG');
-        args.push('-DOBJC_ARC');
     }
 
     if(flow.target == 'android') {
