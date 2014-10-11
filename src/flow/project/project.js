@@ -400,33 +400,34 @@ exports.find_arch = function(flow) {
 
         //check if there is any explicit arch given
     if(flow.flags.arch) {
+
         var _arch = flow.flags.arch;
+
         if(_arch === true) {
             flow.log(1, '\nError\n--arch specified but no arch given\n\n> use --arch 32, --arch 64, --arch armv6 etc.\n');
             return null;
         } else {
             arch = String(_arch);
         }
-    }
 
-        //99.9% (guess) of used macs are x64 now,
-        //so default to x64. use --arch 32 if you want to force it
-    if(flow.target == 'mac') {
-        if(!arch) {
-            arch = '64';
-        }
-    }
+    } //flags.arch
 
-        //default to the host operating system arch on linux
-    if(flow.target == 'linux') {
+    if( flow.target == 'mac' || 
+        flow.target == 'windows' || 
+        flow.target == 'linux') {
+
         if(!arch) {
+
             if(process.arch == 'x64') {
                 arch = '64';
             } else if(process.arch == 'ia32') {
                 arch = '32';
             }
-        }
-    } //linux
+
+        } //not explicit arch
+
+    } //desktop
+
 
         //default to armv7 on mobile, use --arch armv6 etc to override
     if(flow.target == 'ios' || flow.target == 'android') {
@@ -447,7 +448,7 @@ exports.find_arch = function(flow) {
             arch = 'armv7';
         }
 
-    }
+    } //ios || android
 
     return arch;
 
