@@ -405,7 +405,7 @@ exports.find_arch = function(flow) {
             flow.log(1, '\nError\n--arch specified but no arch given\n\n> use --arch 32, --arch 64, --arch armv6 etc.\n');
             return null;
         } else {
-            arch = _arch;
+            arch = String(_arch);
         }
     }
 
