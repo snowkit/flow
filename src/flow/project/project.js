@@ -424,7 +424,18 @@ exports.find_arch = function(flow) {
                           process.env.hasOwnProperty('PROCESSOR_ARCHITEW6432');
 
             if(is64bit) {
+
                 arch = '64';
+
+                    //:todo: currently hxcpp doesn't bundle
+                    //the prebuilt Windows64/ libs. And might not build 64 bit?
+                    //to build these, use `neko ./build.n`
+                    //from within /path/to/hxcpp/project/ folder
+                    //and use --arch 64 explicitly
+                if(flow.target == 'windows') {
+                    arch = '32';
+                }
+
             } else if(process.arch == 'ia32') {
                 arch = '32';
             }
