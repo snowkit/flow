@@ -449,17 +449,6 @@ exports.find_arch = function(flow) {
 
     }
 
-        //until hxcpp gets x64 support, force 32 bit on windows
-    if(flow.target == 'windows') {
-
-        if(arch == '64') {
-            flow.log(1, 'hxcpp does not support 64 bit on windows at the moment. Please ask at http://github.com/haxefoundation/hxcpp/issues if you would like this to happen.');
-        }
-            //force 32
-        arch = '32';
-
-    } //windows
-
     return arch;
 
 } //arch
