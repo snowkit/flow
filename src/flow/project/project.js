@@ -418,7 +418,12 @@ exports.find_arch = function(flow) {
 
         if(!arch) {
 
-            if(process.arch == 'x64') {
+                //https://coderwall.com/p/0eds7q
+                //because windows is terrible at basics.
+            var is64bit = process.arch === 'x64' || 
+                          process.env.hasOwnProperty('PROCESSOR_ARCHITEW6432');
+
+            if(is64bit) {
                 arch = '64';
             } else if(process.arch == 'ia32') {
                 arch = '32';
