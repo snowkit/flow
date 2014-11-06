@@ -959,23 +959,76 @@ internal.prepare_icons = function(flow, prepared) {
 internal.prepare_files = function(flow, prepared) {
 
     internal.log(flow, 3, 'prepare - files ...');
+        var result = { build_files:[], project_files:[] }
 
-        var result = files.parse(flow, prepared, flow.project.parsed, null);
+        //some local helper functions
+
+            var file_update_into = function(source, dest) {
+                return {
+                    nodeid: source.nodeid,
+                    template: source.template,
+                    source: source.source, dest: source.dest,
+                    dest_value: source.dest_value,
+                    source_value: source.source_value,
+                    source_name: source.source_name
+                }
+            }
+
+                //for each node in the existing list, if this nodeid is the same,
+                //we update the existing item, otherwise we add it to the list
+            var file_update_or_add = function(list, node) {
+
+                var existed = false;
+                for(fidx in list) {
+                    var existing = list[fidx];
+                    if(existing.nodeid == node.nodeid) {
+                        existing = file_update_into(node, existing);
+                        list[fidx] = existing;
+                        existed = true;
+                    }
+                }
+
+                if(!existed) {
+                    list.push(node);
+                }
+
+                return list;
+
+            } //file_update_or_add
+
+            var list_update_or_add = function(list_src, list_dest) {
+
+                for(idx in list_src) {
+                    list_dest = file_update_or_add(list_dest, list_src[idx]);
+                }
+
+                return list_dest;
+
+            } //list_update_or_add
+
 
             //now, check each dependency and get their files, making them
             //absolute to their path, such that they can be copied
-        for(index in prepared.depends) {
+        for(index in prepared.depends_list) {
 
-            var depend = prepared.depends[index];
+            var name = prepared.depends_list[index];
+            var depend = prepared.depends[name];
 
             var sourcepath = depend.project.__root;
             var depfiles = files.parse(flow, prepared, depend.project, sourcepath);
 
                 //merge them into the final list
-            result.build_files = util.array_union(result.build_files, depfiles.build_files);
-            result.project_files = util.array_union(result.project_files, depfiles.project_files);
+            result.build_files = list_update_or_add(depfiles.build_files, result.build_files);
+            result.project_files = list_update_or_add(depfiles.project_files, result.project_files);
 
         } //each depends
+
+            //now fetch the ones from the root project last so they are respected
+        var projfiles = files.parse(flow, prepared, flow.project.parsed, null);
+
+            //and merge them
+        result.build_files = list_update_or_add(projfiles.build_files, result.build_files);
+        result.project_files = list_update_or_add(projfiles.project_files, result.project_files);
 
         prepared.files = result;
 

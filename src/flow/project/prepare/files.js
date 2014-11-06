@@ -152,13 +152,13 @@ internal.parse_conditional_files = function(flow, prepared, source, file_list, b
 
 internal.parse_node_list = function(flow, prepared, list, file_list) {
     for(name in list) {
-        internal.parse_file(flow, prepared, list[name], file_list);
+        internal.parse_file(flow, prepared, name, list[name], file_list);
     }
 } //parse_node_list
 
-internal.parse_file = function(flow, prepared, _node, file_list) {
+internal.parse_file = function(flow, prepared, _name, _node, file_list) {
 
-    var _path = internal.parse_node(flow, prepared, _node);
+    var _path = internal.parse_node(flow, prepared, _name, _node);
 
     if(_path === null) {
         flow.log(1, 'files - parsing failed for %s in %s', name, prepared.source.__path);
@@ -173,8 +173,8 @@ internal.parse_file = function(flow, prepared, _node, file_list) {
 } //parse_file
 
 
-    //parse a path into { source :'', dest:'', template:'' }
-internal.parse_node = function(flow, prepared, _node) {
+    //parse a path into { nodeid:'', source :'', dest:'', template:'' }
+internal.parse_node = function(flow, prepared, _name, _node) {
 
     var _file_path = _node;
 
@@ -203,7 +203,7 @@ internal.parse_node = function(flow, prepared, _node) {
         //clean up whitespaces
     parts = parts.map(function(part) { return part.trim(); });
 
-    var result = { source:util.normalize(parts[0]), dest:util.normalize(parts[1]) };
+    var result = { nodeid:_name, source:util.normalize(parts[0]), dest:util.normalize(parts[1]) };
 
     if(_node.template) {
         result.template = _node.template;
