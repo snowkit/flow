@@ -1,6 +1,7 @@
 var   util = require('../../util/util')
     , path = require('path')
     , fs = require('graceful-fs')
+    , cmds = require('../')
 
 var internal = {};
 
@@ -56,6 +57,7 @@ exports.verify = function verify(flow, done) {
 
     internal.leaf = flow.flags._next('config');
     internal.list = flow.flags.list;
+    var err;
 
     if(internal.leaf) {
 
@@ -106,9 +108,13 @@ exports.verify = function verify(flow, done) {
 
         internal.node = node;
 
-    } //leaf
+    } else { //leaf
 
-    done(null, null);
+        err = ': requires arguments, see `flow usage config` for details';
+
+    }
+
+    done(err, null);
 
 } //verify
 
