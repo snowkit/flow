@@ -16,3 +16,6 @@ options
 
     --clean
         runs the clean command before building. see `flow usage clean`
+
+    --output-path <path>
+        override the flow tree project.app.output path

@@ -239,7 +239,18 @@ exports.verify = function verify(flow, project_path, project_root, is_dependency
     //the final target path for the output
 exports.get_path_root = function(flow, prepared) {
 
-    return util.normalize(prepared.source.project.app.output, true);
+    var outpath = prepared.source.project.app.output;
+
+    var cli_outpath = flow.flags['output-path'];
+    if(cli_outpath) {
+        if(cli_outpath !== true) {
+            outpath = cli_outpath;
+        } else {
+            flow.log(2, 'project - warning - cli specified output-path without a value. ignoring!');
+        }
+    }
+
+    return util.normalize(outpath, true);
 
 } //get_path_root
 
