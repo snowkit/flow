@@ -36,8 +36,8 @@ exports.parse = function parse(flow, prepared, source, srcpath) {
         build_file_list = internal.append_source(flow, build_file_list, srcpath);
 
             //then filter unsafe/non-relative paths
-        project_file_list = internal.filter_unsafe(flow, project_file_list, srcpath, project_out, project_root);
-        build_file_list = internal.filter_unsafe(flow, build_file_list, srcpath, project_out, project_root);
+        project_file_list = internal.filter_unsafe(flow, prepared, project_file_list, srcpath, project_out, project_root);
+        build_file_list = internal.filter_unsafe(flow, prepared, build_file_list, srcpath, project_out, project_root);
 
     } else {
 
@@ -46,8 +46,8 @@ exports.parse = function parse(flow, prepared, source, srcpath) {
         build_file_list = internal.append_source(flow, build_file_list, flow.project.root);
 
             //then filter unsafe/non-relative paths
-        project_file_list = internal.filter_unsafe(flow, project_file_list, project_root, project_out, project_root);
-        build_file_list = internal.filter_unsafe(flow, build_file_list, project_root, project_out, project_root);
+        project_file_list = internal.filter_unsafe(flow, prepared, project_file_list, project_root, project_out, project_root);
+        build_file_list = internal.filter_unsafe(flow, prepared, build_file_list, project_root, project_out, project_root);
 
     }
 
@@ -94,7 +94,7 @@ internal.append_source = function(flow, list, srcpath) {
 
 } //append_source
 
-internal.filter_unsafe = function(flow, list, srcpath, dstpath, rootpath) {
+internal.filter_unsafe = function(flow, prepared, list, srcpath, dstpath, rootpath) {
 
     return list.filter(function(file){
 
@@ -109,17 +109,19 @@ internal.filter_unsafe = function(flow, list, srcpath, dstpath, rootpath) {
 
         if(rel_src.indexOf('..') != -1) {
             is_source_safe = false;
-            flow.log(2, '>     - files - ignoring source file due to unsafe path. %s should be inside %s (becomes %s)',
+            flow.log(2, '>     - files - source file with unsafe path. %s not inside %s (becomes %s)',
                 file.source_name ? file.source_name : file.source, srcpath, file.source);
         }
 
         if(rel_dst.indexOf('..') != -1) {
             is_dest_safe = false;
-            flow.log(2, '>     - files - ignoring dest file due to unsafe path. %s should be inside %s (becomes %s)',
+            flow.log(2, '>     - files - dest file with unsafe path. %s not inside %s (becomes %s)',
                 file.dest, rootpath, abs_dest);
         }
 
-        return is_source_safe && is_dest_safe;
+        var is_safe = (is_source_safe && is_dest_safe);
+
+        return (is_safe || prepared.files_unsafe);
 
     });
 

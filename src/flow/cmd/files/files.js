@@ -20,7 +20,7 @@ exports.run = function run(flow, files) {
             flow.log(3,'');
         }
 
-        var project_file_path = path.join(flow.project.root, flow.project.paths.files);
+        var project_file_path = path.resolve(flow.project.root, flow.project.paths.files);
         var projectfiles = internal.copy_files(flow, files.project_files, project_file_path, ignore_files);
 
         var ignore_build_files = (flow.flags['build-files'] === false);
@@ -32,7 +32,7 @@ exports.run = function run(flow, files) {
             flow.log(3,'');
         }
 
-        var project_build_file_path = path.join(flow.project.root, flow.project.paths.build);
+        var project_build_file_path = path.resolve(flow.project.root, flow.project.paths.build);
         var buildfiles = internal.copy_files(flow, files.build_files, project_build_file_path, ignore_build_files);
 
         //clean up the list of files by their destination

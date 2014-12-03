@@ -63,6 +63,11 @@ exports.prepare = function prepare(flow) {
         //then prepare the remaining nodes that need it
     internal.prepare_project(flow, prepared);
 
+        //allow failing during prepare phases
+    if(flow.project.failed) {
+        return null;
+    }
+
         //finally, store it in the project as valid and return
     flow.project.prepared = prepared;
 
@@ -339,6 +344,10 @@ internal.prepare_project = function(flow, prepared) {
     // project.build.hooks
 
             internal.prepare_hooks(flow, prepared);
+
+    // project.app nodes except icon
+
+            internal.prepare_app(flow, prepared);
 
     // project.app.icon
 
@@ -887,6 +896,21 @@ internal.prepare_hooks = function(flow, prepared) {
 
 } //prepare_hooks
 
+
+    //prepare the app nodes that make sense
+internal.prepare_app = function(flow, prepared) {
+
+    //:todo:wip:
+    //this may have side effects, will
+    //do when can focus on it
+
+    // "main" : "Main",
+    // "output" : "bin",
+    // "package" : "org.snowkit.flow_app",
+    // "codepaths" : [ "src" ],
+
+} //prepare_app
+
 internal.prepare_icons = function(flow, prepared) {
 
     //icons simply need to append their source project path so that they can be
@@ -959,6 +983,22 @@ internal.prepare_icons = function(flow, prepared) {
 internal.prepare_files = function(flow, prepared) {
 
     internal.log(flow, 3, 'prepare - files ...');
+
+    var projconf = flow.project.parsed.flow;
+    if(projconf) {
+        if(projconf.build && projconf.build.files_allow_unsafe_paths) {
+            internal.log(flow, 1, '>>>> prepare - files - IMPORTANT - project is explicitly allowing unsafe paths');
+
+            if(flow.flags['files-allow-unsafe-paths']) {
+                prepared.files_unsafe = true;
+                internal.log(flow, 1, '>>>> prepare - files - given both --files-allow-unsafe-paths and files_allow_unsafe_paths in config. unsafe paths are now enabled!');
+            } else {
+                return internal.fail(flow, prepared, 'files', 'prepare - files - unsafe paths requires the --files-allow-unsafe-paths flag as well as files_allow_unsafe_paths in the flow build config from the root project.');
+            }
+
+        }
+    }
+
         var result = { build_files:[], project_files:[] }
 
         //some local helper functions
