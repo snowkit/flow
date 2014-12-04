@@ -38,16 +38,16 @@ exports.run = function run(flow, files) {
         //clean up the list of files by their destination
     projectfiles.map(function(_path, i){
         _path = util.normalize(_path);
-        var _root = path.join(flow.project.root, flow.project.paths.files);
-            _root = util.normalize(_root);
+        var _root = path.resolve(flow.project.root, flow.project.paths.files);
+            _root = util.normalize(_root, true);
         projectfiles[i] = _path.replace(_root,'');
     });
 
         //clean up the list of files by their destination
     buildfiles.map(function(_path, i){
         _path = util.normalize(_path);
-        var _root = path.join(flow.project.root, flow.project.paths.build);
-            _root = util.normalize(_root);
+        var _root = path.resolve(flow.project.root, flow.project.paths.build);
+            _root = util.normalize(_root, true);
         buildfiles[i] = _path.replace(_root,'');
     });
 

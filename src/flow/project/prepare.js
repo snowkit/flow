@@ -989,12 +989,13 @@ internal.prepare_files = function(flow, prepared) {
         if(projconf.build && projconf.build.files_allow_unsafe_paths) {
             internal.log(flow, 1, '>>>> prepare - files - IMPORTANT - project is explicitly allowing unsafe paths');
 
-            if(flow.flags['files-allow-unsafe-paths']) {
+            // if(flow.flags['files-allow-unsafe-paths']) {
                 prepared.files_unsafe = true;
-                internal.log(flow, 1, '>>>> prepare - files - given both --files-allow-unsafe-paths and files_allow_unsafe_paths in config. unsafe paths are now enabled!');
-            } else {
-                return internal.fail(flow, prepared, 'files', 'prepare - files - unsafe paths requires the --files-allow-unsafe-paths flag as well as files_allow_unsafe_paths in the flow build config from the root project.');
-            }
+                // internal.log(flow, 1, '>>>> prepare - files - given both --files-allow-unsafe-paths and files_allow_unsafe_paths in config. unsafe paths are now enabled!');
+                internal.log(flow, 1, '>>>> prepare - files - given files_allow_unsafe_paths in config. unsafe paths are now enabled!');
+            // } else {
+                // return internal.fail(flow, prepared, 'files', 'prepare - files - unsafe paths requires the --files-allow-unsafe-paths flag as well as files_allow_unsafe_paths in the flow build config from the root project.');
+            // }
 
         }
     }
