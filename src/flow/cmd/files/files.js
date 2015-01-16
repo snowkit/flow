@@ -313,7 +313,7 @@ internal.template_file = function(flow, _template, _source, _dest) {
         var templ = templates[index];
         var context = flow.project.prepared.source[templ];
         if(!context) {
-            flow.log(1, '    Warning - template value missing! %s was not found in the project root', templ);
+            flow.log(3, '    Warning - template value missing! %s was not found in the project root', templ);
         } else {
             real_context[templ] = context;
         }
