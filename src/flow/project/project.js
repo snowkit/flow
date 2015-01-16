@@ -81,6 +81,14 @@ bars.registerHelper('toString', function( value ) {
     return ( value === void 0 ) ? 'undefined' : value.toString();
 });
 
+bars.registerHelper('not_undefined', function( value ) {
+    return ( value !== void 0 );
+});
+
+bars.registerHelper('is_undefined', function( value ) {
+    return ( value === void 0 );
+});
+
 bars.registerHelper('upperFirst', function( value ) {
     return value.charAt(0).toUpperCase() + value.slice(1);
 });
