@@ -31,7 +31,7 @@
                     "libs":{
                         "native":{}
                     },
-                    "sdk_min" : 10,
+                    "sdk_min" : 12,
                     "sdk_target" : 19,
                     "permissions" : ["READ_EXTERNAL_STORAGE", "INTERNET"],
                     "certificate" : ""
