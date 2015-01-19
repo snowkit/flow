@@ -157,6 +157,9 @@ internal.launch_android_logcat = function(flow) {
             logcat_filter += ' ' + include + ':V';
         }  else {
             logcat_filter += ' ' + include;
+            logcat_filter += ' ' + include.replace(':F', ':E');
+            logcat_filter += ' ' + include.replace(':F', ':V');
+            logcat_filter += ' ' + include.replace(':F', ':I');
         }
     }
 
