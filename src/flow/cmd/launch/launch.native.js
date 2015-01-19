@@ -151,9 +151,13 @@ internal.launch_android_logcat = function(flow) {
 
     for(name in flow.config.build.android.logcat_include) {
         var include = flow.config.build.android.logcat_include[name];
-        logcat_filter += ' ' + include + ':E';
-        logcat_filter += ' ' + include + ':I';
-        logcat_filter += ' ' + include + ':V';
+        if(include.indexOf(':F') == -1) {
+            logcat_filter += ' ' + include + ':E';
+            logcat_filter += ' ' + include + ':I';
+            logcat_filter += ' ' + include + ':V';
+        }  else {
+            logcat_filter += ' ' + include;
+        }
     }
 
     logcat_filter = logcat_filter.trim();
