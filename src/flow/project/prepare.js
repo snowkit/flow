@@ -133,6 +133,10 @@ internal.prepare_config_paths = function(flow, prepared) {
         path_context.app.archtag = '-v7';
     }
 
+    if(flow.target_arch == 'armv7s') {
+        path_context.app.archtag = '-v7s';
+    }
+
         //store for use later against files etc
     flow.project.path_context = path_context;
 

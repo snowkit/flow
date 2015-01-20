@@ -264,12 +264,24 @@ exports.build_hxcpp = function(flow, run_path, hxcpp_file, done) {
     switch(flow.target_arch) {
         case '64':
             args.push('-DHXCPP_M64');
+
+            if(flow.target_mobile) {
+                flow.log(1, 'build / WARNING / you are using a --arch 64 setting on mobile, you probably meant --arch arm64?')
+            }
+
+            break;
+        case 'arm64':
+            args.push('-DHXCPP_ARM64');
+            args.push('-DHXCPP_M64');
             break;
         case 'armv6':
             args.push('-DHXCPP_ARMV6');
             break;
         case 'armv7':
             args.push('-DHXCPP_ARMV7');
+            break;
+        case 'armv7s':
+            args.push('-DHXCPP_ARMV7S');
             break;
         case 'x86':
             args.push('-DHXCPP_X86');

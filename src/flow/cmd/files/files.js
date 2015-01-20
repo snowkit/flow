@@ -309,6 +309,10 @@ internal.template_file = function(flow, _template, _source, _dest) {
         real_context.archtag = '-v7';
     }
 
+    if(flow.target_arch == 'armv7') {
+        real_context.archtag = '-v7s';
+    }
+
     for(index in templates) {
         var templ = templates[index];
         var context = flow.project.prepared.source[templ];
