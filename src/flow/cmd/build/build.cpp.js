@@ -246,7 +246,6 @@ exports.run_hxcpp = function(flow, run_path, hxcpp_file, done) {
     } else {
             //just build the normal one
         archs = [flow.target_arch];
-        flow.log(2, 'build - building single arch', flow.target_arch);
     }
 
     internal.build_hxcpp_arch_list(flow, archs, run_path, hxcpp_file, done );
@@ -403,7 +402,7 @@ exports.build_hxcpp = function(flow, target_arch, run_path, hxcpp_file, done) {
         //append command line + project based flags
     args = util.array_union(args, flow.project.prepared.hxcpp.flags);
 
-    flow.log(2, 'build - running hxcpp for %s ...', target_arch);
+    flow.log(2, 'build - running hxcpp for arch %s ...', target_arch);
     flow.log(3, 'haxelib run hxcpp %s', args.join(' ') );
     flow.log(3, 'running hxcpp from %s', run_path );
 
