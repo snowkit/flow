@@ -3,6 +3,7 @@
         , fs = require('graceful-fs')
         , path = require('path')
         , cmd = require('../../util/process')
+        , haxelib = require('../../util/haxelib')
         , util = require('../../util/util')
         , bars = require('handlebars')
         , fse = require('fs-extra')
@@ -13,36 +14,64 @@ exports.post_build = function(flow, done) {
 
     flow.log(3,'build - running cpp post process');
 
-        //run upx against the newly built binary first
-    flow.execute(flow, cmds['upx'], function(){
-
-        //the post build is so that we can move the binary file
-        //from the output path if needed etc, run extra scripts and so on
-        var source_path = util.normalize(path.join(flow.project.paths.build, 'cpp/' + flow.project.paths.binary.source));
-
-        flow.log(3,'build - moving binary from %s to %s', source_path, flow.project.paths.binary.full);
-
-            if(flow.timing) console.time('build - binary copy');
-        util.copy_path(flow, source_path, flow.project.paths.binary.full);
-            if(flow.timing) console.timeEnd('build - binary copy');
-
-        if(flow.target_desktop) {
-            internal.post_build_desktop(flow, source_path, done);
-        } else {
-            internal.post_build_mobile(flow, source_path, done);
-        }
-
-    }); //upx
+    if(flow.target_desktop) {
+        flow.log(3,'build - cpp - target desktop post build');
+        internal.post_build_desktop(flow, done);
+    } else if(flow.target_mobile) {
+        flow.log(3,'build - cpp - target mobile post build');
+        internal.post_build_mobile(flow, done);
+    } else {
+        flow.log(3,'build - cpp - non desktop/mobile post build');
+        if(done) done();
+    }
 
 } //post_build
 
-internal.post_build_mobile = function(flow, source_path, done) {
+exports.ios_combine_archs = function(flow, done) {
+
+    if(flow.flags.archs) {
+
+        var archs = flow.flags.archs.split(',');
+            archs = archs.map(function(a){ return flow.project.adjust_arch(flow, a.trim()) });
+
+        flow.log(2, "build - ios - combining multiple archs into one", archs);
+
+        var dest = flow.project.get_path_binary_dest_full(flow, flow.project.prepared, 'fat');
+            fse.ensureFileSync(dest);
+
+        var args = ['-sdk','iphoneos', 'lipo',
+                    '-output', dest,
+                    '-create'];
+
+        var input_list = archs.map(function(a){
+            return flow.project.get_path_binary_dest_full(flow, flow.project.prepared, a);
+        });
+
+        args = args.concat(input_list);
+
+        cmd.exec(flow, 'xcrun', args, { quiet:false }, function(code,out,err){
+            if(done) {
+                done(code);
+            }
+        });
+
+        return;
+
+    }  //if multiple archs
+
+} //ios_combine_archs
+
+
+internal.post_build_mobile = function(flow, done) {
 
         //run platform specific build chains
     if(flow.target == 'android') {
-        internal.build_android(flow, done);
-        return;
+        return internal.build_android(flow, done);
     }
+
+    if(flow.target == 'ios') {
+        return exports.ios_combine_archs(flow, done);
+    } //ios
 
         //other platforms end here
     if(done) {
@@ -123,7 +152,7 @@ internal.build_android = function(flow, done) {
 
 } //build_android
 
-internal.post_build_desktop = function(flow, source_path, done) {
+internal.post_build_desktop = function(flow, done) {
 
 
     if(flow.system == 'mac' || flow.system == 'linux') {
@@ -150,9 +179,81 @@ internal.post_build_desktop = function(flow, source_path, done) {
 
 } //post_build_desktop
 
-exports.post_haxe = function(flow, done) {
+internal.move_binary = function(flow, target_arch) {
 
-            if(flow.timing) console.time('build - hxcpp');
+    target_arch = target_arch || flow.target_arch;
+
+    var binary_source = flow.project.get_path_binary_name_source(flow, flow.project.prepared, target_arch);
+    var binary_dest_full = flow.project.get_path_binary_dest_full(flow, flow.project.prepared, target_arch);
+    var source_path = util.normalize(path.join(flow.project.paths.build, 'cpp/' + binary_source));
+
+    flow.log(3,'build - moving binary for %s from %s to %s', target_arch, source_path, binary_dest_full);
+
+        if(flow.timing) console.time('build - binary copy');
+
+    util.copy_path(flow, source_path, binary_dest_full);
+
+        if(flow.timing) console.timeEnd('build - binary copy');
+
+} //move_binary
+
+internal.build_hxcpp_arch_list = function(flow, arch_list, run_path, hxcpp_file, done ) {
+
+        //no list?
+    if(!arch_list) {
+        if(done) done();
+        return;
+    }
+
+        //no more left in list?
+    if(arch_list.length <= 0) {
+        if(done) done();
+        return;
+    }
+
+        //remove current arch from list
+    var curr_arch = arch_list.shift();
+
+    exports.build_hxcpp(flow, curr_arch, run_path, hxcpp_file, function(err) {
+
+        if(err) {
+            flow.log(1, '\n build - stopping because of errors in hxcpp compile, while building %s \n', curr_arch);
+            flow.project.failed = true;
+            return flow.finished();
+        }
+
+            //for now lib based projects don't do this step
+        if(!flow.project.parsed.project.lib) {
+            internal.move_binary(flow, curr_arch);
+        }
+
+        internal.build_hxcpp_arch_list(flow, arch_list, run_path, hxcpp_file, done);
+
+    }); //run hxcpp
+
+} //build_hxcpp_arch_list
+
+
+exports.run_hxcpp = function(flow, run_path, hxcpp_file, done) {
+
+       //building multiple archs?
+    var archs = [flow.target_arch];
+
+    if(flow.flags.archs) {
+        archs = flow.flags.archs.split(',');
+        archs = archs.map(function(a){ return flow.project.adjust_arch(flow, a.trim()); });
+        flow.log(2, 'build - building multiple archs', archs);
+    } else {
+            //just build the normal one
+        archs = [flow.target_arch];
+        flow.log(2, 'build - building single arch', flow.target_arch);
+    }
+
+    internal.build_hxcpp_arch_list(flow, archs, run_path, hxcpp_file, done );
+
+} //run_hxcpp
+
+exports.post_haxe = function(flow, done) {
 
     var cpp_path = path.join(flow.project.paths.build, 'cpp/');
         cpp_path = path.resolve(flow.project.root, cpp_path);
@@ -160,20 +261,8 @@ exports.post_haxe = function(flow, done) {
         //write custom xml
     exports.write_hxcpp(flow, cpp_path);
 
-        //use custom xml
-    exports.build_hxcpp(flow, cpp_path, 'flow.Build.xml', function(err) {
-
-            if(flow.timing) console.timeEnd('build - hxcpp');
-
-        if(err) {
-            flow.log(1, '\n build - stopping because of errors in hxcpp compile \n');
-            flow.project.failed = true;
-            return flow.finished();
-        }
-
-        done();
-
-    }); //run hxcpp
+        //build against it
+    exports.run_hxcpp(flow, cpp_path, 'flow.Build.xml', done);
 
 } //exports
 
@@ -237,7 +326,7 @@ exports.write_hxcpp = function(flow, run_path) {
 
 } //write_hxcpp
 
-exports.build_hxcpp = function(flow, run_path, hxcpp_file, done) {
+exports.build_hxcpp = function(flow, target_arch, run_path, hxcpp_file, done) {
 
     var hxcpp_file = hxcpp_file || 'flow.Build.xml';
     var args = [hxcpp_file];
@@ -250,10 +339,16 @@ exports.build_hxcpp = function(flow, run_path, hxcpp_file, done) {
         args.push("-Ddebug");
     }
 
+        //define the hxcpp api level
+    args.push('-DHXCPP_API_LEVEL=' + flow.project.prepared.defines_all.hxcpp_api_level.value);
+
+        //with --log 3+ hxcpp can also be verbose
     if(flow.flags.log > 2) {
-        args.push('-verbose');
+        // args.push('-verbose');
     }
 
+        //default to no windows console, but allow it through 
+        //--d show_console or user define in project tree
     if(flow.target == 'windows' &&
        flow.project.prepared.defines_list.indexOf('show_console') == -1) {
         args.push('-Dno_console');
@@ -261,7 +356,7 @@ exports.build_hxcpp = function(flow, run_path, hxcpp_file, done) {
 
     args.push('-D' + flow.target);
 
-    switch(flow.target_arch) {
+    switch(target_arch) {
         case '64':
             args.push('-DHXCPP_M64');
 
@@ -286,14 +381,16 @@ exports.build_hxcpp = function(flow, run_path, hxcpp_file, done) {
         case 'x86':
             args.push('-DHXCPP_X86');
             break;
+        case 'sim64':
+            args.push('-Dsimulator');
+            args.push('-DHXCPP_M64');
+            break;
+        case 'sim':
+            args.push('-Dsimulator');
+            break;
     }
 
     if(flow.target == 'ios') {
-
-        if(flow.flags.sim) {
-            args.push('-Dsimulator');
-        }
-
         args.push('-Diphone');
         args.push('-DHXCPP_CPP11');
         args.push('-DHXCPP_CLANG');
@@ -306,7 +403,7 @@ exports.build_hxcpp = function(flow, run_path, hxcpp_file, done) {
         //append command line + project based flags
     args = util.array_union(args, flow.project.prepared.hxcpp.flags);
 
-    flow.log(2, 'build - running hxcpp ...');
+    flow.log(2, 'build - running hxcpp for %s ...', target_arch);
     flow.log(3, 'haxelib run hxcpp %s', args.join(' ') );
     flow.log(3, 'running hxcpp from %s', run_path );
 
