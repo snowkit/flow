@@ -2,6 +2,7 @@
 var   cmd = require('./process')
     , path = require('path')
     , util = require('./util')
+    , fs = require('graceful-fs')
 
 //caches a list of installed haxelibs for the remaining execution,
 var libs = {};
@@ -97,6 +98,31 @@ var internal = {};
         return result.join(', ');
 
     } //version
+
+    exports.json = function json(flow, name, version) {
+
+            //current if none specified
+        version = version || "*";
+
+        flow.log(3, 'haxelib get json for %s(%s)', name, version );
+
+        if(!libs[name]) {
+            flow.log(1, 'haxelib - get json for %s(%s) failed, no haxelib under that name', name, version );
+            return;
+        }
+
+        var lib_path = libs[name].versions[version].path;
+        var json_path = path.resolve(lib_path, 'haxelib.json');
+
+        if(fs.existsSync(json_path)) {
+            try {
+                return require(json_path);
+            } catch(e) {
+                flow.log(1, 'haxelib.json failed to parse, from %s', json_path);
+            }
+        }
+
+    } //json
 
     exports.path = function path(flow, name, version) {
 
