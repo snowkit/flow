@@ -195,7 +195,8 @@ internal.save_user_config = function(flow) {
             state.push('debug = true');
         }
 
-        if(flow.flags.sim) {
+        if( flow.target == 'ios' &&
+           (flow.target_arch == 'sim' || flow.target_arch == 'sim64')) {
             state.push('simulator = true');
         }
 

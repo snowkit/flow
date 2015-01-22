@@ -293,25 +293,7 @@ internal.template_file = function(flow, _template, _source, _dest) {
 
         //we wrap the context against a root for clarity in the template files
         //as well as allowing multiple contexts side by side
-    var real_context = {
-        debug : flow.flags.debug || false,
-        arch : flow.target_arch,
-        archtag : '',
-        debugtag : '',
-        flow : { config : flow.config }
-    };
-
-    if(flow.flags.debug) {
-        real_context.debugtag = '-debug';
-    }
-
-    if(flow.target_arch == 'armv7') {
-        real_context.archtag = '-v7';
-    }
-
-    if(flow.target_arch == 'armv7') {
-        real_context.archtag = '-v7s';
-    }
+    var file_context = flow.project.get_file_context(flow);
 
     for(index in templates) {
         var templ = templates[index];
@@ -319,16 +301,16 @@ internal.template_file = function(flow, _template, _source, _dest) {
         if(!context) {
             flow.log(3, '    Warning - template value missing! %s was not found in the project root', templ);
         } else {
-            real_context[templ] = context;
+            file_context[templ] = context;
         }
     } //each templates
 
     var raw_file = fs.readFileSync(_source, 'utf8');
 
-    flow.log(6, 'context for file node : ', _source, real_context);
+    flow.log(6, 'context for file node : ', _source, file_context);
 
     var template = bars.compile(raw_file);
-    var templated = template( real_context );
+    var templated = template( file_context );
 
     fse.ensureFileSync(_dest);
     fs.writeFileSync(_dest, templated, 'utf8');

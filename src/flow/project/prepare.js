@@ -90,88 +90,34 @@ internal.prepare_config = function(flow) {
     var _app = flow.project.parsed.project.app;
     var _app_main = _app.main || 'FlowApp';
     flow.config.build.boot = _app_main;
+
+    flow.config_source = util.deep_copy(flow.config);
 }
 
-internal.template_config_path = function(flow, prepared, path_node, context) {
-    var template = bars.compile(path_node);
-    var result = template(context);
-    return util.normalize(result);
-}
 
 internal.prepare_config_paths = function(flow, prepared) {
 
     flow.project.paths = {
         android : { project : flow.config.build.android.project },
-        ios : { project : flow.config.build.ios.project },
-        output : flow.project.get_path_output(flow, prepared),
-        build : flow.project.get_path_build(flow, prepared)
-    }
-
-        //go over the config path values and
-        //template them against this specific context
-    var path_context = {
-        app : {
-            arch : flow.target_arch,
-            archtag : '',
-            debugtag : '',
-            iostag : 'os',
-            boot : flow.config.build.boot,
-            name : prepared.source.project.app.name
-        },
-        paths : flow.project.paths
-    }
-
-    if(flow.flags.debug) {
-        path_context.app.debugtag = '-debug';
-    }
-
-    if(flow.flags.sim) {
-        path_context.app.iostag = 'sim';
-    }
-
-    if(flow.target_arch == 'armv7') {
-        path_context.app.archtag = '-v7';
-    }
-
-    if(flow.target_arch == 'armv7s') {
-        path_context.app.archtag = '-v7s';
+        ios     : { project : flow.config.build.ios.project },
+        output  : flow.project.get_path_output(flow, prepared),
+        build   : flow.project.get_path_build(flow, prepared)
     }
 
         //store for use later against files etc
-    flow.project.path_context = path_context;
+    flow.project.path_context = flow.project.get_path_context(flow, prepared, flow.target_arch);
 
-    var list = ['binary_source_name','binary_dest_name', 'binary_dest_path', 'files_dest_path'];
+        //these template the defaults based on flow.target_arch,
+        //in places where they need to be unique they are called again
 
-    for(name in flow.config.build) {
-        var node = flow.config.build[name];
-
-            //if this is platform specific
-        if(flow.config.build.known_targets.indexOf(name) != -1) {
-            for(subname in node) {
-                var subnode = node[subname];
-                if(list.indexOf(subname) != -1) {
-                    flow.config.build[name][subname] = internal.template_config_path(flow, prepared, subnode, path_context);
-                }
-            }
-        } else {
-            if(list.indexOf(name) != -1) {
-                flow.config.build[name] = internal.template_config_path(flow, prepared, node, path_context);
-            }
-        }
-    }
-
-        //now, assign more specific paths like the binary path
+        //the output files path
+    flow.project.paths.files = flow.project.get_path_files(flow, prepared);
     flow.project.paths.binary = {
         source : flow.project.get_path_binary_name_source(flow, prepared),
-        path : flow.project.get_path_binary_dest(flow, prepared),
-        name : flow.project.get_path_binary_name(flow, prepared)
+        path   : flow.project.get_path_binary_dest(flow, prepared),
+        name   : flow.project.get_path_binary_name(flow, prepared),
+        full   : flow.project.get_path_binary_dest_full(flow, prepared)
     }
-
-    flow.project.paths.binary.full = path.join(flow.project.paths.binary.path, flow.project.paths.binary.name);
-    flow.project.paths.files = flow.project.get_path_files(flow, prepared);
-
-    flow.project.paths.binary.full = util.normalize(flow.project.paths.binary.full);
-    flow.project.paths.files = util.normalize(flow.project.paths.files, true);
 
     flow.log(3, 'paths for project', flow.project.paths);
 
@@ -249,7 +195,7 @@ internal.prepare_dependencies = function(flow, parsed) {
 
 internal.cascade_project = function(flow, prepared) {
 
-        //we go through all dependencies now and merge
+    //we go through all dependencies now and merge
         //them with only unique values persisting, i.e respecting last value
         //we also make a deep copy because the function operates on the one, causing
         //changes to be reflected into the depends tree, which is a fail
@@ -389,7 +335,7 @@ internal.prepare_project = function(flow, prepared) {
 
 internal.prepare_conditionals = function(flow, prepared) {
 
-        //backmerge known conditional nodes against the project itself
+    //backmerge known conditional nodes against the project itself
     if(prepared.source.if) {
         for(condition in prepared.source.if) {
             if(defines.satisfy(flow, prepared, condition)) {
@@ -416,7 +362,33 @@ internal.prepare_conditionals = function(flow, prepared) {
     //for hxcpp, we store the list of absolute paths so they can be used correctly
 internal.prepare_hxcpp = function(flow, prepared) {
 
-        //so, do dependencies first, in order
+        //no previously defined level?
+    if(!prepared.defines_all.hxcpp_api_level) {
+
+        var hxcpp_json = haxelib.json(flow,'hxcpp');
+        var hxcpp_api = '0';
+
+        if(hxcpp_json) {
+            hxcpp_api = hxcpp_json.version.replace(/[.]/g, '').substr(0,3);
+            flow.log(3, 'prepare - hxcpp - api version taken from haxelib.json');
+        } else {
+            flow.log(3, 'prepare - hxcpp - unable to find hxcpp haxelib.json? trying current...');
+            var hxcpp_lib = haxelib.current(flow, 'hxcpp');
+            if(hxcpp_lib.version != 'git' && hxcpp_lib.version != 'dev') {
+                hxcpp_api = hxcpp_lib.version.replace(/[.]/g, '').substr(0,3);
+                flow.log(3, 'prepare - hxcpp - api version taken from hxcpp current');
+            } else {
+                flow.log(1, 'prepare - hxcpp - hxcpp version is dev or git and doesn\'t have a haxelib.json file. This means that the hxcpp_api level will be unknown and default to 0, which might be problematic.');
+            }
+        }
+
+        prepared.defines_all['hxcpp_api_level'] = { name:'hxcpp_api_level', met:true, value:hxcpp_api };
+
+        flow.log(3, 'prepare - hxcpp - api level - %s', hxcpp_api );
+
+    } //hxcpp_api_level
+
+    //so, do dependencies first, in order
     for(index in prepared.depends_list) {
 
         var name = prepared.depends_list[index];
@@ -640,10 +612,6 @@ internal.prepare_defines = function(flow, prepared) {
     prepared.defines_all[arch] = { name:arch, met:true };
 
     if(flow.target == 'ios') {
-
-        if(flow.flags.sim) {
-                prepared.defines_all['ios-sim'] = { name:'ios-sim', met:true };
-        }
 
             //ios has a special flag to handle the project folder generation,
             //if this flag is give the framework can use it to write the project

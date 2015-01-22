@@ -244,9 +244,57 @@ exports.verify = function verify(flow, project_path, project_root, is_dependency
 } //verify
 
 
-    //the final target path for the output
-exports.get_path_root = function(flow, prepared) {
 
+//path utilities
+
+
+
+exports.get_path_context = function(flow, prepared, target_arch) {
+
+    var path_context = {
+        app : {
+            arch : target_arch,
+            archtag : '',
+            debugtag : flow.flags.debug ? '-debug' : '',
+            iostag : 'os',
+            boot : flow.config.build.boot,
+            name : prepared.source.project.app.name
+        },
+        paths : flow.project.paths
+    }
+
+    if(target_arch == 'sim' || target_arch == 'sim64') {
+        path_context.app.iostag = 'sim';
+    }
+
+        switch(target_arch) {
+            case 'arm64':
+            case 'sim64':
+                path_context.app.archtag = '-64';
+                break;
+            case 'armv7':
+                path_context.app.archtag = '-v7';
+                break;
+            case 'armv7s':
+                path_context.app.archtag = '-v7s';
+                break;
+        }
+
+    return path_context;
+
+} //get_path_context
+
+exports.path_config_template = function(flow, prepared, path_template, context, norm) {
+    var template = bars.compile(path_template);
+    var result = template(context);
+    return util.normalize(result, norm);
+}
+
+
+    //the final target path for the output
+exports.get_path_root = function(flow, prepared, target_arch) {
+
+    target_arch = exports.adjust_arch(flow, target_arch);
     var outpath = prepared.source.project.app.output;
 
     var cli_outpath = flow.flags['output-path'];
@@ -262,22 +310,24 @@ exports.get_path_root = function(flow, prepared) {
 
 } //get_path_root
 
-exports.get_path_output = function(flow, prepared) {
+exports.get_path_output = function(flow, prepared, target_arch) {
 
+    target_arch = exports.adjust_arch(flow, target_arch);
     var dest_folder = exports.get_path_root(flow, prepared);
 
     dest_folder = path.join(dest_folder, flow.target);
 
     if(flow.target_arch == '64') {
-        dest_folder += flow.target_arch;
+        dest_folder += '64';
     }
 
     return util.normalize(dest_folder, true);
 
 } //get_path_output
 
-exports.get_path_build = function(flow, prepared) {
+exports.get_path_build = function(flow, prepared, target_arch) {
 
+    target_arch = exports.adjust_arch(flow, target_arch);
     var dest_folder = exports.get_path_output(flow, prepared);
 
         //remove trailing slash
@@ -287,8 +337,9 @@ exports.get_path_build = function(flow, prepared) {
 
 } //get_path_build
 
-exports.get_path_files = function(flow, prepared) {
+exports.get_path_files = function(flow, prepared, target_arch) {
 
+    target_arch = exports.adjust_arch(flow, target_arch);
     var dest_path = flow.config.build.files_dest_path;
 
     var plat = flow.config.build[flow.target];
@@ -296,12 +347,16 @@ exports.get_path_files = function(flow, prepared) {
         dest_path = plat.files_dest_path;
     }
 
-    return dest_path;
+        //work out the context needed
+    var context = exports.get_path_context(flow, prepared, target_arch);
+        //return the templated value
+    return exports.path_config_template(flow, prepared, dest_path, context, true);
 
 } //get_path_files
 
-exports.get_path_binary_dest = function(flow, prepared) {
+exports.get_path_binary_dest = function(flow, prepared, target_arch) {
 
+    target_arch = exports.adjust_arch(flow, target_arch);
     var dest_path = flow.config.build.binary_dest_path;
 
     var plat = flow.config.build[flow.target];
@@ -309,12 +364,16 @@ exports.get_path_binary_dest = function(flow, prepared) {
         dest_path = plat.binary_dest_path;
     }
 
-    return util.normalize(dest_path, true);
+        //work out the context needed
+    var context = exports.get_path_context(flow, prepared, target_arch);
+        //return the templated value
+    return exports.path_config_template(flow, prepared, dest_path, context, true);
 
 } //get_path_binary_dest
 
-exports.get_path_binary_name = function(flow, prepared) {
+exports.get_path_binary_name = function(flow, prepared, target_arch) {
 
+    target_arch = exports.adjust_arch(flow, target_arch);
     var dest_name = flow.config.build.binary_dest_name;
 
     var plat = flow.config.build[flow.target];
@@ -322,12 +381,16 @@ exports.get_path_binary_name = function(flow, prepared) {
         dest_name = plat.binary_dest_name;
     }
 
-    return dest_name;
+        //work out the context needed
+    var context = exports.get_path_context(flow, prepared, target_arch);
+        //return the templated value
+    return exports.path_config_template(flow, prepared, dest_name, context);
 
 } //get_path_binary_name
 
-exports.get_path_binary_name_source = function(flow, prepared) {
+exports.get_path_binary_name_source = function(flow, prepared, target_arch) {
 
+    target_arch = exports.adjust_arch(flow, target_arch);
     var src_name = flow.config.build.binary_source_name;
 
     var plat = flow.config.build[flow.target];
@@ -335,10 +398,36 @@ exports.get_path_binary_name_source = function(flow, prepared) {
         src_name = plat.binary_source_name;
     }
 
-    return src_name;
+        //work out the context needed
+    var context = exports.get_path_context(flow, prepared, target_arch);
+        //return the templated value
+    return exports.path_config_template(flow, prepared, src_name, context);
 
 } //get_path_binary_name_source
 
+exports.get_path_binary_dest_full = function(flow, prepared, target_arch) {
+
+    target_arch = exports.adjust_arch(flow, target_arch);
+
+    var dest = exports.get_path_binary_dest(flow, prepared, target_arch);
+    var file = exports.get_path_binary_name(flow, prepared, target_arch);
+
+    return path.join(dest,file);
+
+} //get_path_binary_full
+
+exports.adjust_arch = function(flow, target_arch) {
+
+    target_arch = target_arch || flow.target_arch;
+
+    if(flow.target == 'ios') {
+        if(target_arch == 'i386') target_arch = 'sim';
+        if(target_arch == 'x86_64') target_arch = 'sim64';
+    }
+
+    return target_arch;
+
+} //adjust_arch
 
 exports.prepare = function prepare(flow) {
 
@@ -409,6 +498,58 @@ exports.bake = function bake(flow) {
 
 } //exports.bake
 
+
+    //return the specific arch/debug etc tags
+    //for the given flow state
+internal.get_context_tags = function(flow, into_node) {
+
+        if(flow.flags.debug) {
+            into_node.debugtag = '-debug';
+        }
+
+        if(flow.target_arch == 'sim' || flow.target_arch == 'sim64') {
+            into_node.iostag = 'sim';
+        }
+
+        if(flow.target_arch == 'arm64') {
+            into_node.archtag = '-64';
+        }
+
+        if(flow.target_arch == 'sim64') {
+            into_node.archtag = '-64';
+        }
+
+        if(flow.target_arch == 'armv7') {
+            into_node.archtag = '-v7';
+        }
+
+        if(flow.target_arch == 'armv7s') {
+            into_node.archtag = '-v7s';
+        }
+
+    return into_node;
+
+} //get_context_tags
+
+    //get a template context for a file template
+exports.get_file_context = function(flow) {
+
+    var result = {
+        debug : flow.flags.debug || false,
+        arch : flow.target_arch,
+        archtag : '',
+        debugtag : '',
+        flow : {
+            config : util.deep_copy(flow.config)
+        }
+    };
+
+    result = internal.get_context_tags(flow, result);
+
+    return result;
+
+} //get_file_context
+
 exports.find_arch = function(flow) {
 
     var arch = '';
@@ -431,15 +572,15 @@ exports.find_arch = function(flow) {
 
     } //flags.arch
 
-    if( flow.target == 'mac' || 
-        flow.target == 'windows' || 
+    if( flow.target == 'mac' ||
+        flow.target == 'windows' ||
         flow.target == 'linux') {
 
         if(!arch) {
 
                 //https://coderwall.com/p/0eds7q
                 //because windows is terrible at basics.
-            var is64bit = process.arch === 'x64' || 
+            var is64bit = process.arch === 'x64' ||
                           process.env.hasOwnProperty('PROCESSOR_ARCHITEW6432');
 
             if(is64bit) {
@@ -469,14 +610,15 @@ exports.find_arch = function(flow) {
 
             //if running from an xcode build
         if(process.env['XCODE_VERSION_ACTUAL']) {
-            if(process.env['CURRENT_ARCH'] == 'i386') {
-                flow.flags.sim = true;
-            }
-        }
+            var env_arch = process.env['CURRENT_ARCH'];
+            if(env_arch == 'i386' || env_arch == 'x86_64') {
 
-        if(flow.flags.sim) {
-                //force sim arch
-            arch = 'i386';
+                arch = 'sim';
+
+                if(env_arch == 'x86_64') {
+                    arch += '64';
+                }
+            }
         }
 
         if(!arch) {
