@@ -362,31 +362,6 @@ internal.prepare_conditionals = function(flow, prepared) {
     //for hxcpp, we store the list of absolute paths so they can be used correctly
 internal.prepare_hxcpp = function(flow, prepared) {
 
-        //no previously defined level?
-    if(!prepared.defines_all.hxcpp_api_level) {
-
-        var hxcpp_json = haxelib.json(flow,'hxcpp');
-        var hxcpp_api = '0';
-
-        if(hxcpp_json) {
-            hxcpp_api = hxcpp_json.version.replace(/[.]/g, '').substr(0,3);
-            flow.log(3, 'prepare - hxcpp - api version taken from haxelib.json');
-        } else {
-            flow.log(3, 'prepare - hxcpp - unable to find hxcpp haxelib.json? trying current...');
-            var hxcpp_lib = haxelib.current(flow, 'hxcpp');
-            if(hxcpp_lib.version != 'git' && hxcpp_lib.version != 'dev') {
-                hxcpp_api = hxcpp_lib.version.replace(/[.]/g, '').substr(0,3);
-                flow.log(3, 'prepare - hxcpp - api version taken from hxcpp current');
-            } else {
-                flow.log(1, 'prepare - hxcpp - hxcpp version is dev or git and doesn\'t have a haxelib.json file. This means that the hxcpp_api level will be unknown and default to 0, which might be problematic.');
-            }
-        }
-
-        prepared.defines_all['hxcpp_api_level'] = { name:'hxcpp_api_level', met:true, value:hxcpp_api };
-
-        flow.log(3, 'prepare - hxcpp - api level - %s', hxcpp_api );
-
-    } //hxcpp_api_level
 
     //so, do dependencies first, in order
     for(index in prepared.depends_list) {

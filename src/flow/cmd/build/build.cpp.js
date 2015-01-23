@@ -338,9 +338,6 @@ exports.build_hxcpp = function(flow, target_arch, run_path, hxcpp_file, done) {
         args.push("-Ddebug");
     }
 
-        //define the hxcpp api level
-    args.push('-DHXCPP_API_LEVEL=' + flow.project.prepared.defines_all.hxcpp_api_level.value);
-
         //with --log 3+ hxcpp can also be verbose
     if(flow.flags.log > 2) {
         // args.push('-verbose');
