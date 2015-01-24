@@ -99,10 +99,38 @@ exports.satisfy = function satisfy(flow, prepared, condition) {
 
     var cond = conditions.conditions[condition];
     if(cond && cond.length > 1) {
-        return internal.resolve_multi(flow, prepared.defines_all, cond)
+
+        return internal.resolve_multi(flow, prepared.defines_all, cond);
+
     } else {
-        return prepared.defines[condition] ? true : false;
-    }
+
+        var satisfied = false;
+           //check if this is an inverse condition
+        var inverse = false;
+        if(condition.indexOf('!') != -1) {
+            inverse = true;
+            condition = condition.replace('!','').trim();
+        }
+
+        var defines = prepared.defines_all;
+        var define = defines[condition];
+
+        if(define) {
+            if(defines[condition].met === true) {
+                satisfied = inverse ? false : true;
+            } else {
+                satisfied = inverse ? true : false;
+            }
+        } else {
+                //not defined, so if the inverse is queried, return true
+            if(inverse) satisfied = true;
+        }
+
+        flow.log(5, 'defines - single condition satisfy result? %s ', satisfied);
+
+        return satisfied;
+
+    } //multi condition
 
 } //satisfy
 
@@ -134,8 +162,13 @@ internal.resolve_single = function(flow, defines, define) {
         }
 
     } else {
-        flow.log(4, 'defines - condition against %s failed as its not found at all', condition);
-        return false;
+        if(!inverse) {
+            flow.log(4, 'defines - condition against %s failed as its not found at all', condition);
+            return false;
+        } else {
+            flow.log(4, 'defines - condition against %s success, its not defined, but had !condition', condition);
+            return true;
+        }
     }
 
 } //resolve_single
