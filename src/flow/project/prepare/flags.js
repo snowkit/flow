@@ -2,27 +2,23 @@
     var   defines = require('./defines')
         , util = require('../../util/util')
 
-exports.parse = function parse(flow, project) {
+exports.parse = function parse(flow, prepared) {
 
-    var flags = project.flags || [];
+    var flags = prepared.flags || [];
 
             //the default flags set
-        if(project.source.project.build.flags) {
-            flags = util.array_union(flags, project.source.project.build.flags);
+        if(prepared.source.project.build.flags) {
+            flags = util.array_union(flags, prepared.source.project.build.flags);
         }
 
-            //parse any potentially conditional flags
-        if(project.source.project.build.if) {
-            for(conditional in project.source.project.build.if) {
-                var current = project.source.project.build.if[conditional].flags;
-                if(current) {
-                    if(defines.satisfy(flow, project, 'if', conditional)){
-                        flags = util.array_union(flags, current);
-                    }
+        for(condition in prepared.source.if) {
+            var node = prepared.source.if[condition];
+            if(node.build && node.build.flags) {
+                if(defines.satisfy(flow, prepared, condition)) {
+                    flags = util.array_union(flags, node.build.flags);
                 }
             }
         }
-
 
     return flags;
 
