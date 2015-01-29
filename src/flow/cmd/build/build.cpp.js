@@ -217,7 +217,7 @@ internal.build_hxcpp_arch_list = function(flow, arch_list, run_path, hxcpp_file,
     exports.build_hxcpp(flow, curr_arch, run_path, hxcpp_file, function(err) {
 
         if(err) {
-            flow.log(1, '\n build - stopping because of errors in hxcpp compile, while building %s \n', curr_arch);
+            flow.log(1, '\n build - stopping because of errors in hxcpp compile, while building arch %s \n', curr_arch);
             flow.project.failed = true;
             return flow.finished();
         }
@@ -338,9 +338,18 @@ exports.build_hxcpp = function(flow, target_arch, run_path, hxcpp_file, done) {
         args.push("-Ddebug");
     }
 
+
+    //related to haxe 3.2, this bug https://github.com/HaxeFoundation/haxe/pull/3813
+    var options_str = fs.readFileSync(path.join(run_path,'Options.txt'),'utf8');
+    var api_re = /-Dhxcpp_api_level="(.*?)"/gim;
+    var matches = options_str.match(api_re);
+    if(matches && matches.length) {
+        args = args.concat(matches);
+    }
+
         //with --log 3+ hxcpp can also be verbose
     if(flow.flags.log > 2) {
-        // args.push('-verbose');
+        args.push('-verbose');
     }
 
         //default to no windows console, but allow it through 
