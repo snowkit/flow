@@ -404,20 +404,28 @@ exports.build_hxcpp = function(flow, target_arch, run_path, hxcpp_file, done) {
 
         var options_file = path.join(run_path,'Options.txt');
         var options_str = fs.readFileSync(options_file,'utf8');
+        var opt_empty_err = 'build - cpp - Options.txt was blank/empty?!';
 
         flow.log(3, 'build - cpp - using Options.txt from %s', options_file);
 
         if(options_str && options_str.length) {
-            var opt_list = options_str.split(' ');
-            if(opt_list && opt_list.length) {
-                args = args.concat(opt_list);
+            var opt_lines = options_str.split(/\r?\n/g);
+            if(opt_lines && opt_lines.length) {
+                var opt_list = opt_lines[0].split(/ /);
+                if(opt_list && opt_list.length) {
+                    args = util.array_union(args, opt_list);
+                } else {
+                    flow.log(1,opt_empty_err,options_file);
+                }
+            } else {
+                flow.log(1,opt_empty_err,options_file);
             }
         } else {
-            flow.log(1, 'build - cpp - Options.txt was blank/empty?!', options_file);
+            flow.log(1, opt_empty_err, options_file);
         }
 
     } catch(e) {
-        flow.log(3, 'build - cpp - no Options.txt for this build?');
+        flow.log(3, 'build - cpp - no Options.txt for this build? ', e);
     }
 
 
