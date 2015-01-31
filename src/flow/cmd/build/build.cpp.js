@@ -338,19 +338,6 @@ exports.build_hxcpp = function(flow, target_arch, run_path, hxcpp_file, done) {
         args.push("-Ddebug");
     }
 
-
-    //related to haxe 3.2, this bug https://github.com/HaxeFoundation/haxe/pull/3813
-    try {
-        var options_str = fs.readFileSync(path.join(run_path,'Options.txt'),'utf8');
-        var api_re = /-Dhxcpp_api_level="(.*?)"/gim;
-        var matches = options_str.match(api_re);
-        if(matches && matches.length) {
-            args = args.concat(matches);
-        }
-    } catch(e) {
-        flow.log(3, 'build - cpp - no Options.txt for this build?');
-    }
-
         //with --log 3+ hxcpp can also be verbose
     if(flow.flags.log > 2) {
         args.push('-verbose');
@@ -411,6 +398,28 @@ exports.build_hxcpp = function(flow, target_arch, run_path, hxcpp_file, done) {
 
         //append command line + project based flags
     args = util.array_union(args, flow.project.prepared.hxcpp.flags);
+
+        //and finally include the Options.txt flags
+    try {
+
+        var options_file = path.join(run_path,'Options.txt');
+        var options_str = fs.readFileSync(options_file,'utf8');
+
+        flow.log(3, 'build - cpp - using Options.txt from %s', options_file);
+
+        if(options_str && options_str.length) {
+            var opt_list = options_str.split(' ');
+            if(opt_list && opt_list.length) {
+                args = args.concat(opt_list);
+            }
+        } else {
+            flow.log(1, 'build - cpp - Options.txt was blank/empty?!', options_file);
+        }
+
+    } catch(e) {
+        flow.log(3, 'build - cpp - no Options.txt for this build?');
+    }
+
 
     flow.log(2, 'build - running hxcpp for arch %s ...', target_arch);
     flow.log(3, 'haxelib run hxcpp %s', args.join(' ') );

@@ -13,6 +13,8 @@ var   exec = require('child_process').exec
     exports.exec = function(flow, cmd, args, opt, done) {
 
         flow.log(3, 'process util - running : %s', cmd, args.join(' '));
+        var time_node = 'flow / timing / util - process - ' + cmd + ' ' + args.join(' ');
+        if(flow.timing) console.time(time_node);
 
         try {
 
@@ -44,18 +46,22 @@ var   exec = require('child_process').exec
             _process.on('error', function (err) {
                  flow.log(1, 'process util - failed to run : %s', cmd, args.join(' '));
                  flow.log(1, 'process util -', err);
+                 if(flow.timing) console.timeEnd(time_node);
             });
 
             _process.on('close', function (code) {
                 flow.log(4, 'process util - child process %s exited with code %d', cmd, code);
                 process.chdir(prevwd);
+                if(flow.timing) console.timeEnd(time_node);
                 if(done) done(code, stdout, stderr);
             });
 
         } catch(e) {
+            if(flow.timing) console.timeEnd(time_node);
             flow.log(1, 'process util - failed to run! : %s', cmd, args.join(' '));
             flow.log(1, 'process util -', e);
         }
+
 
     } //exec
 
