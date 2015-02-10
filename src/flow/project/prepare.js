@@ -545,10 +545,45 @@ internal.prepare_mobile = function(flow, prepared) {
                 prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationPortrait');
                 prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationPortraitUpsideDown');
             break;
+            case 'both':
+                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationPortrait');
+                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationLandscapeRight');
+            break;
+            case 'all':
+                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationPortrait');
+                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationPortraitUpsideDown');
+                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationLandscapeRight');
+                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationLandscapeLeft');
+            break;
         }
 
 
-    } //ios
+    } else if(flow.target == 'android') { //ios
+
+        prepared.source.project.app.mobile._orientation = prepared.source.project.app.mobile.orientation;
+
+        switch(prepared.source.project.app.mobile.orientation) {
+            case 'landscape left':
+                prepared.source.project.app.mobile._orientation = 'reverseLandscape';
+            break;
+            case 'landscape both':
+                prepared.source.project.app.mobile._orientation = 'sensorLandscape';
+            break;
+            case 'portrait upside down':
+                prepared.source.project.app.mobile._orientation = 'reversePortrait';
+            break;
+            case 'portrait both':
+                prepared.source.project.app.mobile._orientation = 'sensorPortrait';
+            break;
+            case 'both':
+                prepared.source.project.app.mobile._orientation = 'sensor';
+            break;
+            case 'all':
+                prepared.source.project.app.mobile._orientation = 'fullSensor';
+            break;
+        }
+
+    } //android
 
 } //prepare_mobile
 
