@@ -214,11 +214,21 @@ internal.attempt_haxelib_json = function(flow, lib, depth) {
 
         } //each dependency in the haxelib json
 
+        var haxelib_classpath = [];
+        if(json.classPath && json.classPath.length) {
+            haxelib_classpath = [json.classPath];
+        }
+
+        if(haxelib_classpath.length) {
+            prepare.log(flow, 3, 'prepare - %s - found a haxelib classpath ', util.pad(depth*2, '', ' '), haxelib_classpath);
+        }
+
             //work out a valid project
         lib.project = {
             project: {
                 name:lib.name,
                 version:json.version,
+                app:{ codepaths:haxelib_classpath },
                 build:{
                     dependencies:deps
                 }
