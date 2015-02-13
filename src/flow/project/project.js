@@ -275,6 +275,9 @@ exports.get_path_context = function(flow, prepared, target_arch) {
             case 'armv7':
                 path_context.app.archtag = '-v7';
                 break;
+            case 'x86':
+                path_context.app.archtag = '-x86';
+                break;
             case 'armv7s':
                 path_context.app.archtag = '-v7s';
                 break;

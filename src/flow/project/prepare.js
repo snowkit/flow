@@ -98,11 +98,23 @@ internal.prepare_config = function(flow) {
 internal.prepare_config_paths = function(flow, prepared) {
 
     flow.project.paths = {
-        android : { project : flow.config.build.android.project },
+        android : { project : flow.config.build.android.project, libabi:'armeabi' },
         ios     : { project : flow.config.build.ios.project },
         output  : flow.project.get_path_output(flow, prepared),
         build   : flow.project.get_path_build(flow, prepared)
     }
+
+    if(flow.target == 'android') {
+        switch(flow.target_arch) {
+            case 'x86':
+                flow.project.paths.android.libabi = 'x86';
+            break;
+            default:
+                flow.project.paths.android.libabi = 'armeabi';
+            break;
+        }
+    }
+
 
         //store for use later against files etc
     flow.project.path_context = flow.project.get_path_context(flow, prepared, flow.target_arch);

@@ -53,7 +53,7 @@
             "activity_name" : "MainActivity",
             "binary_source_name" : "lib{{app.boot}}{{app.debugtag}}{{app.archtag}}.so",
             "binary_dest_name" : "lib{{app.name}}.so",
-            "binary_dest_path" : "{{paths.build}}/{{paths.android.project}}/libs/armeabi",
+            "binary_dest_path" : "{{paths.build}}/{{paths.android.project}}/libs/{{paths.android.libabi}}",
             "files_dest_path" : "{{paths.build}}/{{paths.android.project}}/assets"
         },
 
