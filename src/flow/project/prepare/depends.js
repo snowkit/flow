@@ -174,7 +174,12 @@ internal.process_found_dependencies = function(flow, result, found, depth) {
 
             flow.log(3, 'prepare - %s - %s has no flow file, this is not an error state', util.pad(depth*2, '', ' '), depend);
 
-            lib.project = internal.attempt_haxelib_json(flow, lib, depth);
+            var found_info = internal.attempt_haxelib_json(flow, lib, depth);
+            if(found_info != null) {
+                lib.project = found_info;
+            } else {
+                return result = null;
+            }
 
         } //no lib.project
 
@@ -199,8 +204,20 @@ internal.attempt_haxelib_json = function(flow, lib, depth) {
         //if the haxelib file exists,
     if(fs.existsSync(haxelib_json)) {
 
-            //use it
-        var json = JSON.parse( fs.readFileSync(haxelib_json, 'utf8') );
+            //try use it
+        var json = null;
+        try {
+            json = JSON.parse( fs.readFileSync(haxelib_json, 'utf8') );
+        } catch(e) {
+
+            console.log('');
+            prepare.log(flow, 1, 'prepare - %s - haxelib json file has a syntax error: \n', util.pad(depth*2, '', ' '));
+            console.log('> haxelib.json error:');
+            console.log('>', haxelib_json);
+            console.log('> %s:', e.name, e.message);
+            console.log('');
+            return null;
+        }
 
             //use these to find any dependencies the haxelib describes
         var deps = {};
