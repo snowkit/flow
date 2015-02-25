@@ -232,7 +232,14 @@ exports.copy_path = function(flow, source, dest) {
         flow.log(5, '     util - copying folder from %s to %s', source, dest);
         return exports.copy_folder_recursively(flow, source, dest);
     } else {
-        flow.log(5, '     util - copying file from %s to %s', source, dest);
+
+        var fname = path.basename(source);
+        if(flow.config.build.files_blacklist.indexOf(fname) != -1) {
+            flow.log(3, '     util - ignoring file %s', source);
+            return [];
+        }
+
+        flow.log(3, '     util - copying file from %s to %s', source, dest);
         wrench.mkdirSyncRecursive(path.dirname(dest), 0755);
         fse.copySync(source, dest);
         return [ dest ];
@@ -270,12 +277,25 @@ exports.copy_folder_recursively = function(flow, _source, _dest, _overwrite) {
 
         //for each file only, copy it across
     for(var i = 0; i < _source_file_list.length; ++i) {
-        var _dest_file = util.normalize(path.join(_dest,_source_file_list[i]));
+
+        var _source_name = _source_file_list[i];
+        var _source_base = path.basename(_source_name);
+        var _source_path = util.normalize(path.join(_source, _source_name));
+
+        if(flow.config.build.files_blacklist.indexOf(_source_base) != -1) {
+            flow.log(3, '        - ignoring file %s', _source_name);
+            continue;
+        }
+
+        var _dest_file = util.normalize(path.join(_dest,_source_name));
+
+        flow.log(3,'        - copying ' + _source_path + ' to ' + _dest_file );
+
         fse.ensureFileSync(_dest_file);
-        var source_path = util.normalize(path.join(_source, _source_file_list[i]));
-        flow.log(3,'        - copying ' + source_path + ' to ' + _dest_file );
-        fse.copySync( source_path, _dest_file );
+        fse.copySync( _source_path, _dest_file );
+
         copied_list.push( _dest_file );
+
     }
 
     return copied_list;
