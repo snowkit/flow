@@ -64,7 +64,7 @@ exports.ios_combine_archs = function(flow, done) {
 
 internal.post_build_mobile = function(flow, done) {
 
-        //run platform specific build chains
+    //run platform specific build chains
     if(flow.target == 'android') {
         return internal.build_android(flow, done);
     }
@@ -134,13 +134,23 @@ internal.build_android = function(flow, done) {
             var apk_path = path.join(project_root, 'bin/' + apk_name);
             var apk_dest = path.join(flow.project.paths.output, apk_name);
 
-                if(flow.timing) console.time('build - apk copy');
-            util.copy_path(flow, apk_path, apk_dest);
-                if(flow.timing) console.timeEnd('build - apk copy');
+            if(!fs.existsSync(apk_path)) {
 
+                flow.log(1,'build - android - cannot copy build to output path!');
+                flow.log(1,'build - android - missing file because %s build failed to generate an apk:', build_type, apk_path);
+                flow.project.failed = true;
+                return flow.finished();
 
-            if(done) {
-                done(code,out,err);
+            } else {
+
+                    if(flow.timing) console.time('build - apk copy');
+                util.copy_path(flow, apk_path, apk_dest);
+                    if(flow.timing) console.timeEnd('build - apk copy');
+
+                if(done) {
+                    done(code,out,err);
+                }
+
             }
 
         });
@@ -151,6 +161,7 @@ internal.build_android = function(flow, done) {
     }
 
 } //build_android
+
 
 internal.post_build_desktop = function(flow, done) {
 
@@ -199,7 +210,7 @@ internal.move_binary = function(flow, target_arch) {
 
 internal.build_hxcpp_arch_list = function(flow, arch_list, run_path, hxcpp_file, done ) {
 
-        //no list?
+    //no list?
     if(!arch_list) {
         if(done) done();
         return;
@@ -236,7 +247,7 @@ internal.build_hxcpp_arch_list = function(flow, arch_list, run_path, hxcpp_file,
 
 exports.run_hxcpp = function(flow, run_path, hxcpp_file, done) {
 
-       //building multiple archs?
+    //building multiple archs?
     var archs = [flow.target_arch];
 
     if(flow.flags.archs) {

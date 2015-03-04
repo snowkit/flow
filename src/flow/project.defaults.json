@@ -34,7 +34,8 @@
                     "sdk_min" : 12,
                     "sdk_target" : 19,
                     "permissions" : ["READ_EXTERNAL_STORAGE", "INTERNET"],
-                    "certificate" : ""
+                    "keystore_path" : "",
+                    "keystore_alias" : ""
                 }
             }
         }
