@@ -648,6 +648,16 @@ internal.prepare_defines = function(flow, prepared) {
 
     } //ios
 
+    if(flow.target == 'web') {
+        if(prepared.source.project.app && prepared.source.project.app.web) {
+            var embed_source_map = prepared.source.project.app.web.source_map_content;
+            if(embed_source_map) {
+                var source_map_define = 'source-map-content';
+                prepared.defines_all[source_map_define] = { name:source_map_define, met:true };
+            }
+        }
+    }
+
         //and we store "mobile" for convenience
     if(flow.target_mobile) {
         prepared.defines_all['mobile'] = { name:'mobile', met:true };

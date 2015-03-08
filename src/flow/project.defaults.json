@@ -11,6 +11,7 @@
             "codepaths" : [ "src" ],
             "web" : {
                 "min" : false,
+                "source_map_content" : true,
                 "libs" : {
                 }
             },
