@@ -336,6 +336,43 @@ exports.write_hxcpp = function(flow, run_path) {
 
 } //write_hxcpp
 
+internal.parse_optionstxt = function(flow, options_file, text) {
+
+    var result = [];
+    var opt_empty_err = 'build - cpp - Options.txt was blank/empty?!';
+
+    if(text && text.length) {
+        flow.log(4, options_file + ' / ' + text);
+        var opt_lines = text.split(/\r?\n/g);
+        if(opt_lines && opt_lines.length) {
+
+            if(flow.haxe.major == 3
+            && flow.haxe.minor == 1) {
+                opt_lines = opt_lines[0].split(/ /);
+                opt_lines = opt_lines.filter(function(l) { if(l) return true; })
+            } else
+            if(flow.haxe.major == 3
+            && flow.haxe.minor == 2) {
+                opt_lines = opt_lines.filter(function(l) { if(l) return true; })
+                opt_lines = opt_lines.map(function(l) { return '-D'+l; })
+            }
+
+            result = opt_lines;
+
+        } else {
+            flow.log(1,opt_empty_err,options_file);
+        }
+    } else {
+        flow.log(1, opt_empty_err, options_file);
+    }
+
+    flow.log(4, 'hxcpp flags: ');
+    flow.log(4, result);
+
+    return result;
+
+}
+
 exports.build_hxcpp = function(flow, target_arch, run_path, hxcpp_file, done) {
 
     var hxcpp_file = hxcpp_file || 'flow.Build.xml';
@@ -415,25 +452,11 @@ exports.build_hxcpp = function(flow, target_arch, run_path, hxcpp_file, done) {
 
         var options_file = path.join(run_path,'Options.txt');
         var options_str = fs.readFileSync(options_file,'utf8');
-        var opt_empty_err = 'build - cpp - Options.txt was blank/empty?!';
 
         flow.log(3, 'build - cpp - using Options.txt from %s', options_file);
 
-        if(options_str && options_str.length) {
-            var opt_lines = options_str.split(/\r?\n/g);
-            if(opt_lines && opt_lines.length) {
-                var opt_list = opt_lines[0].split(/ /);
-                if(opt_list && opt_list.length) {
-                    args = util.array_union(args, opt_list);
-                } else {
-                    flow.log(1,opt_empty_err,options_file);
-                }
-            } else {
-                flow.log(1,opt_empty_err,options_file);
-            }
-        } else {
-            flow.log(1, opt_empty_err, options_file);
-        }
+        var list = internal.parse_optionstxt(flow, options_file, options_str);
+        args = util.array_union(args, list);
 
     } catch(e) {
         flow.log(3, 'build - cpp - no Options.txt for this build? ', e);
