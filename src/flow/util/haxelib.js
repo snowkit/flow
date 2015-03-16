@@ -16,8 +16,32 @@ var internal = {};
 
     HaxelibError.prototype = Error.prototype;
 
-        //caches all libs and values from haxelib list
     exports.init = function init(flow, done) {
+
+            //find haxelib library path
+        cmd.exec(flow, 'haxe', ['-version'], { quiet:true }, function(code, out, err) {
+
+            var version = out || err;
+            version = version.trim()
+
+            flow.log(2, 'haxe version %s', version);
+
+            var parts = version.split('.');
+            flow.haxe = {
+                version: version,
+                major:parts[0],
+                minor:parts[1],
+                patch:parts[2]
+            }
+
+            exports.init_haxelib(flow, done);
+
+        });
+
+    }
+
+        //caches all libs and values from haxelib list
+    exports.init_haxelib = function init_haxelib(flow, done) {
 
             //always reset these because we are flushing cache
         libs = {};
