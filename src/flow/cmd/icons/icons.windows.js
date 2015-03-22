@@ -33,9 +33,9 @@ exports.convert = function(flow, icon, done) {
     fs.writeFileSync(rcfilepath, rccontent, 'utf8');
 
     	//:todo: configure/safety
-    var vsdir = process.env['VS100COMNTOOLS'] ||
+    var vsdir = process.env['VS120COMNTOOLS'] ||
                 process.env['VS110COMNTOOLS'] ||
-                process.env['VS120COMNTOOLS'];
+                process.env['VS100COMNTOOLS'];
 
     if(!vsdir) {
 
