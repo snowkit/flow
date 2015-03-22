@@ -5,21 +5,8 @@ var   haxelib = require('../../util/haxelib')
 
 exports.run = function run(flow, data) {
 
-    flow.log(2, 'setup - loading setup help');
-    flow.log(2, 'press ctrl-c to end this process');
-
-        //setup will launch a local web server to run the setup
-    var port = 40444;
-    var setup_content = path.join( __dirname, 'setup/');
-    var url = 'http://localhost:' + port;
-
-    util.launch_server(flow, port, setup_content, 0, true);
-
-    setTimeout(function() {
-
-        util.openurl(flow, url);
-
-    }, 300);
+    flow.log(2, 'setup - setup will exist in a different form in future. For setup instructions:\n');
+    flow.log(2, 'http://snowkit.org/2014/10/29/quick-setup-guides-and-help/\n');
 
 } //run
 
