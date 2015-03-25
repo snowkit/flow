@@ -24,7 +24,7 @@ To install the sublime text plugins for code completion, syntax highlighting and
 - Press `Ctrl/cmd + Shift + P` `Package Control : Install Package`
 - Do this twice, and choose
   - sublime_flow
-  - sublime_haxe_completion
+  - sublime_haxe
 - Restart sublime text
 
 #### Using the plugins
