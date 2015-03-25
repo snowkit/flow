@@ -19,8 +19,8 @@ To install the sublime text plugins for code completion, syntax highlighting and
 - Make sure you have [package control](https://sublime.wbond.net/installation)
 - Press `Ctrl/cmd + Shift + P` `Package Control : Add repository`
 - Do this twice, add 
-  - https://github.com/underscorediscovery/sublime_haxe_completion
-  - https://github.com/underscorediscovery/sublime_flow
+  - https://github.com/snowkit/sublime_haxe
+  - https://github.com/snowkit/sublime_flow
 - Press `Ctrl/cmd + Shift + P` `Package Control : Install Package`
 - Do this twice, and choose
   - sublime_flow
@@ -43,7 +43,7 @@ The plugin works by specifying _which_ flow file you want to use as your current
 
 - Right click _inside_ the flow file, and choose "flow status" (`ctrl+shift+0`)
 
-![](../images/plugins/1.png)
+![](../images/plugins/sublime.png)
 
 The flow status window has some options:
 - selecting the flow file will open the active project file
@@ -67,8 +67,8 @@ If you have errors, you can double click the error in the console, and it will j
 ![](../images/plugins/4.png)
 
 
-_Take note that if you have the common Haxe plugin installed already, disable it using Package Control : Disable Package. 
-The features are similar, but supports the flow build tool chain and code completion. You can toggle between them any time._
+_Take note that if you have the main, default Haxe plugin installed already, you could potentially have them fighting over things. Package control lets you easily disable a plugin you aren't using at the moment.
+_
 
 &nbsp;
 &nbsp;

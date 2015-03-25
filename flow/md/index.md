@@ -171,6 +171,22 @@ by running the following command :
 
 <div class="guide">
 
+###Install the flow shortcut
+
+Anywhere you see `flow` as a command, it's because an alias has been set up.   
+
+**If you don't install the shortcut**,   
+you must use `haxelib run flow` instead of `flow` where you see it.
+
+Right now, the shortcut is a manual install but in the near future will be automated.
+
+#### To install the shortcut alias
+
+- Linux/Mac [download](https://raw.githubusercontent.com/underscorediscovery/flow/master/setup/flow)
+    - copy this file to /usr/local/bin or anywhere in your path
+
+- Windows [download](https://raw.githubusercontent.com/underscorediscovery/flow/master/setup/flow.bat)
+    - copy this file to c:\haxetoolkit\haxe next to the haxe.exe file, or anywhere in your path
 
 ###Usage
 
@@ -190,17 +206,27 @@ If target is not specified, it will use your current system i.e
 
 ---
 
-##Editor support
+<style> img {max-width:26em;} </style>
+
+## Editor support
 
 Where possible, full code completion and building from the editor is supplied.
 
-[Sublime Text](guide/sublimetext.html) (mac/windows/linux) <br/><br/>
-[![](images/plugins/1.png)](guide/sublimetext.html)
+#### [Sublime Text](guide/sublimetext.html) (mac/windows/linux)
+[![](images/plugins/sublime.png)](guide/sublimetext.html)
 
-[FlashDevelop](guide/flashdevelop.html) (windows only)<br/><br/>
-template is in `setup/`, but here is a [Download link](https://github.com/underscorediscovery/flow/blob/master/setup/flow_FlashDevelopTemplate.fdz?raw=true)   
+---
 
-[![](images/plugins/5.png)](guide/flashdevelop.html)
+#### [Atom](https://atom.io/packages/flow) (mac/windows/linux)
+[![](images/plugins/atom.png)](https://atom.io/packages/flow)
+
+---
+
+#### [FlashDevelop](guide/flashdevelop.html) (windows only)
+
+template is at [snowkit-fd](https://github.com/Chman/Snowkit-FD), and here is a [Download link](https://github.com/Chman/Snowkit-FD/blob/master/SnowkitTemplate.fdz?raw=true)   
+
+[![](images/plugins/fd.png)](guide/flashdevelop.html)
 
 ---
 
