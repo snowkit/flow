@@ -9,9 +9,9 @@ exports.run = function run(flow, data, done) {
 
     flow.log(2, 'build - running upx...');
 
-    var source_path = util.normalize(path.resolve(flow.project.paths.build));
-    var source_file = path.join(source_path, 'cpp/' + flow.project.paths.binary.source);
+    var source_file = flow.project.get_path_binary_dest_full(flow, flow.project.prepared, flow.target_arch);
         source_file = util.normalize(source_file);
+    var source_path = flow.project.root;
 
     var upx_path = util.normalize(path.dirname(flow.bin_path));
     var upx_file = 'upx-' + flow.system;
