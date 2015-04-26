@@ -13,6 +13,7 @@ exports.icons = require('./icons/icons');
 exports.config = require('./config/config');
 exports.upx = require('./upx/upx');
 exports.info = require('./info/info');
+exports.sync = require('./sync/sync');
 
 //special
 

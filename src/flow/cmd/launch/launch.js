@@ -49,6 +49,10 @@ internal.launch = function(flow) {
         return;
     }
 
+    if( flow.flags.sync ) {
+        flow.execute(flow, cmds['sync']);
+    }
+
     flow.log(2, 'launching %s %s for %s\n',
         flow.project.parsed.project.name, flow.project.parsed.project.version, flow.target);
 

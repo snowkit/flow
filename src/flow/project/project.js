@@ -32,6 +32,7 @@ exports.init = function init(flow) {
         flow.flags._next('icons')   ||
         flow.flags._next('hooks')   ||
         flow.flags._next('setup')   ||
+        flow.flags._next('sync')    ||
         flow.system;
 
     flow.target_arch = flow.project.find_arch(flow);
@@ -152,7 +153,7 @@ exports.verify = function verify(flow, project_path, project_root, is_dependency
         //if no explicit project given, search for one
     if(!project_file) {
 
-        flow.log(2, 'project - searching project root %s', project_root)
+        flow.log(3, 'project - searching project root %s', project_root)
 
         var flow_files = exports.find_flow_files(flow, project_root);
 

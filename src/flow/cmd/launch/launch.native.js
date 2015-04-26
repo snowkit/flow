@@ -37,7 +37,9 @@ internal.launch = function(flow) {
         var abs_binary = path.resolve(flow.project.root, flow.project.paths.binary.full);
         var abs_outpath = path.resolve(flow.project.root, flow.project.paths.output);
 
-        cmd.exec(flow, abs_binary, [], { cwd: abs_outpath });
+        cmd.exec(flow, abs_binary, [], { cwd: abs_outpath }, function(code, out, err) {
+           process.exit(0);
+        });
 
     } else if(flow.target_mobile) {
 

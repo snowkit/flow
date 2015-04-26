@@ -14,6 +14,7 @@ exports.launch = function(flow) {
 
         var flag_launch_wait = flow.flags['launch-wait'];
         var flag_url = flow.flags['url'];
+        var flag_sync = flow.flags['sync'];
 
         if(flag_launch_wait !== undefined) {
             launch_wait = parseFloat(flag_launch_wait);
@@ -21,6 +22,10 @@ exports.launch = function(flow) {
 
         if(flag_url !== undefined) {
             url = flag_url;
+        }
+
+        if(flag_sync !== undefined) {
+            timeout = 0;
         }
 
     if(flow.flags.launch !== false) {
