@@ -174,7 +174,7 @@ exports.verify = function verify(flow, project_path, project_root, is_dependency
 
 
     if(!flow.quiet.project && !quiet) {
-        flow.log(2, 'project - using project file %s', abs_path)
+        flow.log(3, 'project - using project file %s', abs_path)
     }
 
     if(!fs.existsSync(abs_path)) {
