@@ -496,6 +496,16 @@ internal.prepare_web = function(flow, prepared) {
 
 internal.prepare_mobile = function(flow, prepared) {
 
+    //:todo: this might be better a general rule, but since it is for sure
+        // a problem on android it's better to short term notify users
+
+        var _app_name = prepared.source.project.app.name;
+        if(_app_name) {
+            if(_app_name.indexOf(' ') != -1) {
+                return internal.fail(flow, prepared, 'project.app.name', 'project.app.name(`'+_app_name+'`) contains a space, which can easily cause problems especially on mobile platforms.');
+            }
+        }
+
     //now we also handle any platform specifics that might need to be resolved to different values
         //like orientations or device targets etc
 
