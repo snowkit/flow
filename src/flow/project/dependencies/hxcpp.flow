@@ -40,9 +40,9 @@
         "android && arch-armv7 && !hxcpp_static_std" : {
           build : {
             files : {
-              libregexp : { path:"bin/Android/libregexp-v7.so => project/libs/armeabi/libregexp.so" },
-              libstd : { path:"bin/Android/libstd-v7.so => project/libs/armeabi/libstd.so" },
-              libzlib : { path:"bin/Android/libzlib-v7.so => project/libs/armeabi/libzlib.so" }
+              libregexp : { path:"bin/Android/libregexp-v7.so => project/libs/armeabi-v7a/libregexp.so" },
+              libstd : { path:"bin/Android/libstd-v7.so => project/libs/armeabi-v7a/libstd.so" },
+              libzlib : { path:"bin/Android/libzlib-v7.so => project/libs/armeabi-v7a/libzlib.so" }
             }
           }
         },
@@ -60,9 +60,9 @@
         "android && arch-x86 && !hxcpp_static_std" : {
           build : {
             files : {
-              libregexp : { path:"bin/Android/libregexp-x86.so => project/libs/armeabi/libregexp.so" },
-              libstd : { path:"bin/Android/libstd-x86.so => project/libs/armeabi/libstd.so" },
-              libzlib : { path:"bin/Android/libzlib-x86.so => project/libs/armeabi/libzlib.so" }
+              libregexp : { path:"bin/Android/libregexp-x86.so => project/libs/x86/libregexp.so" },
+              libstd : { path:"bin/Android/libstd-x86.so => project/libs/x86/libstd.so" },
+              libzlib : { path:"bin/Android/libzlib-x86.so => project/libs/x86/libzlib.so" }
             }
           }
         },
