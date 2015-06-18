@@ -44,8 +44,16 @@ exports.ios_uniqueid = function(flow) {
 }
 
 exports.array_union = function(a,b) {
+
+    var dst = b;
+
+    if(dst.constructor == String) {
+      dst = b.split(',');
+      dst = dst.map(function(part) { return part.trim(); });
+    }
+
     var r = a.slice(0);
-    b.forEach(function(i) { if (r.indexOf(i) < 0) r.push(i); });
+    dst.forEach(function(i) { if (r.indexOf(i) < 0) r.push(i); });
     return r;
 }
 
