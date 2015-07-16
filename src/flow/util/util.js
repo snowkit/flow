@@ -198,9 +198,20 @@ exports.random_file = function random_file() {
 } //random_file
 
 exports.pad = function pad(width, string, padding) {
-  return (width <= string.length) ? string : exports.pad(width, padding + string, padding)
-}
 
+  if(string.length >= width) {
+    return string;
+  }
+
+  var diff = width - string.length;
+
+  for(var i = 0; i < diff; ++i) {
+    string += padding;
+  }
+
+  return string;
+
+} //pad
 
 exports.openurl = function(flow, url) {
 
