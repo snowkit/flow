@@ -181,7 +181,7 @@ internal.save_user_config = function(flow) {
         }
 
             //useful immediate information
-        flow.log(2, '%s', flow.version);
+        flow.log(2, '%s (node.js %s)', flow.version, process.version);
         flow.log(3, 'current platform is %s', flow.system);
         flow.log(2, 'target is %s', flow.target, flow.target != 'web' ? '( arch '+flow.target_arch+' )' : '' );
 
