@@ -37,7 +37,10 @@ exports.convert = function(flow, icon, done) {
                 process.env['VS110COMNTOOLS'] ||
                 process.env['VS100COMNTOOLS'];
 
-    flow.log(3, 'icons - vsdir detected as', vsdir);
+    flow.log(3, 'icons - vsdir detected as `%s`', vsdir);
+    flow.log(3, 'icons -       checked 120: `%s`', process.env['VS120COMNTOOLS']);
+    flow.log(3, 'icons -       checked 110: `%s`', process.env['VS110COMNTOOLS']);
+    flow.log(3, 'icons -       checked 100: `%s`', process.env['VS100COMNTOOLS']);
 
     if(!vsdir) {
 
