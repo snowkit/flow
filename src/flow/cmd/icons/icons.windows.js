@@ -37,6 +37,8 @@ exports.convert = function(flow, icon, done) {
                 process.env['VS110COMNTOOLS'] ||
                 process.env['VS100COMNTOOLS'];
 
+    flow.log(3, 'icons - vsdir detected as', vsdir);
+
     if(!vsdir) {
 
         flow.log(1,'icons - failed - do you have visual C++ installed?');
