@@ -33,12 +33,15 @@ exports.convert = function(flow, icon, done) {
     fs.writeFileSync(rcfilepath, rccontent, 'utf8');
 
     	//:todo: configure/safety
+        //note: uses 2013 first because that's the default
     var vsdir = process.env['VS120COMNTOOLS'] ||
+                process.env['VS140COMNTOOLS'] ||
                 process.env['VS110COMNTOOLS'] ||
                 process.env['VS100COMNTOOLS'];
 
     flow.log(3, 'icons - vsdir detected as `%s`', vsdir);
     flow.log(3, 'icons -       checked 120: `%s`', process.env['VS120COMNTOOLS']);
+    flow.log(3, 'icons -       checked 140: `%s`', process.env['VS140COMNTOOLS']);
     flow.log(3, 'icons -       checked 110: `%s`', process.env['VS110COMNTOOLS']);
     flow.log(3, 'icons -       checked 100: `%s`', process.env['VS100COMNTOOLS']);
 
