@@ -34,7 +34,7 @@
                     },
                     "sdk_min" : 12,
                     "sdk_target" : 19,
-                    "permissions" : ["android.permission.READ_EXTERNAL_STORAGE", "android.permission.INTERNET"],
+                    "permissions" : [],
                     "keystore_path" : "",
                     "keystore_alias" : ""
                 }
