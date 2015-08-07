@@ -178,7 +178,7 @@ internal.copy_files = function(flow, files, output, no_copy) {
 
                     if(node.template) {
 
-                        flow.log(3, '   copying with template %s from %s to %s%s', node.template, node.source, output, node.dest);
+                        flow.log(3, '   copying with template %s from %s to %s/%s', node.template, node.source, output, node.dest);
 
                         var res = internal.template_path(flow, node, dest);
 
@@ -188,7 +188,7 @@ internal.copy_files = function(flow, files, output, no_copy) {
 
                     } else {
 
-                        flow.log(3, '   copying %s to %s%s', node.source, output, node.dest);
+                        flow.log(3, '   copying %s to %s/%s', node.source, output, node.dest);
 
                         var res = util.copy_path(flow, node.source, dest);
 
