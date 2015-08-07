@@ -235,7 +235,7 @@ internal.build_hxcpp_arch_list = function(flow, arch_list, run_path, hxcpp_file,
 
             //for now lib based projects don't do this step
         if(!flow.project.parsed.project.lib) {
-            if(!flow.flags.set_haxe_output) {
+            if(!internal.set_haxe_output) {
                 internal.move_binary(flow, curr_arch);
             }
         }
@@ -269,6 +269,8 @@ exports.post_haxe = function(flow, done) {
 
     var cpp_path = path.join(flow.project.paths.build, 'cpp/');
         cpp_path = path.resolve(flow.project.root, cpp_path);
+
+    internal.set_haxe_output = flow.project.prepared.defines_list.indexOf('set_haxe_output') != -1;
 
         //write custom xml
     exports.write_hxcpp(flow, cpp_path);
@@ -347,14 +349,14 @@ exports.build_hxcpp = function(flow, target_arch, run_path, hxcpp_file, done) {
         run_path = util.normalize(run_path, true);
     }
 
-    if(flow.flags.set_haxe_output) {
+    if(internal.set_haxe_output) {
             //ensure the correct path and executable is used
         var binary_dest = flow.project.get_path_binary_dest_full(flow, flow.project.prepared, target_arch);
             binary_dest = path.relative(run_path, binary_dest);
             binary_dest = path.resolve(run_path, binary_dest);
             binary_dest = util.normalize(binary_dest);
         fse.ensureFileSync(binary_dest);
-        flow.log(1, 'build - hxcpp - setting binary output path to', binary_dest);
+        flow.log(3, 'build - hxcpp - setting binary output path to', binary_dest);
         args.push("-Dhaxe_output=" + binary_dest);
     }
 
