@@ -357,6 +357,10 @@ internal.prepare_conditionals = function(flow, prepared) {
 
                 var node = prepared.source.if[condition];
 
+                if(node.build && node.build.number) {
+                    prepared.source.project.build.number = node.build.number;
+                }
+
                 if(node.app && node.app.mobile) {
 
                     if(node.app.mobile.ios) {
