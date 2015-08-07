@@ -235,7 +235,9 @@ internal.build_hxcpp_arch_list = function(flow, arch_list, run_path, hxcpp_file,
 
             //for now lib based projects don't do this step
         if(!flow.project.parsed.project.lib) {
-            internal.move_binary(flow, curr_arch);
+            if(!flow.flags.set_haxe_output) {
+                internal.move_binary(flow, curr_arch);
+            }
         }
 
         internal.build_hxcpp_arch_list(flow, arch_list, run_path, hxcpp_file, done);
@@ -345,6 +347,17 @@ exports.build_hxcpp = function(flow, target_arch, run_path, hxcpp_file, done) {
         run_path = util.normalize(run_path, true);
     }
 
+    if(flow.flags.set_haxe_output) {
+            //ensure the correct path and executable is used
+        var binary_dest = flow.project.get_path_binary_dest_full(flow, flow.project.prepared, target_arch);
+            binary_dest = path.relative(run_path, binary_dest);
+            binary_dest = path.resolve(run_path, binary_dest);
+            binary_dest = util.normalize(binary_dest);
+        fse.ensureFileSync(binary_dest);
+        flow.log(1, 'build - hxcpp - setting binary output path to', binary_dest);
+        args.push("-Dhaxe_output=" + binary_dest);
+    }
+
     if(flow.flags.debug) {
         args.push("-Ddebug");
     }
@@ -354,7 +367,7 @@ exports.build_hxcpp = function(flow, target_arch, run_path, hxcpp_file, done) {
         args.push('-verbose');
     }
 
-        //default to no windows console, but allow it through 
+        //default to no windows console, but allow it through
         //--d show_console or user define in project tree
     if(flow.target == 'windows' &&
        flow.project.prepared.defines_list.indexOf('show_console') == -1) {
