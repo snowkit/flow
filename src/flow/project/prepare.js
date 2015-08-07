@@ -364,6 +364,10 @@ internal.prepare_conditionals = function(flow, prepared) {
                     }
                     if(node.app.mobile.android) {
                         prepared.source.project.app.mobile.android.libs = util.merge_unique(node.app.mobile.android.libs, prepared.source.project.app.mobile.android.libs);
+
+                        prepared.source.project.app.mobile.android.build_type = node.app.mobile.android.build_type;
+                        prepared.source.project.app.mobile.android.keystore_path = node.app.mobile.android.keystore_path;
+                        prepared.source.project.app.mobile.android.keystore_alias = node.app.mobile.android.keystore_alias;
                     }
 
                 } //if app and app.mobile
