@@ -11,6 +11,7 @@ drawable-xxxhdpi/  640 dpi (192x192px)
 var   util = require('../../util/util')
     , cmd = require('../../util/process')
     , path = require('path')
+    , fs = require('fs-extra')
 
 exports.convert = function(flow, icon, done) {
 
@@ -19,11 +20,19 @@ exports.convert = function(flow, icon, done) {
     var icon_folder = path.join(icon.source, 'android');
     var icon_output = path.join(flow.project.paths.build, flow.project.paths.android.project, 'res');
 
-    flow.log(3, 'icons / copy %s to %s', icon_folder, icon_output);
+    if(fs.existsSync(icon_folder)) {
 
-    flow.log(3,'icons - ok - copying to output folder');
+        flow.log(3, 'icons / copy %s to %s', icon_folder, icon_output);
 
-    util.copy_path(flow, icon_folder, icon_output);
+        flow.log(3,'icons - ok - copying to output folder');
+
+        util.copy_path(flow, icon_folder, icon_output);
+
+    } else {
+
+        flow.log(2,'icons - warning - icons node specified but no source file for android at %s', icon_folder);
+
+    }
 
     if(done) {
         done();
