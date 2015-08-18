@@ -128,8 +128,13 @@ internal.get_user_config = function(flow) {
 
 internal.save_user_config = function(flow) {
 
+    var _contents = JSON.stringify(flow.user_config, null,'    ');
+
+    flow.log(2, 'config - saving user config to `%s`', flow.user_config_path);
+    flow.log(3, 'config - saving user config as `%s`', _contents);
+
     fse.ensureFileSync(flow.user_config_path);
-    fs.writeFileSync(flow.user_config_path, JSON.stringify(flow.user_config,null,'    '), 'utf8');
+    fs.writeFileSync(flow.user_config_path, _contents, 'utf8');
 
 } //save_user_config
 
