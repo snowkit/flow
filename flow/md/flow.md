@@ -441,11 +441,11 @@ The app node controls build configurations specific to the binary/app output of 
 - `permissions`
     - list of strings `[ ]`
     - matches the [android manifest permissions](http://developer.android.com/reference/android/Manifest.permission.html)
+    - documentation mentions "constant value", 
+    - example:
+        - `['android.permission.READ_EXTERNAL_STORAGE', 'android.permission.INTERNET']`
     - permissions will combine in project tree
-    - default `['READ_EXTERNAL_STORAGE', 'INTERNET']`
-
-- `certificate`
-    - `:todo:`
+    - default `[]`
 
 
 ---
@@ -459,6 +459,9 @@ The build node controls build specific configurations and files.
 <a name="build.dependencies"></a>
 - `dependencies`
     - node of keys `{ depend:'version' }`
+    - key must be quoted if contains `.` or `-` or others
+        - plainalpha
+        - "with-quotes"
     - dependencies use haxelib directly
     - dependencies do not require a flow file, just a haxelib entry
     - `haxelib.json` will be read if no flow file is found, including dependencies
