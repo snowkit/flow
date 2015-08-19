@@ -561,13 +561,13 @@
 <ul>
 <li>list of strings <code>[ ]</code></li>
 <li>matches the <a href="http://developer.android.com/reference/android/Manifest.permission.html">android manifest permissions</a></li>
-<li>permissions will combine in project tree</li>
-<li>default <code>[&#39;READ_EXTERNAL_STORAGE&#39;, &#39;INTERNET&#39;]</code></li>
+<li>documentation mentions “constant value”, </li>
+<li>example:<ul>
+<li><code>[&#39;android.permission.READ_EXTERNAL_STORAGE&#39;, &#39;android.permission.INTERNET&#39;]</code></li>
 </ul>
 </li>
-<li><p><code>certificate</code></p>
-<ul>
-<li><code>:todo:</code></li>
+<li>permissions will combine in project tree</li>
+<li>default <code>[]</code></li>
 </ul>
 </li>
 </ul>
@@ -579,6 +579,11 @@
 <ul>
 <li><code>dependencies</code><ul>
 <li>node of keys <code>{ depend:&#39;version&#39; }</code></li>
+<li>key must be quoted if contains <code>.</code> or <code>-</code> or others<ul>
+<li>plainalpha</li>
+<li>“with-quotes”</li>
+</ul>
+</li>
 <li>dependencies use haxelib directly</li>
 <li>dependencies do not require a flow file, just a haxelib entry</li>
 <li><code>haxelib.json</code> will be read if no flow file is found, including dependencies</li>
