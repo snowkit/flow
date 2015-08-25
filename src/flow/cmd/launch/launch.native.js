@@ -187,7 +187,7 @@ internal.launch_ios = function(flow) {
     if(fs.existsSync(ios_project_file)) {
         cmd.exec(flow, 'open', [ios_project_file]);
     } else {
-        flow.log(1, 'seems the project is not located at expected location %s, can\'t focus it?', ios_project_file);
+        flow.log(1, 'seems the project is not located at expected location %s, can\'t open it?', ios_project_file);
     }
 
 }

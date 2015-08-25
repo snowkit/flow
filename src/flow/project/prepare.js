@@ -662,9 +662,15 @@ internal.prepare_defines = function(flow, prepared) {
         var ios_project_exists = fs.existsSync( ios_project_path );
 
         if(flow.flags['xcode-project'] || !ios_project_exists) {
-            flow.log(2, 'project - ios project will be generated at', ios_project_path);
+            flow.log(2, 'project - ios xcode project will be generated at', ios_project_path);
             prepared.defines_all['ios-xcode-project'] = { name:'ios-xcode-project', met:true };
             flow.project.skip_build = true;
+        }
+
+            //if not running from xcode, and the project existed
+        if(!process.env['XCODE_VERSION_ACTUAL'] && ios_project_exists) {
+            flow.project.skip_build = true;
+            flow.log(2, 'project - use xcode ios project at', ios_project_path);
         }
 
     } //ios

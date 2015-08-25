@@ -9,7 +9,7 @@
 exports.run = function run(flow, data) {
 
         //this is so build can use this to check if
-        //it should execute run as well
+        //it should execute launch as well
     flow.action = 'run';
 
     flow.execute(flow, cmds['build']);
