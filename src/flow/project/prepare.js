@@ -667,8 +667,10 @@ internal.prepare_defines = function(flow, prepared) {
             flow.project.skip_build = true;
         }
 
+        var allow_build = flow.flags['ios-allow-cli-build'];
+
             //if not running from xcode, and the project existed
-        if(!process.env['XCODE_VERSION_ACTUAL'] && ios_project_exists) {
+        if((!process.env['XCODE_VERSION_ACTUAL'] && ios_project_exists) && !allow_build) {
             flow.project.skip_build = true;
             flow.log(2, 'project - use xcode ios project at', ios_project_path);
         }
