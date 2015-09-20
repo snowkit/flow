@@ -4,7 +4,6 @@ var   path = require('path')
     , bake = require('./bake')
     , bars = require('handlebars')
     , gate = require('json-gate')
-    , jsonic = require('jsonic')
     , fs = require('graceful-fs')
 
     , depends = require('./prepare/depends')
