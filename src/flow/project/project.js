@@ -82,6 +82,11 @@ bars.registerHelper('toString', function( value ) {
     return ( value === void 0 ) ? 'undefined' : value.toString();
 });
 
+bars.registerHelper('packageClass', function( value ) {
+    var _parts = value.split('.');
+    return _parts[_parts.length-1];
+});
+
 bars.registerHelper('not_undefined', function( value ) {
     return ( value !== void 0 );
 });

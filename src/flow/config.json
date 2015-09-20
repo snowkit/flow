@@ -15,7 +15,7 @@
         "command_line" : false,
         "icons_disable_default" : false,
 
-        "binary_source_name" : "{{app.boot}}{{app.debugtag}}",
+        "binary_source_name" : "{{packageClass app.boot}}{{app.debugtag}}",
         "binary_dest_name" : "{{app.name}}",
         "binary_dest_path" : "{{paths.output}}",
         "files_dest_path" : "{{paths.output}}",
@@ -27,7 +27,7 @@
             "launch_wait" : 0.3
         },
         "windows" : {
-            "binary_source_name" : "{{app.boot}}{{app.debugtag}}.exe",
+            "binary_source_name" : "{{packageClass app.boot}}{{app.debugtag}}.exe",
             "binary_dest_name" : "{{app.name}}.exe"
         },
         "mac" : {
@@ -36,7 +36,7 @@
         },
         "ios" : {
             "project" : "ios.project",
-            "binary_source_name" : "lib{{app.boot}}{{app.debugtag}}.iphone{{app.iostag}}{{app.archtag}}.a",
+            "binary_source_name" : "lib{{packageClass app.boot}}{{app.debugtag}}.iphone{{app.iostag}}{{app.archtag}}.a",
             "binary_dest_name" : "lib{{app.name}}.a",
             "binary_dest_path" : "{{paths.ios.project}}/project/libs/{{app.arch}}",
             "files_dest_path" : "{{paths.ios.project}}/project/assets"
@@ -51,7 +51,7 @@
 
             "project" : "project",
             "activity_name" : "MainActivity",
-            "binary_source_name" : "lib{{app.boot}}{{app.debugtag}}{{app.archtag}}.so",
+            "binary_source_name" : "lib{{packageClass app.boot}}{{app.debugtag}}{{app.archtag}}.so",
             "binary_dest_name" : "lib{{app.name}}.so",
             "binary_dest_path" : "{{paths.build}}/{{paths.android.project}}/libs/{{paths.android.libabi}}",
             "files_dest_path" : "{{paths.build}}/{{paths.android.project}}/assets"
