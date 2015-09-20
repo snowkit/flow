@@ -11,6 +11,7 @@ var   path = require('path')
     , conditions = require('./prepare/conditions')
     , defines = require('./prepare/defines')
     , flags = require('./prepare/flags')
+    , hxmls = require('./prepare/hxmls')
     , files = require('./prepare/files')
 
 var internal = {};
@@ -834,6 +835,9 @@ internal.prepare_codepaths = function (flow, prepared) {
 internal.prepare_flags = function(flow, prepared) {
 
     internal.log(flow, 3, 'prepare - project - flags ...');
+
+        prepared.hxmls = [];
+        prepared.hxmls = hxmls.parse(flow, prepared);
 
         prepared.flags = [];
         internal.prepare_codepaths(flow, prepared);

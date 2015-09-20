@@ -2,6 +2,8 @@
 var   path = require('path')
     , util = require('../util/util')
 
+var internal = {};
+
 exports.bake = function bake(flow) {
 
     var project = flow.project.prepared;
@@ -72,6 +74,20 @@ exports.target = function(flow, project, split) {
 
 } //target
 
+exports.hxmls = function(flow, project, split) {
+    
+    split = split || '\n';
+
+    var _other_hxmls = flow.project.prepared.hxmls;
+    
+    _other_hxmls = _other_hxmls.map(function(v) {
+        return internal.get_hxml_path(flow, v);
+    });
+
+    return split + _other_hxmls.join(split);
+
+} //hxmls
+
     //bakes the whole project into a usable complete hxml
 exports.hxml = function(flow, project, with_compile, split) {
 
@@ -90,8 +106,14 @@ exports.hxml = function(flow, project, with_compile, split) {
     hxml_ += exports.defines(flow, project, split);
     hxml_ += exports.flags(flow, project, split);
     hxml_ += exports.target(flow, project, split);
-
+    hxml_ += exports.hxmls(flow, project, split);
 
     return hxml_;
 
 } //hxml
+
+internal.get_hxml_path = function(flow, hxml_file) {
+    var hxml_path = util.normalize( path.join(flow.project.paths.build, hxml_file) );
+        hxml_path = path.relative( flow.project.root, hxml_path );
+    return hxml_path;
+}
