@@ -197,7 +197,7 @@ internal.parse_versions = function(flow) {
                 lib_path = path.join( exports.haxelib_path, lib, 'git' );
             } else {
                     //the other types becomes /v,e,r/
-                lib_path = path.join( exports.haxelib_path, lib, v.replace(/\./gi,',') );
+                lib_path = path.join( exports.haxelib_path, lib.replace(/\./gi,','), v.replace(/\./gi,',') );
             }
 
             lib_path = util.normalize(lib_path, true);
