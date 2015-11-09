@@ -194,7 +194,7 @@ internal.parse_versions = function(flow) {
                 v = 'dev';
             } else if(v == 'git') {
                     //git folder is in the root like so
-                lib_path = path.join( exports.haxelib_path, lib, 'git' );
+                lib_path = path.join( exports.haxelib_path, lib.replace(/\./gi,','), 'git' );
             } else {
                     //the other types becomes /v,e,r/
                 lib_path = path.join( exports.haxelib_path, lib.replace(/\./gi,','), v.replace(/\./gi,',') );
