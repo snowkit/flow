@@ -3,7 +3,6 @@ internal = {}
 
 exports.run = function run(flow, data) {
 
-
     if(flow.flags.hxml) {
         console.log(flow.project.hxml);
         return;
@@ -39,7 +38,8 @@ exports.error = function(flow, err) {
 
 
 internal.escape_json = function(str) {
-   return str
+    if(!str) return str;
+    return str
         .replace(/[\"]/g, '\\\"')
         .replace(/[\n]/g, '\\n')
         .replace(/[\t]/g, '\\t')
