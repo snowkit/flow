@@ -18,7 +18,7 @@ exports.convert = function(flow, icon, done) {
     var project = flow.project.prepared.source.project;
 
     var icon_folder = path.join(icon.source, 'android');
-    var icon_output = path.join(flow.project.paths.build, flow.project.paths.android.project, 'res');
+    var icon_output = path.join(flow.project.root, flow.project.paths.android.project, 'app','src','main','res');
 
     if(fs.existsSync(icon_folder)) {
 

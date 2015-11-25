@@ -49,13 +49,13 @@ internal.launch = function(flow) {
 
                 internal.android_launch_init(flow);
 
-                internal.install_android(flow, function(code) {
-                    if(!code) {
-                        internal.launch_android(flow);
-                    } else {
-                        flow.log(1, 'launch - stopping due to failure in install step');
-                    }
-                });
+                // internal.install_android(flow, function(code) {
+                //     if(!code) {
+                //         internal.launch_android(flow);
+                //     } else {
+                //         flow.log(1, 'launch - stopping due to failure in install step');
+                //     }
+                // });
 
                 break;
 

@@ -82,6 +82,10 @@ internal.post_build_mobile = function(flow, done) {
 
     //runs ant, and such
 internal.build_android = function(flow, done) {
+    done();
+}
+
+internal.build_androidold = function(flow, done) {
 
 
     flow.log(2, 'android specifics', flow.project.prepared.source.project.app.mobile.android);

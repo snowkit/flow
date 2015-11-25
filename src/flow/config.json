@@ -49,12 +49,12 @@
                 "am":"ActivityManager", "ar":"AndroidRuntime",
                 "exception":"Exception", "loader":"loader", "libc":"libc" },
 
-            "project" : "project",
-            "activity_name" : "MainActivity",
+            "project" : "android.project",
+            "activity_name" : "AppActivity",
             "binary_source_name" : "lib{{packageClass app.boot}}{{app.debugtag}}{{app.archtag}}.so",
             "binary_dest_name" : "lib{{app.name}}.so",
-            "binary_dest_path" : "{{paths.build}}/{{paths.android.project}}/libs/{{paths.android.libabi}}",
-            "files_dest_path" : "{{paths.build}}/{{paths.android.project}}/assets"
+            "binary_dest_path" : "{{paths.android.project}}/app/src/main/jniLibs/{{paths.android.libabi}}",
+            "files_dest_path" : "{{paths.android.project}}/app/src/main/assets"
         },
 
         "files_output_list" : false,
