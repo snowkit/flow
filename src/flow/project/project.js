@@ -23,6 +23,7 @@ exports.init = function init(flow) {
         //but needs to watch for command lines calling target
     flow.target =
         flow.flags._next('build')   ||
+        flow.flags._next('compile') ||
         flow.flags._next('launch')  ||
         flow.flags._next('run')     ||
         flow.flags._next('files')   ||

@@ -194,6 +194,8 @@ internal.save_user_config = function(flow) {
 
         if(flow.flags._has('build')) {
             state.push('build only');
+        } else if(flow.flags._has('compile')) {
+            state.push('compile only');
         }
 
         if(flow.flags.debug) {

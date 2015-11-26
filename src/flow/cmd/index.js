@@ -4,6 +4,7 @@
 exports.run = require('./run/run');
 exports.launch = require('./launch/launch');
 exports.build = require('./build/build');
+exports.compile = require('./compile/compile');
 exports.hooks = require('./hooks/hooks');
 exports.clean = require('./clean/clean');
 exports.package = require('./package/package');

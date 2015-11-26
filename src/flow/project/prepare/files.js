@@ -8,7 +8,7 @@ var internal = {};
     //returns an array of { source:dest } for the files in project
 exports.parse = function parse(flow, prepared, source, srcpath) {
 
-    flow.log(3, 'prepare - files');
+    flow.log(4, 'prepare - files');
 
     var project_file_list = [];
     var build_file_list = [];

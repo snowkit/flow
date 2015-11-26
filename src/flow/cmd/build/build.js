@@ -104,6 +104,8 @@ var internal = {};
             //if build + run was asked
             if(flow.action == 'run') {
                 flow.execute(flow, cmds['launch']);
+            } else {
+                return flow.finished();
             }
 
         } else { //err

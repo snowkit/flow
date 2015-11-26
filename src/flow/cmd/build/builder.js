@@ -94,6 +94,10 @@ exports.run = function(flow, done) {
 
 internal.post_haxe = function(flow, done) {
 
+    if(flow.action == 'compile') {
+        return internal.complete(flow, done);
+    }
+
         //on native targets we run hxcpp against the now
         //generated build files in the build output
     if(flow.target_cpp) {

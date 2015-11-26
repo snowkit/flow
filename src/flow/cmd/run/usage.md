@@ -2,12 +2,12 @@
 
   [target] is implied as your current system if not specified. 
   
-  `flow run` will execute `build`, `files`, `launch` in that order.    
+  `flow run` will execute `files`, `build`, `launch` in that order.    
   `--options` includes all options from the listed commands.
   
   for full info, `flow usage` and more specifically   
-    `flow usage build`    
     `flow usage files`   
+    `flow usage build`    
     `flow usage launch`   
 
   examples   
