@@ -211,6 +211,18 @@ internal.copy_files = function(flow, files, output, no_copy) {
 
 } //copy_project_files
 
+exports.template_path = function(flow, template, source, dest) {
+    
+    if(fs.statSync(source).isDirectory()) {
+        var _node = {source:source, template:template, source_name:'ext'};
+        return internal.template_folder_recursively(flow, _node, dest);
+    } else {
+        internal.template_file(flow, template, source, dest);
+        return [ dest ];
+    }
+
+} //template_path
+
 internal.template_path = function(flow, node, dest) {
 
     if(fs.statSync(node.source).isDirectory()) {
@@ -251,6 +263,9 @@ internal.template_folder_recursively = function(flow, node, _dest, _overwrite) {
             if(allow) {
               _source_file_list.push(_source_list[i]);
             }
+        } else {
+            var _dest_dir = path.join( _dest, _source_list[i] );
+            wrench.mkdirSyncRecursive(_dest_dir, 0755);
         }
     }
 
