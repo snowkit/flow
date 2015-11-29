@@ -3,7 +3,6 @@
 var   mac = require('./icons.mac')
     , web = require('./icons.web')
     , ios = require('./icons.ios')
-    , android = require('./icons.android')
     , windows = require('./icons.windows')
 
 var internal = {};
@@ -42,14 +41,11 @@ exports.run = function run(flow, data, done) {
         case 'ios':
                 ios.convert(flow, icon, done);
             break;
-        case 'android':
-                android.convert(flow, icon, done);
-            break;
         case 'windows':
                 windows.convert(flow, icon, done);
             break;
         default:{
-                flow.log(2, 'no icon convert just yet for', flow.target);
+                flow.log(3, 'no icon step for', flow.target);
                 if(done) {
                     done();
                 }
