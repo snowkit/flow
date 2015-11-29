@@ -14,6 +14,7 @@
 
 var   cmd = require('../../util/process')
     , util = require('../../util/util')
+    , files = require('../files/files')
 
 var internal = {};
 
@@ -127,8 +128,18 @@ internal.get_hook_flow = function(flow, stage, _name, hook) {
         target_js       : Boolean(flow.target_js),
         target_desktop  : Boolean(flow.target_desktop),
         target_mobile   : Boolean(flow.target_mobile),
-        project         : util.deep_copy(flow.project.prepared.source),
         log_level       : Number(flow.log_level),
+        util            : util,
+        files           : {
+            template_path: function(template, source, dest){
+                files.template_path(flow, template, source, dest)
+            }
+        },
+        project         : {
+            source: util.deep_copy(flow.project.prepared.source),
+            paths: util.deep_copy(flow.project.paths),
+            root: String(flow.project.root)
+        },
         log : function(){
             var args = Array.prototype.slice.call(arguments,0);
             flow.log.apply(flow,args);
@@ -146,12 +157,12 @@ internal.run_hook = function(flow, stage, _name, hook, done) {
     flow.log(3, 'hooks -     desc : %s', hook.desc || 'no description');
 
     var fail = function(e) {
-        
+
         if(hook.require_success) {
             flow.project.failed = true;
         }
 
-        flow.log(1, 'hook returned error:', e);
+        flow.log(1, e);
 
         if(done) {
             done(e);
@@ -178,9 +189,11 @@ internal.run_hook = function(flow, stage, _name, hook, done) {
 
         try {
 
-            hook_script.hook(hook_flow, function(err) {
-                if(err) {
-                    return fail(err);
+            hook_script.hook(hook_flow, function(err,skip_build) {
+                if(err) return fail(err);
+                if(skip_build) {
+                    flow.log(3, 'hooks - build skip requested');
+                    flow.project.skip_build = true;
                 }
                 done(err);
             });
