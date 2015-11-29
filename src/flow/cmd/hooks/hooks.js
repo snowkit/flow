@@ -146,15 +146,17 @@ internal.run_hook = function(flow, stage, _name, hook, done) {
     flow.log(3, 'hooks -     desc : %s', hook.desc || 'no description');
 
     var fail = function(e) {
+        
         if(hook.require_success) {
             flow.project.failed = true;
         }
 
-        flow.log(1, e);
+        flow.log(1, 'hook returned error:', e);
 
         if(done) {
             done(e);
         }
+
     } //fail
 
     var hook_script;
@@ -170,13 +172,16 @@ internal.run_hook = function(flow, stage, _name, hook, done) {
         var hook_flow = internal.get_hook_flow(flow, stage, _name, hook);
 
         var s = hook_script.hook.toString();
-        if(s.indexOf('done()') == -1) {
+        if(s.indexOf('done(') == -1) {
             return fail('hook script is missing a done(); call. This will stall! fix this before trying again.');
         }
 
         try {
 
-            hook_script.hook(hook_flow, function(err){
+            hook_script.hook(hook_flow, function(err) {
+                if(err) {
+                    return fail(err);
+                }
                 done(err);
             });
 
