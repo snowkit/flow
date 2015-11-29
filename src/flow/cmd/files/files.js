@@ -310,10 +310,19 @@ internal.template_file = function(flow, _template, _source, _dest) {
     flow.log(6, 'context for file node : ', _source, file_context);
 
     var template = bars.compile(raw_file);
-    var templated = template( file_context );
+    var templated = false;
 
-    fse.ensureFileSync(_dest);
-    fs.writeFileSync(_dest, templated, 'utf8');
+    try {
+        templated = template( file_context );
+    } catch(err) {
+        flow.log(3, '        - NOTE cannot template file (binary?), copying as is', _source);
+        util.copy_path(flow, _source, _dest);
+    }
+
+    if(templated !== false) {
+        fse.ensureFileSync(_dest);
+        fs.writeFileSync(_dest, templated, 'utf8');
+    }
 
 } //template_file
 
