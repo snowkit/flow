@@ -2,7 +2,6 @@
 
 var   mac = require('./icons.mac')
     , web = require('./icons.web')
-    , ios = require('./icons.ios')
     , windows = require('./icons.windows')
 
 var internal = {};
@@ -37,9 +36,6 @@ exports.run = function run(flow, data, done) {
             break;
         case 'web':
                 web.convert(flow, icon, done);
-            break;
-        case 'ios':
-                ios.convert(flow, icon, done);
             break;
         case 'windows':
                 windows.convert(flow, icon, done);
