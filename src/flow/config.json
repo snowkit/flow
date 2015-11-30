@@ -38,7 +38,7 @@
             "project" : "ios.project",
             "binary_source_name" : "lib{{packageClass app.boot}}{{app.debugtag}}.iphone{{app.iostag}}{{app.archtag}}.a",
             "binary_dest_name" : "lib{{app.name}}.a",
-            "binary_dest_path" : "{{paths.ios.project}}/project/libs/{{app.arch}}",
+            "binary_dest_path" : "bin/ios.build/cpp/",
             "files_dest_path" : "{{paths.ios.project}}/project/assets"
         },
         "android" : {

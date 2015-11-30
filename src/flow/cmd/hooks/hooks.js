@@ -152,8 +152,8 @@ internal.run_hook = function(flow, stage, _name, hook, done) {
 
     var hook_file = path.join(hook.__path, hook.script);
 
-    flow.log(2, 'hooks - running hook from %s in %s', _name, hook.__path);
-    flow.log(2, 'hooks -     running %s hook named `%s` from %s', stage, hook.name, hook.script);
+    flow.log(3, 'hooks - running hook from %s in %s', _name, hook.__path);
+    flow.log(2, 'hooks -     running %s hook `%s` from %s', stage, hook.name, hook.script);
     flow.log(3, 'hooks -     desc : %s', hook.desc || 'no description');
 
     var fail = function(e) {
