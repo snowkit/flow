@@ -14,30 +14,6 @@
                 "source_map_content" : true,
                 "libs" : {
                 }
-            },
-            "mobile" : {
-                "fullscreen" : true,
-                "orientation" : "landscape",
-                "ios" : {
-                    "devices" : "Universal",
-                    "cpp" : "libc++",
-                    "deployment_target" : "6.0",
-                    "libs":{
-                        "native":{}
-                    }
-                },
-                "android" : {
-                    "build_type" : "debug",
-                    "install_location" : "preferExternal",
-                    "libs":{
-                        "native":{}
-                    },
-                    "sdk_min" : 12,
-                    "sdk_target" : 19,
-                    "permissions" : [],
-                    "keystore_path" : "",
-                    "keystore_alias" : ""
-                }
             }
         }
     }

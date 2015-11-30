@@ -87,11 +87,9 @@ internal.build_android = function(flow, done) {
 
 internal.build_androidold = function(flow, done) {
 
-
-    flow.log(2, 'android specifics', flow.project.prepared.source.project.app.mobile.android);
-
     //handle ability to compile store build, vs debug test build
-    var build_type = flow.project.prepared.source.project.app.mobile.android.build_type;
+    // var build_type = flow.project.prepared.source.project.app.mobile.android.build_type;
+    var build_type = flow.flags['android-build-type'] || 'debug';
 
         //where to build from
     var project_root = path.join(flow.project.paths.build, flow.config.build.android.project);
@@ -421,10 +419,6 @@ exports.build_hxcpp = function(flow, target_arch, run_path, hxcpp_file, done) {
         args.push('-Diphone');
         args.push('-DHXCPP_CPP11');
         args.push('-DHXCPP_CLANG');
-    }
-
-    if(flow.target == 'android') {
-        args.push('-Dandroid-' + flow.project.parsed.project.app.mobile.android.sdk_target);
     }
 
         //append command line + project based flags

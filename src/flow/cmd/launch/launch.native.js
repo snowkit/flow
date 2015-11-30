@@ -81,7 +81,7 @@ internal.android_launch_init = function(flow) {
         //work out where adb should be
     internal.adb_path = path.join(flow.config.build.android.sdk,'platform-tools/adb');
         //find out if this is a signed or unsigned store build
-    internal.build_type = project.app.mobile.android.build_type;
+    internal.build_type = flow.flags['android-build-type'] || 'debug';
         //work out the name of the apk
     internal.apk_name = project.app.name + '-' + internal.build_type + '.apk';
         //work out the apk location
