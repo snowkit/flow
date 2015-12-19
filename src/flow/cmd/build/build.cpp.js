@@ -44,7 +44,9 @@ exports.ios_combine_archs = function(flow, done) {
                     '-create'];
 
         var input_list = archs.map(function(a){
-            return flow.project.get_path_binary_dest_full(flow, flow.project.prepared, a);
+            var binary_source = flow.project.get_path_binary_name_source(flow, flow.project.prepared, a);
+            var source_path = util.normalize(path.join(flow.project.paths.build, 'cpp/' + binary_source));
+            return source_path;
         });
 
         args = args.concat(input_list);
@@ -194,11 +196,13 @@ internal.post_build_desktop = function(flow, done) {
 
 internal.move_binary = function(flow, target_arch) {
 
+    if(flow.target == 'ios') return;
+
     target_arch = target_arch || flow.target_arch;
 
     var binary_source = flow.project.get_path_binary_name_source(flow, flow.project.prepared, target_arch);
-    var binary_dest_full = flow.project.get_path_binary_dest_full(flow, flow.project.prepared, target_arch);
     var source_path = util.normalize(path.join(flow.project.paths.build, 'cpp/' + binary_source));
+    var binary_dest_full = flow.project.get_path_binary_dest_full(flow, flow.project.prepared, target_arch);
 
     flow.log(3,'build - moving binary for %s from %s to %s', target_arch, source_path, binary_dest_full);
 
@@ -379,6 +383,7 @@ exports.build_hxcpp = function(flow, target_arch, run_path, hxcpp_file, done) {
     }
 
     args.push('-D' + flow.target);
+    args.push('-DHAXE_OUTPUT_PART=' + flow.project.prepared.source.project.app.name);
 
     switch(target_arch) {
         case '32':
