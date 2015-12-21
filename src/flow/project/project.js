@@ -307,15 +307,6 @@ exports.get_path_root = function(flow, prepared, target_arch) {
     target_arch = exports.adjust_arch(flow, target_arch);
     var outpath = prepared.source.project.app.output;
 
-    var cli_outpath = flow.flags['output-path'];
-    if(cli_outpath) {
-        if(cli_outpath !== true) {
-            outpath = cli_outpath;
-        } else {
-            flow.log(2, 'project - warning - cli specified output-path without a value. ignoring!');
-        }
-    }
-
     return util.normalize(outpath, true);
 
 } //get_path_root
@@ -331,6 +322,24 @@ exports.get_path_output = function(flow, prepared, target_arch) {
         dest_folder += '64';
     }
 
+    if(flow.target == 'mac') {
+        var from_xcode = process.env['XCODE_VERSION_ACTUAL'];
+        if(from_xcode) {
+            dest_folder = process.env['TARGET_BUILD_DIR'];
+            flow.log(2, 'project - set build output path to Xcode build directory');
+            flow.log(2, 'project -     - `%s`', dest_folder);
+        }
+    }
+
+    var cli_outpath = flow.flags['output-path'];
+    if(cli_outpath) {
+        if(cli_outpath !== true) {
+            dest_folder = cli_outpath;
+        } else {
+            flow.log(2, 'project - warning - cli specified output-path without a value. ignoring!');
+        }
+    }
+
     return util.normalize(dest_folder, true);
 
 } //get_path_output
@@ -338,12 +347,17 @@ exports.get_path_output = function(flow, prepared, target_arch) {
 exports.get_path_build = function(flow, prepared, target_arch) {
 
     target_arch = exports.adjust_arch(flow, target_arch);
-    var dest_folder = exports.get_path_output(flow, prepared);
+    var dest_folder = exports.get_path_root(flow, prepared);
 
-        //remove trailing slash
-    dest_folder = dest_folder.slice(0, -1);
+    dest_folder = path.join(dest_folder, flow.target);
 
-    return util.normalize(dest_folder + '.build', true);
+    if(flow.target_arch == '64') {
+        dest_folder += '64';
+    }
+
+    dest_folder += '.build';
+
+    return util.normalize(dest_folder, true);
 
 } //get_path_build
 
@@ -425,6 +439,7 @@ exports.get_path_binary_dest_full = function(flow, prepared, target_arch) {
     return path.join(dest,file);
 
 } //get_path_binary_full
+
 
 exports.adjust_arch = function(flow, target_arch) {
 
