@@ -100,6 +100,7 @@ internal.prepare_config_paths = function(flow, prepared) {
     flow.project.paths = {
         android : { project : flow.config.build.android.project, libabi:'armeabi' },
         ios     : { project : flow.config.build.ios.project },
+        mac     : { project : flow.config.build.mac.project },
         output  : flow.project.get_path_output(flow, prepared),
         build   : flow.project.get_path_build(flow, prepared)
     }
@@ -525,29 +526,6 @@ internal.prepare_defines = function(flow, prepared) {
     var arch = 'arch-' + flow.target_arch;
     prepared.defines_all[arch] = { name:arch, met:true };
 
-    if(flow.target == 'ios') {
-
-            //ios has a special flag to handle the project folder generation,
-            //if this flag is give the framework can use it to write the project
-        var ios_project_path = path.resolve( flow.project.root, flow.config.build.ios.project );
-        var ios_project_exists = fs.existsSync( ios_project_path );
-
-        if(flow.flags['xcode-project'] || !ios_project_exists) {
-            flow.log(2, 'project - ios xcode project will be generated at', ios_project_path);
-            prepared.defines_all['ios-xcode-project'] = { name:'ios-xcode-project', met:true };
-            flow.project.skip_build = true;
-        }
-
-        var allow_build = flow.flags['ios-allow-cli-build'];
-
-            //if not running from xcode, and the project existed
-        if((!process.env['XCODE_VERSION_ACTUAL'] && ios_project_exists) && !allow_build) {
-            flow.project.skip_build = true;
-            flow.log(2, 'project - use xcode ios project at', ios_project_path);
-        }
-
-    } //ios
-
     if(flow.target == 'web') {
         if(prepared.source.project.app && prepared.source.project.app.web) {
             var embed_source_map = prepared.source.project.app.web.source_map_content;
@@ -569,6 +547,12 @@ internal.prepare_defines = function(flow, prepared) {
 
     if(flow.flags.debug) {
         prepared.defines_all['debug'] = { name:'debug', met:true };
+    }
+
+    if(flow.target == 'mac' || flow.target == 'ios') {
+        if(process.env['XCODE_VERSION_ACTUAL']) {
+            prepared.defines_all['xcode-build'] = { name:'xcode-build', met:true };
+        }
     }
 
 
@@ -897,23 +881,7 @@ internal.prepare_icons = function(flow, prepared) {
 internal.prepare_files = function(flow, prepared) {
 
     internal.log(flow, 3, 'prepare - files ...');
-
-    var projconf = flow.project.parsed.flow;
-    if(projconf) {
-        if(projconf.build && projconf.build.files_allow_unsafe_paths) {
-            internal.log(flow, 1, '>>>> prepare - files - IMPORTANT - project is explicitly allowing unsafe paths');
-
-            // if(flow.flags['files-allow-unsafe-paths']) {
-                prepared.files_unsafe = true;
-                // internal.log(flow, 1, '>>>> prepare - files - given both --files-allow-unsafe-paths and files_allow_unsafe_paths in config. unsafe paths are now enabled!');
-                internal.log(flow, 1, '>>>> prepare - files - given files_allow_unsafe_paths in config. unsafe paths are now enabled!');
-            // } else {
-                // return internal.fail(flow, prepared, 'files', 'prepare - files - unsafe paths requires the --files-allow-unsafe-paths flag as well as files_allow_unsafe_paths in the flow build config from the root project.');
-            // }
-
-        }
-    }
-
+        
         var result = { build_files:[], project_files:[] }
 
         //some local helper functions
