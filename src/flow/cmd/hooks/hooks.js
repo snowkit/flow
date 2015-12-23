@@ -199,7 +199,12 @@ internal.run_hook = function(flow, stage, _name, hook, done) {
             });
 
         } catch(e) {
-            return fail(e);
+
+            var _stack = e.stack.split('\n');
+                _stack.splice(_stack.length-9,_stack.length);
+
+            return fail('hook exception:\n\n' + _stack.join('\n'));
+
         } //try
 
     } else { //hook_script
