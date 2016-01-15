@@ -3,7 +3,7 @@
   "name": "flow",
   "description": "flow is a haxe project build tool chain",
   "license": "MIT",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "repository": "http://github.com/underscorediscovery/flow",
   "scripts": {
     "start": "flow.js"
