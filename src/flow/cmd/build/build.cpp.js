@@ -382,8 +382,8 @@ exports.build_hxcpp = function(flow, target_arch, run_path, hxcpp_file, done) {
         args.push('-Dno_console');
     }
 
-    // args.push('-D' + flow.target);
-    // args.push('-Dhaxe_output=' + flow.project.prepared.source.project.app.name);
+    args.push('-D' + flow.target);
+    args.push('-DHAXE_OUTPUT_PART=' + flow.project.prepared.source.project.app.name);
 
     switch(target_arch) {
         case '32':
