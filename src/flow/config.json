@@ -54,7 +54,7 @@
             "activity_name" : "AppActivity",
             "binary_source_name" : "lib{{app.name}}{{app.debugtag}}{{app.archtag}}.so",
             "binary_dest_name" : "lib{{app.name}}.so",
-            "binary_dest_path" : "{{paths.android.project}}/app/src/main/jniLibs/{{paths.android.libabi}}",
+            "binary_dest_path" : "{{paths.android.project}}/app/src/main/jniLibs/{{app.libabi}}",
             "files_dest_path" : "{{paths.android.project}}/app/src/main/assets"
         },
 

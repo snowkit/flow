@@ -105,6 +105,7 @@ internal.prepare_config_paths = function(flow, prepared) {
         build   : flow.project.get_path_build(flow, prepared)
     }
 
+        //:todo: this is the default, but the path context has its own libabi
     if(flow.target == 'android') {
         switch(flow.target_arch) {
             case 'x86':

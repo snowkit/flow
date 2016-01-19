@@ -274,6 +274,20 @@ exports.get_path_context = function(flow, prepared, target_arch) {
         path_context.app.iostag = 'sim';
     }
 
+        if(flow.target == 'android') {
+            switch(target_arch) {
+                case 'x86':
+                    path_context.app.libabi = 'x86';
+                break;
+                case 'armv7':
+                    path_context.app.libabi = 'armeabi-v7a';
+                break;
+                default:
+                    path_context.app.libabi = 'armeabi';
+                break;
+            }
+        }
+
         switch(target_arch) {
             case 'arm64':
             case 'sim64':
