@@ -100,10 +100,12 @@ internal.prepare_config_paths = function(flow, prepared) {
     flow.project.paths = {
         android : { project : flow.config.build.android.project, libabi:'armeabi' },
         ios     : { project : flow.config.build.ios.project },
+        mac     : { project : flow.config.build.mac.project },
         output  : flow.project.get_path_output(flow, prepared),
         build   : flow.project.get_path_build(flow, prepared)
     }
 
+        //:todo: this is the default, but the path context has its own libabi
     if(flow.target == 'android') {
         switch(flow.target_arch) {
             case 'x86':
@@ -357,25 +359,6 @@ internal.prepare_conditionals = function(flow, prepared) {
 
                 var node = prepared.source.if[condition];
 
-                if(node.build && node.build.number) {
-                    prepared.source.project.build.number = node.build.number;
-                }
-
-                if(node.app && node.app.mobile) {
-
-                    if(node.app.mobile.ios) {
-                        prepared.source.project.app.mobile.ios.libs = util.merge_unique(node.app.mobile.ios.libs, prepared.source.project.app.mobile.ios.libs);
-                    }
-                    if(node.app.mobile.android) {
-                        prepared.source.project.app.mobile.android.libs = util.merge_unique(node.app.mobile.android.libs, prepared.source.project.app.mobile.android.libs);
-
-                        prepared.source.project.app.mobile.android.build_type = node.app.mobile.android.build_type;
-                        prepared.source.project.app.mobile.android.keystore_path = node.app.mobile.android.keystore_path;
-                        prepared.source.project.app.mobile.android.keystore_alias = node.app.mobile.android.keystore_alias;
-                    }
-
-                } //if app and app.mobile
-
             } //if satisfied
         } //each condition
     } //if conditional node
@@ -507,116 +490,6 @@ internal.prepare_web = function(flow, prepared) {
 
 internal.prepare_mobile = function(flow, prepared) {
 
-    //:todo: this might be better a general rule, but since it is for sure
-        // a problem on android it's better to short term notify users
-
-        var _app_name = prepared.source.project.app.name;
-        if(_app_name) {
-            if(_app_name.indexOf(' ') != -1) {
-                return internal.fail(flow, prepared, 'project.app.name', 'project.app.name(`'+_app_name+'`) contains a space, which can easily cause problems especially on mobile platforms.');
-            }
-        }
-
-    //now we also handle any platform specifics that might need to be resolved to different values
-        //like orientations or device targets etc
-
-    if(flow.target == 'ios') {
-
-            //handle project lib as ldflag
-        var lib_ldflags = [prepared.source.project.app.name];
-            //handle native libs as lib_ldflags
-        var libs = prepared.source.project.app.mobile.ios.libs;
-        if(libs) {
-            if(libs.native) {
-                for(name in libs.native) {
-                    //generate a unique ID for this file reference
-                    lib_ldflags.push(name);
-                }
-            }
-        }
-
-            //add the -l parts
-        lib_ldflags = lib_ldflags.map(function(a) { return '-l \\"' + a +'\\"'; });
-            //join with spaces
-        var _lib_ldflags = lib_ldflags.join(' ');
-        flow.log(3, 'prepare - ios ldflags set to `%s`', _lib_ldflags);
-
-        prepared.source.project.app.mobile.ios.ldflags = _lib_ldflags;
-
-            //handle conversion from named device target to enum for project file
-        switch(prepared.source.project.app.mobile.ios.devices) {
-            case 'Universal':
-                prepared.source.project.app.mobile.ios._devices = "1,2";
-            break;
-            case 'iPhone':
-                prepared.source.project.app.mobile.ios._devices = 1;
-            break;
-            case 'iPad':
-                prepared.source.project.app.mobile.ios._devices = 2;
-            break;
-        }
-
-        prepared.source.project.app.mobile._orientation = [];
-        switch(prepared.source.project.app.mobile.orientation) {
-            case 'landscape':
-                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationLandscapeRight');
-            break;
-            case 'landscape left':
-                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationLandscapeLeft');
-            break;
-            case 'landscape both':
-                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationLandscapeLeft');
-                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationLandscapeRight');
-            break;
-            case 'portrait':
-                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationPortrait');
-            break;
-            case 'portrait upside down':
-                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationPortraitUpsideDown');
-            break;
-            case 'portrait both':
-                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationPortrait');
-                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationPortraitUpsideDown');
-            break;
-            case 'both':
-                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationPortrait');
-                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationLandscapeRight');
-            break;
-            case 'all':
-                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationPortrait');
-                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationPortraitUpsideDown');
-                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationLandscapeRight');
-                prepared.source.project.app.mobile._orientation.push('UIInterfaceOrientationLandscapeLeft');
-            break;
-        }
-
-
-    } else if(flow.target == 'android') { //ios
-
-        prepared.source.project.app.mobile._orientation = prepared.source.project.app.mobile.orientation;
-
-        switch(prepared.source.project.app.mobile.orientation) {
-            case 'landscape left':
-                prepared.source.project.app.mobile._orientation = 'reverseLandscape';
-            break;
-            case 'landscape both':
-                prepared.source.project.app.mobile._orientation = 'sensorLandscape';
-            break;
-            case 'portrait upside down':
-                prepared.source.project.app.mobile._orientation = 'reversePortrait';
-            break;
-            case 'portrait both':
-                prepared.source.project.app.mobile._orientation = 'sensorPortrait';
-            break;
-            case 'both':
-                prepared.source.project.app.mobile._orientation = 'sensor';
-            break;
-            case 'all':
-                prepared.source.project.app.mobile._orientation = 'fullSensor';
-            break;
-        }
-
-    } //android
 
 } //prepare_mobile
 
@@ -654,29 +527,6 @@ internal.prepare_defines = function(flow, prepared) {
     var arch = 'arch-' + flow.target_arch;
     prepared.defines_all[arch] = { name:arch, met:true };
 
-    if(flow.target == 'ios') {
-
-            //ios has a special flag to handle the project folder generation,
-            //if this flag is give the framework can use it to write the project
-        var ios_project_path = path.resolve( flow.project.root, flow.config.build.ios.project );
-        var ios_project_exists = fs.existsSync( ios_project_path );
-
-        if(flow.flags['xcode-project'] || !ios_project_exists) {
-            flow.log(2, 'project - ios xcode project will be generated at', ios_project_path);
-            prepared.defines_all['ios-xcode-project'] = { name:'ios-xcode-project', met:true };
-            flow.project.skip_build = true;
-        }
-
-        var allow_build = flow.flags['ios-allow-cli-build'];
-
-            //if not running from xcode, and the project existed
-        if((!process.env['XCODE_VERSION_ACTUAL'] && ios_project_exists) && !allow_build) {
-            flow.project.skip_build = true;
-            flow.log(2, 'project - use xcode ios project at', ios_project_path);
-        }
-
-    } //ios
-
     if(flow.target == 'web') {
         if(prepared.source.project.app && prepared.source.project.app.web) {
             var embed_source_map = prepared.source.project.app.web.source_map_content;
@@ -698,6 +548,12 @@ internal.prepare_defines = function(flow, prepared) {
 
     if(flow.flags.debug) {
         prepared.defines_all['debug'] = { name:'debug', met:true };
+    }
+
+    if(flow.target == 'mac' || flow.target == 'ios') {
+        if(process.env['XCODE_VERSION_ACTUAL']) {
+            prepared.defines_all['xcode-build'] = { name:'xcode-build', met:true };
+        }
     }
 
 
@@ -936,6 +792,13 @@ internal.prepare_hooks = function(flow, prepared) {
     //prepare the app nodes that make sense
 internal.prepare_app = function(flow, prepared) {
 
+    var _app_name = prepared.source.project.app.name;
+    if(_app_name) {
+        if(_app_name.indexOf(' ') != -1) {
+            return internal.fail(flow, prepared, 'project.app.name', 'project.app.name(`'+_app_name+'`) contains a space, which is invalid. This is used for the binary name, and more on mobile.');
+        }
+    }
+
     //:todo:wip:
     //this may have side effects, will
     //do when can focus on it
@@ -1019,23 +882,7 @@ internal.prepare_icons = function(flow, prepared) {
 internal.prepare_files = function(flow, prepared) {
 
     internal.log(flow, 3, 'prepare - files ...');
-
-    var projconf = flow.project.parsed.flow;
-    if(projconf) {
-        if(projconf.build && projconf.build.files_allow_unsafe_paths) {
-            internal.log(flow, 1, '>>>> prepare - files - IMPORTANT - project is explicitly allowing unsafe paths');
-
-            // if(flow.flags['files-allow-unsafe-paths']) {
-                prepared.files_unsafe = true;
-                // internal.log(flow, 1, '>>>> prepare - files - given both --files-allow-unsafe-paths and files_allow_unsafe_paths in config. unsafe paths are now enabled!');
-                internal.log(flow, 1, '>>>> prepare - files - given files_allow_unsafe_paths in config. unsafe paths are now enabled!');
-            // } else {
-                // return internal.fail(flow, prepared, 'files', 'prepare - files - unsafe paths requires the --files-allow-unsafe-paths flag as well as files_allow_unsafe_paths in the flow build config from the root project.');
-            // }
-
-        }
-    }
-
+        
         var result = { build_files:[], project_files:[] }
 
         //some local helper functions

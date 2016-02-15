@@ -14,6 +14,7 @@
 
 var   cmd = require('../../util/process')
     , util = require('../../util/util')
+    , files = require('../files/files')
 
 var internal = {};
 
@@ -127,8 +128,18 @@ internal.get_hook_flow = function(flow, stage, _name, hook) {
         target_js       : Boolean(flow.target_js),
         target_desktop  : Boolean(flow.target_desktop),
         target_mobile   : Boolean(flow.target_mobile),
-        project         : util.deep_copy(flow.project.prepared.source),
         log_level       : Number(flow.log_level),
+        util            : util,
+        files           : {
+            template_path: function(template, source, dest){
+                files.template_path(flow, template, source, dest)
+            }
+        },
+        project         : {
+            source: util.deep_copy(flow.project.prepared.source),
+            paths: util.deep_copy(flow.project.paths),
+            root: String(flow.project.root)
+        },
         log : function(){
             var args = Array.prototype.slice.call(arguments,0);
             flow.log.apply(flow,args);
@@ -141,11 +152,12 @@ internal.run_hook = function(flow, stage, _name, hook, done) {
 
     var hook_file = path.join(hook.__path, hook.script);
 
-    flow.log(2, 'hooks - running hook from %s in %s', _name, hook.__path);
-    flow.log(2, 'hooks -     running %s hook named `%s` from %s', stage, hook.name, hook.script);
+    flow.log(3, 'hooks - running hook from %s in %s', _name, hook.__path);
+    flow.log(3, 'hooks -     running %s hook `%s` from %s', stage, hook.name, hook.script);
     flow.log(3, 'hooks -     desc : %s', hook.desc || 'no description');
 
     var fail = function(e) {
+
         if(hook.require_success) {
             flow.project.failed = true;
         }
@@ -155,6 +167,7 @@ internal.run_hook = function(flow, stage, _name, hook, done) {
         if(done) {
             done(e);
         }
+
     } //fail
 
     var hook_script;
@@ -170,18 +183,28 @@ internal.run_hook = function(flow, stage, _name, hook, done) {
         var hook_flow = internal.get_hook_flow(flow, stage, _name, hook);
 
         var s = hook_script.hook.toString();
-        if(s.indexOf('done()') == -1) {
+        if(s.indexOf('done(') == -1) {
             return fail('hook script is missing a done(); call. This will stall! fix this before trying again.');
         }
 
         try {
 
-            hook_script.hook(hook_flow, function(err){
+            hook_script.hook(hook_flow, function(err,skip_build) {
+                if(err) return fail(err);
+                if(skip_build) {
+                    flow.log(3, 'hooks - build skip requested');
+                    flow.project.skip_build = true;
+                }
                 done(err);
             });
 
         } catch(e) {
-            return fail(e);
+
+            var _stack = e.stack.split('\n');
+                _stack.splice(_stack.length-9,_stack.length);
+
+            return fail('hook exception:\n\n' + _stack.join('\n'));
+
         } //try
 
     } else { //hook_script
