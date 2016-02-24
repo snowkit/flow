@@ -282,6 +282,9 @@ exports.get_path_context = function(flow, prepared, target_arch) {
                 case 'armv7':
                     path_context.app.libabi = 'armeabi-v7a';
                 break;
+                case 'arm64':
+                    path_context.app.libabi = 'arm64-v8a';
+                break;
                 default:
                     path_context.app.libabi = 'armeabi';
                 break;
