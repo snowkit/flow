@@ -114,6 +114,9 @@ internal.prepare_config_paths = function(flow, prepared) {
             case 'armv7':
                 flow.project.paths.android.libabi = 'armeabi-v7a';
             break;
+            case 'arm64':
+                flow.project.paths.android.libabi = 'arm64-v8a';
+            break;
             default:
                 flow.project.paths.android.libabi = 'armeabi';
             break;
