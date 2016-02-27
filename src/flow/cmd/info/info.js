@@ -1,7 +1,14 @@
+    
+var   cmds = require('../')
 
 internal = {}
 
 exports.run = function run(flow, data) {
+
+    if(!flow.flags['skip-files']) {
+        flow.flags.files = false;
+        flow.execute(flow, cmds['files']);
+    }
 
     if(flow.flags.hxml) {
         console.log(flow.project.hxml);
