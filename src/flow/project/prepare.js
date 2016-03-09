@@ -194,12 +194,13 @@ internal.prepare_dependencies = function(flow, parsed) {
 
     if(util.object_size(_depends.failed)) {
 
-        internal.log(flow, 1, 'prepare - failed due to missing dependencies!');
-        internal.log(flow, 1, 'you will probably need to use haxelib to correct this.\n');
+        internal.log(flow, 1, 'prepare - failed due to missing dependencies!\n');
+        internal.log(flow, 1, 'The following dependencies are not listed by haxelib.');
+        internal.log(flow, 1, 'Use haxelib to install or register the libraries:\n');
 
         for(name in _depends.failed) {
             var depend = _depends.failed[name];
-            internal.log(flow, 1, '> %s %s', depend.name, depend.version);
+            internal.log(flow, 1, '`%s` version `%s`', depend.name, depend.version);
         }
 
         internal.log(flow, '');
