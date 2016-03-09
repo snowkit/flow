@@ -637,6 +637,14 @@ internal.prepare_defines = function(flow, prepared) {
 } //prepare_defines
 
 internal.prepare_codepaths = function (flow, prepared) {
+    
+    //add the build bin/target.build/haxe/ path to cp    
+
+        var haxe_files_path = path.join(flow.project.paths.build, 'haxe/');
+            haxe_files_path = path.relative(flow.project.root, haxe_files_path);
+            haxe_files_path = util.normalize(haxe_files_path);
+
+        prepared.flags.push('-cp ' + haxe_files_path);
 
     //store the code paths of each of the dependencies in the flag list
     for(name in prepared.depends) {
@@ -644,7 +652,7 @@ internal.prepare_codepaths = function (flow, prepared) {
         var depend = prepared.depends[name];
 
             //add the root folder of the dependency
-        prepared.flags.push('-cp ' + depend.path);
+        // prepared.flags.push('-cp ' + depend.path);
 
              //if this dependency has its own codepaths,
              //these are absolute paths to the project file root
@@ -677,9 +685,10 @@ internal.prepare_codepaths = function (flow, prepared) {
         //store the app code paths flag list,
         //these are stored relative to the build folder
         //because thats where haxe runs from
-    if(prepared.source.project.app && prepared.source.project.app.codepaths) {
+    var parsed = flow.project.parsed;
+    if(parsed.project.app && parsed.project.app.codepaths) {
 
-        var _paths = prepared.source.project.app.codepaths.map(function(a) {
+        var _paths = parsed.project.app.codepaths.map(function(a) {
             var _path = path.relative( flow.project.root, path.join(flow.project.root, a) );
             return '-cp ' + util.normalize(_path, true);
         });
@@ -699,6 +708,12 @@ internal.prepare_flags = function(flow, prepared) {
 
         prepared.flags = [];
         internal.prepare_codepaths(flow, prepared);
+
+        for(index in prepared.depends_list) {
+            var name = prepared.depends_list[index];
+            prepared.flags.push('-lib ' + name);
+        }
+
         prepared.flags = flags.parse(flow, prepared);
 
         if(flow.flags.f) {
