@@ -59,7 +59,7 @@ exports.array_union = function(a,b) {
 
 exports.find_home_path = function(flow) {
 
-    return process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
+    return process.env.HOME || process.env.USERPROFILE || process.env.HOMEPATH;
 
 } //find_home_path
 
