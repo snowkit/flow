@@ -59,7 +59,13 @@ exports.ios_combine_archs = function(flow, done) {
 
         return;
 
-    }  //if multiple archs
+    } else { //if multiple archs
+
+        if(done) {
+            done();
+        }
+
+    }
 
 } //ios_combine_archs
 
