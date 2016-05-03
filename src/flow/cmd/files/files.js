@@ -331,6 +331,7 @@ internal.template_file = function(flow, _template, _source, _dest) {
         templated = template( file_context );
     } catch(err) {
         flow.log(3, '        - NOTE cannot template file (binary?), copying as is', _source);
+        flow.log(3, '        - NOTE template error was: ', err);
         util.copy_path(flow, _source, _dest);
     }
 
