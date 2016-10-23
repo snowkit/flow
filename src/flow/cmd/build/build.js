@@ -140,25 +140,15 @@ var internal = {};
 
         if(target && target.charAt(0) != '-') {
 
-                //look up the list of known targets
-                //if found, it is a valid build command
-            if(flow.config.build.known_targets.indexOf(target) != -1) {
+                //check that this is a valid target for our system
+            var invalid = flow.config.build.invalid_targets[flow.system];
 
-                    //check that this is a valid target for our system
-                var invalid = flow.config.build.invalid_targets[flow.system];
+                //if not, invalidate
+            if(invalid.indexOf(target) != -1) {
+                return done( internal._error_invalid(flow, target), null );
+            }
 
-                    //if not, invalidate
-                if(invalid.indexOf(target) != -1) {
-                    return done( internal._error_invalid(flow, target), null );
-                }
-
-                return done(null, result);
-
-            } else {
-
-                return done( internal._error_unknown(flow, target), null);
-
-            } //not a known target
+            return done(null, result);
 
         } //target && target[0] != -
 
@@ -193,34 +183,9 @@ var internal = {};
 
     } //_error_project
 
-    internal._error_unknown = function(flow, target){
-
-        var err = 'unknown target `' + target + '`\n\n';
-            err += '> known targets : ' + flow.config.build.known_targets.join(', ');
-
-        return err;
-
-    } //_error_unknown
-
     internal._error_invalid = function(flow, target){
 
         var err = 'invalid target `'+target+'` for system `'+flow.system+'` \n\n';
-
-        var valid = [].concat(flow.config.build.known_targets);
-        var invalid = flow.config.build.invalid_targets[flow.system];
-
-            //remove invalid from valid list
-        for(index in invalid) {
-
-            var value = invalid[index];
-            var valid_index = valid.indexOf(value);
-            if(valid_index != -1) {
-                valid.splice(valid_index,1);
-            }
-
-        } //index in valid
-
-            err += '> valid targets : ' + valid.join(', ');
 
         return err;
 

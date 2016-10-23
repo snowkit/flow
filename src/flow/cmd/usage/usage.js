@@ -143,10 +143,11 @@ internal.specials.targets = function(flow) {
         return str;
     }
 
+        //:todo:
     if(!internal.json) {
-        return 'flow known targets\n' + flow.config.build.known_targets.join(', ');
+        return 'flow targets: []\n';
     } else {
-        return JSON.stringify(flow.config.build.known_targets);
+        return JSON.stringify([]);
     }
 
 } //targets

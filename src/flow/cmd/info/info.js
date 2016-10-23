@@ -23,7 +23,6 @@ exports.run = function run(flow, data) {
     var result = {
         hxml : internal.escape_json(flow.project.hxml),
         paths : flow.project.paths,
-        targets_known : flow.config.build.known_targets,
         targets_invalid : flow.config.build.invalid_targets[flow.system],
     }
 
