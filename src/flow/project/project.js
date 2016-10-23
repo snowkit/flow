@@ -596,39 +596,37 @@ exports.find_arch = function(flow) {
 
     } //flags.arch
 
+    var arch = 'unknown';
+
     if( flow.target == 'mac' ||
         flow.target == 'windows' ||
         flow.target == 'linux') {
 
-        if(!arch) {
+            //https://coderwall.com/p/0eds7q
+            //because windows is terrible at basics.
+        var is64bit = process.arch === 'x64' ||
+                      process.env.hasOwnProperty('PROCESSOR_ARCHITEW6432');
 
-                //https://coderwall.com/p/0eds7q
-                //because windows is terrible at basics.
-            var is64bit = process.arch === 'x64' ||
-                          process.env.hasOwnProperty('PROCESSOR_ARCHITEW6432');
+        if(is64bit) {
 
-            if(is64bit) {
+            arch = '64';
 
-                arch = '64';
-
-                    //:todo: currently hxcpp doesn't bundle
-                    //the prebuilt Windows64/ libs. And might not build 64 bit?
-                    //to build these, use `neko ./build.n`
-                    //from within /path/to/hxcpp/project/ folder
-                    //and use --arch 64 explicitly
-                if(flow.target == 'windows') {
-                    arch = '32';
-                }
-
-            } else if(process.arch == 'ia32') {
+                //:todo: currently hxcpp doesn't bundle
+                //the prebuilt Windows64/ libs. And might not build 64 bit?
+                //to build these, use `neko ./build.n`
+                //from within /path/to/hxcpp/project/ folder
+                //and use --arch 64 explicitly
+            if(flow.target == 'windows') {
                 arch = '32';
             }
 
-        } //not explicit arch
+        } else if(process.arch == 'ia32') {
+            arch = '32';
+        }
+
 
     } //
 
-    var arch = 'unknown';
     
         //if running from an xcode build
     if(process.env['XCODE_VERSION_ACTUAL']) {
