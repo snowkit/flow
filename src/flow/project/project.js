@@ -53,27 +53,10 @@ exports.init = function init(flow) {
         break;
     }
 
-    switch(flow.target) {
+    var type = flow.config.build.target[flow.target];
 
-        case 'mac': case 'windows': case 'linux':
-        case 'ios': case 'android': {
-            flow.target_cpp = true;
-            break;
-        }
-
-        case 'web': {
-            flow.target_js = true;
-            break;
-        }
-
-    }
-
-        //target not found in known targets?
-    if(flow.config.build.known_targets.indexOf(flow.target) == -1) {
-        success = false;
-        flow.log(1, '\n\nError');
-        flow.log(1, '- unknown target `%s`, known targets include %s\n', flow.target, flow.config.build.known_targets.join(', '));
-    }
+    if(type == "cpp") flow.target_cpp = true;
+    if(type == "js") flow.target_js = true;
 
     return success;
 
@@ -594,10 +577,9 @@ exports.get_file_context = function(flow) {
 
 exports.find_arch = function(flow) {
 
-    var arch = '';
-
-    if(flow.target == 'web') {
-        return 'web';
+    var config_arch = flow.config.build.arch[flow.target]
+    if(config_arch) {
+        return config_arch
     }
 
         //check if there is any explicit arch given
@@ -609,7 +591,7 @@ exports.find_arch = function(flow) {
             flow.log(1, '\nError\n--arch specified but no arch given\n\n> use --arch 32, --arch 64, --arch armv6 etc.\n');
             return null;
         } else {
-            arch = String(_arch);
+            return String(_arch);
         }
 
     } //flags.arch
@@ -644,30 +626,20 @@ exports.find_arch = function(flow) {
 
         } //not explicit arch
 
-    } //desktop
+    } //
 
-
-        //default to armv7 on mobile, use --arch armv6 etc to override
-    if(flow.target == 'ios' || flow.target == 'android') {
-
-            //if running from an xcode build
-        if(process.env['XCODE_VERSION_ACTUAL']) {
-            var env_arch = process.env['CURRENT_ARCH'];
-            if(env_arch == 'i386' || env_arch == 'x86_64') {
-
-                arch = 'sim';
-
-                if(env_arch == 'x86_64') {
-                    arch += '64';
-                }
+    var arch = 'unknown';
+    
+        //if running from an xcode build
+    if(process.env['XCODE_VERSION_ACTUAL']) {
+        var env_arch = process.env['CURRENT_ARCH'];
+        if(env_arch == 'i386' || env_arch == 'x86_64') {
+            arch = 'sim';
+            if(env_arch == 'x86_64') {
+                arch += '64';
             }
         }
-
-        if(!arch) {
-            arch = 'armv7';
-        }
-
-    } //ios || android
+    }
 
     return arch;
 
