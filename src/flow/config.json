@@ -75,6 +75,13 @@
             "binary_dest_path" : "bin/ios.build/cpp/",
             "files_dest_path" : "{{paths.ios.project}}/project/assets"
         },
+        "tvos" : {
+            "project" : "tvos.project",
+            "binary_source_name" : "lib{{app.name}}{{app.debugtag}}.appletv{{app.iostag}}{{app.archtag}}.a",
+            "binary_dest_name" : "lib{{app.name}}.a",
+            "binary_dest_path" : "bin/tvos.build/cpp/",
+            "files_dest_path" : "tvos.project/project/assets"
+        },
         "android" : {
             "sdk" : "/Users/sven/dev/android-sdk",
             "ant_path" : "/opt/apache-ant/bin/ant",

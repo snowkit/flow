@@ -445,7 +445,7 @@ exports.adjust_arch = function(flow, target_arch) {
 
     target_arch = target_arch || flow.target_arch;
 
-    if(flow.target == 'ios') {
+    if(flow.target == 'ios' || flow.target == 'tvos') {
         if(target_arch == 'i386') target_arch = 'sim';
         if(target_arch == 'x86_64') target_arch = 'sim64';
     }
