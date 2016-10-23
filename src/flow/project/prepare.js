@@ -520,11 +520,14 @@ internal.prepare_defines = function(flow, prepared) {
 
     internal.log(flow, 3, 'prepare - defines ...');
 
-        //store the list of targets as met or unmet defines based on the target
-        //we are attempting to prepare for
-    for(index in flow.config.build.known_targets) {
-        var name = flow.config.build.known_targets[index];
-        prepared.defines_all[name] = { name:name, met:flow.target == name };
+        //the build target is set as a define
+    prepared.defines_all[flow.target] = { name:flow.target, met:true };
+
+        //then we store a target-<cpp, js, lua, etc>
+    var target_type = flow.config.build.target[flow.target];
+    if(target_type) {
+        var name = 'target-'+target_type;
+        prepared.defines_all[name] = { name:name, met:true };
     }
 
         //also store the current target arch as a define
@@ -554,12 +557,9 @@ internal.prepare_defines = function(flow, prepared) {
         prepared.defines_all['debug'] = { name:'debug', met:true };
     }
 
-    if(flow.target == 'mac' || flow.target == 'ios') {
-        if(process.env['XCODE_VERSION_ACTUAL']) {
-            prepared.defines_all['xcode-build'] = { name:'xcode-build', met:true };
-        }
+    if(process.env['XCODE_VERSION_ACTUAL']) {
+        prepared.defines_all['xcode-build'] = { name:'xcode-build', met:true };
     }
-
 
         //look for command line defines, this must happen before parse, so they are met
     if(flow.flags.d) {
@@ -595,7 +595,7 @@ internal.prepare_defines = function(flow, prepared) {
 
         //now we parse all project defines from the project
     prepared.defines_all = defines.parse(flow, prepared.source, prepared.depends, prepared.defines_all);
-        //and the final list is filtered against the defines themselves, and the known targets
+        //and the final list is filtered against the defines themselves
     prepared.defines = defines.filter(flow, prepared.defines_all);
 
         //if any errors, return out early
