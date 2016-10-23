@@ -391,66 +391,24 @@ exports.build_hxcpp = function(flow, target_arch, run_path, hxcpp_file, done) {
     args.push('-D' + flow.target);
     args.push('-DHAXE_OUTPUT_PART=' + flow.project.prepared.source.project.app.name);
 
-    switch(target_arch) {
-        case '32':
-            args.push('-DHXCPP_M32');
-            break;
-        case '64':
-            args.push('-DHXCPP_M64');
-
-                if(flow.target_mobile) flow.log(1, 'build / WARNING / you are using a --arch 64 setting on mobile, you probably meant --arch arm64?');
-
-            break;
-        case 'arm64':
-            args.push('-DHXCPP_ARM64');
-            args.push('-DHXCPP_M64');
-            break;
-        case 'armv6':
-            args.push('-DHXCPP_ARMV6');
-            break;
-        case 'armv7':
-            args.push('-DHXCPP_ARMV7');
-            break;
-        case 'armv7s':
-            args.push('-DHXCPP_ARMV7S');
-            break;
-        case 'x86':
-            args.push('-DHXCPP_X86');
-            break;
-        case 'sim64':
-            args.push('-Dsimulator');
-            args.push('-DHXCPP_M64');
-            break;
-        case 'sim':
-            args.push('-Dsimulator');
-            break;
+        //get the arch specific flags for hxcpp 
+    var arch_flags = flow.config.build.hxcpp_defines.arch[target_arch];
+    if(arch_flags && arch_flags.constructor == Array) {
+        arch_flags.map(function(f) {
+            args.push('-D' + f)
+        })
     }
 
-    if(flow.target == 'ios') {
-        args.push('-Diphone');
-        args.push('-DHXCPP_CPP11');
-        args.push('-DHXCPP_CLANG');
+        //get the target specific flags for hxcpp 
+    var target_flags = flow.config.build.hxcpp_defines.target[flow.target];
+    if(target_flags && target_flags.constructor == Array) {
+        target_flags.map(function(f) {
+            args.push('-D' + f)
+        })
     }
 
         //append command line + project based flags
     args = util.array_union(args, flow.project.prepared.hxcpp.flags);
-
-        //and finally include the Options.txt flags
-    try {
-
-        var options_file = path.join(run_path,'Options.txt');
-        var options_str = fs.readFileSync(options_file,'utf8');
-
-        flow.log(3, 'build - cpp - hxcpp Options.txt from %s', options_file);
-
-        var opt_lines = options_str.split(/\r?\n/g);
-
-        flow.log(3, 'build - cpp - Options.txt contents: %s', opt_lines.join(' '));
-
-    } catch(e) {
-        flow.log(3, 'build - cpp - no Options.txt for this build? ', e);
-    }
-
 
     flow.log(2, 'build - running hxcpp for arch %s ...', target_arch);
     flow.log(3, 'haxelib run hxcpp %s', args.join(' ') );
