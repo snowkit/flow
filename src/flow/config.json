@@ -2,12 +2,45 @@
     "config" : "1.0.0-alpha-1",
     "build" : {
 
-        "known_targets" : ["mac","windows","linux","ios","android","web"],
-
         "invalid_targets" : {
             "windows"   : ["linux","mac","ios"],
             "mac"       : ["linux","windows"],
             "linux"     : ["windows","mac","ios"]
+        },
+
+        "target": {
+            "web"       : "js",
+            "mac"       : "cpp",
+            "windows"   : "cpp",
+            "linux"     : "cpp",
+            "android"   : "cpp",
+            "ios"       : "cpp",
+            "tvos"      : "cpp"
+        },
+
+        "arch": {
+            "web"       : "web",
+            "android"   : "armv7",
+            "ios"       : "armv7",
+            "tvos"      : "arm64"
+        },
+
+        "hxcpp_defines" : {
+            "arch": {
+                "32"        : ["HXCPP_M32"],
+                "64"        : ["HXCPP_M64"],
+                "x86"       : ["HXCPP_X86"],
+                "arm64"     : ["HXCPP_ARM64", "HXCPP_M64"],
+                "armv6"     : ["HXCPP_ARMV6"],
+                "armv7"     : ["HXCPP_ARMV7"],
+                "armv7s"    : ["HXCPP_ARMV7S"],
+                "sim64"     : ["simulator", "HXCPP_M64"],
+                "sim"       : ["simulator"]
+            },
+            "target" : {
+                "ios": ["HXCPP_CPP11", "HXCPP_CLANG"],
+                "tvos": ["HXCPP_CPP11", "HXCPP_CLANG"]
+            }
         },
 
         "timing" : false,
