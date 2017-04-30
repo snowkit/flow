@@ -9,6 +9,7 @@
 
         , buildcpp = require('./build.cpp')
         , buildweb = require('./build.web')
+        , buildneko = require('./build.neko')
 
 
 var internal = {};
@@ -112,6 +113,12 @@ internal.post_haxe = function(flow, done) {
             internal.post_build(flow, done);
         });
 
+    } else if(flow.target_neko) {
+
+        buildneko.post_haxe(flow, function(err){
+            internal.post_build(flow, done);
+        });
+
     } else { //native targets
 
         internal.post_build(flow, done);
@@ -142,6 +149,12 @@ internal.post_build = function(flow, done) {
     } else if(flow.target_js) {
 
         buildweb.post_build(flow, function(err){
+            internal.complete(flow, done);
+        });
+
+    } else if(flow.target_neko) {
+
+        buildneko.post_build(flow, function(err){
             internal.complete(flow, done);
         });
 

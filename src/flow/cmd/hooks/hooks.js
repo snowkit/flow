@@ -125,6 +125,7 @@ internal.get_hook_flow = function(flow, stage, _name, hook) {
         target          : String(flow.target),
         target_arch     : String(flow.target_arch),
         target_cpp      : Boolean(flow.target_cpp),
+        target_neko     : Boolean(flow.target_neko),
         target_js       : Boolean(flow.target_js),
         target_desktop  : Boolean(flow.target_desktop),
         target_mobile   : Boolean(flow.target_mobile),

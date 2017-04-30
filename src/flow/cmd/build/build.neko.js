@@ -9,9 +9,6 @@ exports.post_build = function(flow, done) {
     var abs_outpath = path.resolve(flow.project.root, flow.project.paths.output);
 
     cmd.exec(flow, 'nekotools', ['boot',abs_binary+'.n'], { cwd: abs_outpath }, function(out,err){
-
-        //convert
-
         done();
     });
 

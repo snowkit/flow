@@ -60,6 +60,10 @@ internal.launch = function(flow) {
         native.launch(flow);
     } else if(flow.target_js) {
         web.launch(flow);
+    } else if(flow.target_neko) {
+        native.launch(flow);
+    } else {        
+        flow.log(2, 'launch / nothing to do')
     }
 
 }

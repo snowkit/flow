@@ -520,8 +520,11 @@ internal.prepare_defines = function(flow, prepared) {
 
     internal.log(flow, 3, 'prepare - defines ...');
 
-        //the build target is set as a define
-    prepared.defines_all[flow.target] = { name:flow.target, met:true };
+        //the build target is set as a define, unless it's a restricted define (?..........)
+    var undefineable = ['neko']
+    if(undefineable.indexOf(flow.target) == -1) {
+        prepared.defines_all[flow.target] = { name:flow.target, met:true };
+    }
 
         //then we store a target-<cpp, js, lua, etc>
     var target_type = flow.config.build.target[flow.target];

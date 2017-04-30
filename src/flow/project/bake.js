@@ -56,7 +56,7 @@ exports.target = function(flow, project, split) {
 
         values += '-cpp ' + cpp_files_path;
 
-    } else if(flow.target_js) {
+    } else if(flow.target_js) { //web
 
             //js the file can go straight out to the dest path
         var out_file = path.join(flow.project.paths.output, project.source.project.app.name+'.js');
@@ -64,7 +64,15 @@ exports.target = function(flow, project, split) {
 
         values += '-js ' + out_file;
 
-    } //web
+    } else if(flow.target_neko) {
+
+            //neko too can go straight out to the dest path
+        var out_file = path.join(flow.project.paths.output, project.source.project.app.name+'.n');
+        out_file = path.relative(flow.project.root, out_file);
+
+        values += '-neko ' + out_file;
+
+    } //
 
     return values;
 

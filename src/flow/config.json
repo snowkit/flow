@@ -15,7 +15,8 @@
             "linux"     : "cpp",
             "android"   : "cpp",
             "ios"       : "cpp",
-            "tvos"      : "cpp"
+            "tvos"      : "cpp",
+            "neko"      : "neko"
         },
 
         "arch": {

@@ -41,6 +41,7 @@ exports.init = function init(flow) {
         //make sure these exist even if unset
     flow.target_cpp = false;
     flow.target_js = false;
+    flow.target_neko = false;
     flow.target_desktop = false;
     flow.target_mobile = false;
 
@@ -57,6 +58,7 @@ exports.init = function init(flow) {
 
     if(type == "cpp") flow.target_cpp = true;
     if(type == "js") flow.target_js = true;
+    if(type == "neko") flow.target_neko = true;
 
     return success;
 

@@ -32,7 +32,7 @@ exports.launch = function(flow) {
 
 internal.launch = function(flow) {
 
-    if(flow.target_desktop) {
+    if(flow.target_desktop || flow.target_neko) {
 
         var abs_binary = path.resolve(flow.project.root, flow.project.paths.binary.full);
         var abs_outpath = path.resolve(flow.project.root, flow.project.paths.output);
