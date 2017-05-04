@@ -35,6 +35,7 @@ exports.convert = function(flow, icon, done) {
     	//:todo: configure/safety
         //note: uses 2013 first because that's the default
     var vsdir = process.env['VS120COMNTOOLS'] ||
+                process.env['VS150COMNTOOLS'] ||
                 process.env['VS140COMNTOOLS'] ||
                 process.env['VS110COMNTOOLS'] ||
                 process.env['VS100COMNTOOLS'];
